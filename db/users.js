@@ -39,3 +39,13 @@ exports.findByUsername = function(username, cb) {
         })
     })
 }
+
+exports.register = function(username, password, email, cb) {
+    process.nextTick(function() {
+        var sql = "INSERT INTO `auth`(username, password, email) VALUES";
+        sql += "('" + username + "','" + password + "','" + email + "')";
+        db.query(sql, function(err, rows) {
+            cb(err);
+        })
+    })
+}

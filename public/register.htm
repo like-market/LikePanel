@@ -8,7 +8,7 @@
     <link href='http://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900' rel='stylesheet' type='text/css'>
 
     <!-- Page title -->
-    <title>LUNA | Responsive Admin Theme</title>
+    <title>LikeTime | Накрутка лайков</title>
 
     <!-- Vendor styles -->
     <link rel="stylesheet" href="vendor\fontawesome\css\font-awesome.css">
@@ -29,9 +29,6 @@
 
     <!-- Main content-->
     <section class="content">
-        <div class="back-link">
-            <a href="index.htm" class="btn btn-accent">Back to Dashboard</a>
-        </div>
 
         <div class="container-center lg animated slideInDown">
 
@@ -41,9 +38,9 @@
                     <i class="pe page-header-icon pe-7s-add-user"></i>
                 </div>
                 <div class="header-title">
-                    <h3>Register</h3>
+                    <h3>Регистрация</h3>
                     <small>
-                        Please enter your data to register.
+                        Введите ваши данные для регистрации.
                     </small>
                 </div>
             </div>
@@ -53,32 +50,32 @@
                     <p>
 
                     </p>
-                    <form action="index.html" id="loginForm" novalidate="">
+                    <form id="loginForm" novalidate="">
                         <div class="row">
                             <div class="form-group col-lg-6">
-                                <label>Username</label>
-                                <input type="" value="" id="username" class="form-control" name="">
-                                <span class="help-block small">Your unique username to app</span>
+                                <label>Логин</label>
+                                <input type="" value="" id="username" class="form-control" name="username">
+                                <span class="help-block small">Ваш логин</span>
                             </div>
                             <div class="form-group col-lg-6">
-                                <label>Password</label>
-                                <input type="password" value="" id="password" class="form-control" name="">
-                                <span class="help-block small">Your hard to guess password</span>
+                                <label>Почта</label>
+                                <input type="" value="" id="email" class="form-control" name="email">
+                                <span class="help-block small">Ваша почта</span>
                             </div>
                             <div class="form-group col-lg-6">
-                                <label>Repeat Password</label>
-                                <input type="password" value="" id="repeatpassword" class="form-control" name="">
-                                <span class="help-block small">Please repeat your pasword</span>
+                                <label>Пароль</label>
+                                <input type="password" value="" id="password" class="form-control" name="password">
+                                <span class="help-block small">Ваш сложный пароль</span>
                             </div>
                             <div class="form-group col-lg-6">
-                                <label>Email Address</label>
-                                <input type="" value="" id="email" class="form-control" name="">
-                                <span class="help-block small">Your address email to contact</span>
+                                <label>Повторите пароль</label>
+                                <input type="password" value="" id="repeatpassword" class="form-control" name="repeatpassword">
+                                <span class="help-block small">Повторите ваш пароль</span>
                             </div>
                         </div>
                         <div>
-                            <button class="btn btn-accent">Register</button>
-                            <a class="btn btn-default" href="login.htm">Login</a>
+                            <a class="btn btn-default" href="login">Вход</a>
+                            <button class="btn btn-accent">Регистрация</button>
                         </div>
                     </form>
                 </div>
@@ -95,6 +92,26 @@
 <script src="vendor\pacejs\pace.min.js"></script>
 <script src="vendor\jquery\dist\jquery.min.js"></script>
 <script src="vendor\bootstrap\js\bootstrap.min.js"></script>
+
+<script>
+$("#loginForm").submit(function(e) {
+
+    var form = $(this);
+
+    console.log(form.serialize());
+
+    $.ajax({
+           type: "POST",
+           url: '/register',
+           data: form.serialize(), // serializes the form's elements.
+           success: function(data) {
+               window.location.href = "/panel";
+           }
+    });
+
+    e.preventDefault(); // avoid to execute the actual submit of the form.
+});
+</script>
 
 <!-- App scripts -->
 <script src="scripts\luna.js"></script>
