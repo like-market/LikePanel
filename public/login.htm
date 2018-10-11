@@ -60,7 +60,7 @@
                         </div>
                         <div>
                             <button class="btn btn-accent">Вход</button>
-                            <a class="btn btn-default" href="register.htm">Регистрация</a>
+                            <a class="btn btn-default" href="register">Регистрация</a>
                         </div>
                     </form>
                 </div>
@@ -92,16 +92,20 @@ $("#loginForm").submit(function(e) {
     var form = $(this);
 
     $.ajax({
-           type: "POST",
-           url: '/login',
-           data: form.serialize(), // serializes the form's elements.
-           success: function(data) {
-                if (data == 'error') {
-                    toastr.error('Логин или пароль введены неверно')    
-                }else {
-                    window.location.href = "/panel";
-                }
-           }
+        type: "POST",
+        url: '/login',
+        data: form.serialize(), // serializes the form's elements.
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log(errorThrown, jqXHR)
+            if (errorThrown == 'Unauthorized') {
+                toastr.error('Логин или пароль введены неверно')
+            }else if (errorThrown == 'Bad Request') {
+                toastr.error('Заполните все поля')
+            }
+        },
+        success: function(data) {
+            window.location.href = "/panel";
+        }
     });
 
     e.preventDefault(); // avoid to execute the actual submit of the form.

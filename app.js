@@ -1,4 +1,5 @@
 var express = require('express');
+var router = express.Router()
 var path    = require("path");
 var bodyParser = require('body-parser')
 var cookieParser = require('cookie-parser')
@@ -15,14 +16,15 @@ const authenticated = (req, res, next) => {
 }
 
 passport.use(new Strategy(
-  function(username, password, cb) {
-    db.users.findByUsername(username, function(err, user) {
-      if (err) { return cb(err); }
-      if (!user) { return cb(null, false); }
-      if (user.password != password) { return cb(null, false); }
-      return cb(null, user);
-    });
-  }));
+	function(username, password, cb) {
+		db.users.findByUsername(username, function(err, user) {
+      		if (err) { return cb(err); }
+      		if (!user) { return cb(null, false); }
+      		if (user.password != password) { return cb(null, false); }
+      		return cb(null, user);
+    	});
+  	}
+));
 passport.serializeUser(function(user, cb) {
   cb(null, user.id);
 });
@@ -55,37 +57,36 @@ app.use('/styles', express.static('public/styles'))
 app.use('/images', express.static('public/images'))
 app.use('/scripts', express.static('public/scripts'))
 
-app.get('/login(.htm)?', function(req, res) {
+router.get('/login(.htm)?', function(req, res) {
 	// Если юзер авторизован - перенаправляем его в панель
-	if (req.user != undefined) {
-		res.redirect('/panel');
-	}else {
-		res.sendFile(path.join(__dirname + '/public/login.htm'));
-	}
+	if (req.isAuthenticated()) return res.redirect('/panel');
+	res.sendFile(path.join(__dirname + '/public/login.htm'));
 });
 
-app.post('/login(.htm)?', 
+router.post('/login(.htm)?', 
   passport.authenticate('local', { 
   	successRedirect: '/panel' }));
 
-app.get('/logout', function(req, res){ 	
+router.get('/logout', function(req, res){ 	
 	req.logout();
 	res.redirect('/login');
 });
 
-app.get('/register(.htm)?', function(req, res){
-	if (!req.isAuthenticated()) return res.redirect('/login')
+router.get('/register(.htm)?', function(req, res){
+	if (req.isAuthenticated()) return res.redirect('/panel');
 	res.sendFile(path.join(__dirname + '/public/register.htm'));
 })
 
-app.post('/register(.htm)?', function(req, res){
+router.post('/register(.htm)?', function(req, res){
 	// TODO
 })
 
-
-
-app.get('/panel(.htm)?',authenticated, function(req, res){
+router.get('/panel(.htm)?', authenticated, function(req, res){
 	res.sendFile(path.join(__dirname + '/public/index.htm'));
+})
+
+app.use(router, function (req, res) {
+  res.redirect('/panel')
 })
 
 app.listen(80);

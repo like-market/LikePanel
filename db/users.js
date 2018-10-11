@@ -1,27 +1,41 @@
-var records = [
-    { id: 1, username: 'jack', password: 'secret', displayName: 'Jack', emails: [ { value: 'jack@example.com' } ] }
-  , { id: 2, username: 'jill', password: 'birthday', displayName: 'Jill', emails: [ { value: 'jill@example.com' } ] }
-];
+var mysql = require('mysql');
+
+var db = mysql.createConnection({
+    host: "localhost",
+    database: "likepanel",
+    user: "root",
+    password: "666666z"
+});
+db.connect(function(err) {
+    if (err) throw err;
+    console.log("Connected!");
+});
 
 exports.findById = function(id, cb) {
-  process.nextTick(function() {
-    var idx = id - 1;
-    if (records[idx]) {
-      cb(null, records[idx]);
-    } else {
-      cb(new Error('User ' + id + ' does not exist'));
-    }
-  });
+    process.nextTick(function() {
+        var sql = "SELECT * FROM `auth` WHERE `id`=" + id;
+        db.query(sql, function(err, rows) {
+            if (!err && rows.length != 0) {
+                var data = JSON.parse(JSON.stringify(rows[0]))
+                return cb(err, data)
+            }else {
+                return cb(err, null)
+            }
+        })
+    });
 }
 
 exports.findByUsername = function(username, cb) {
-  process.nextTick(function() {
-    for (var i = 0, len = records.length; i < len; i++) {
-      var record = records[i];
-      if (record.username === username) {
-        return cb(null, record);
-      }
-    }
-    return cb(null, null);
-  });
+    process.nextTick(function() {
+        var sql = "SELECT * FROM `auth` WHERE `username`='" + username+ "'";
+        db.query(sql, function(err, rows) {
+            if (!err && rows.length != 0) {
+                var data = JSON.parse(JSON.stringify(rows[0]))
+                console.log(data);
+                return cb(err, data)
+            }else {
+                return cb(err, null)
+            }
+        })
+    })
 }
