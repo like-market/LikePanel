@@ -116,7 +116,7 @@ router.get('/panel(.htm)?', authenticated, function(req, res){
 })
 
 app.use(router, function (req, res) {
-  res.redirect('/panel')
+	res.redirect('/panel')
 })
 
 app.listen(80);

@@ -8,7 +8,7 @@ var db = mysql.createConnection({
 });
 db.connect(function(err) {
     if (err) throw err;
-    console.log("Connected!");
+    console.log("Database connected!");
 });
 
 exports.findById = function(id, cb) {
