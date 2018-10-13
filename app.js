@@ -50,72 +50,15 @@ app.use(session({
 	saveUninitialized: false,
 	cookie: { maxAge: 9999999 }
 }))
+
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use('/vendor', express.static('public/vendor'))
-app.use('/styles', express.static('public/styles'))
-app.use('/images', express.static('public/images'))
-app.use('/scripts', express.static('public/scripts'))
 
-router.get('/login(.htm)?', function(req, res) {
-	// Если юзер авторизован - перенаправляем его в панель
-	if (req.isAuthenticated()) return res.redirect('/panel');
-	res.sendFile(path.join(__dirname + '/public/login.htm'));
-});
 
-router.post('/login(.htm)?', 
-  passport.authenticate('local', { 
-  	successRedirect: '/panel' }));
+app.use(require('./routes/routes.js'))
 
-router.get('/logout', function(req, res){ 	
-	req.logout();
-	res.redirect('/login');
-});
-
-router.get('/register(.htm)?', function(req, res){
-	if (req.isAuthenticated()) return res.redirect('/panel');
-	res.sendFile(path.join(__dirname + '/public/register.htm'));
-})
-
-router.post('/register(.htm)?', function(req, res){
-	// Если одно из полей - пустое
-	if (req.body.password == "" || req.body.username == "" || 
-		req.body.email == "") {
-		res.sendStatus(400)
-		res.send('Empty field');
-	// Если пароли не совпадают
-	}else if (req.body.password != req.body.repeatpassword) {
-		res.sendStatus(400)
-		res.send('Password no match');
-	// Проверка на то, что ник уже занят
-	}else {
-		db.users.findByUsername(req.body.username, function(err, user) {
-			if (user != null) {
-				res.sendStatus(400)
-				res.send('User already exist');
-			// Регестрируем клиента
-			} else {
-				b = req.body;
-				db.users.register(b.username, b.password, b.email, function(err) {
-					if (err) return console.error(err)
-					db.users.findByUsername(b.username, function(err, user) {
-						req.login(user, function(err) {
-							if (err) return console.error(err);
-							return res.redirect('/panel')
-						})
-					})
-				})
-			}
-		})
-	}
-})
-
-router.get('/panel(.htm)?', authenticated, function(req, res){
-	res.sendFile(path.join(__dirname + '/public/index.htm'));
-})
-
-app.use(router, function (req, res) {
+app.use(function (req, res) {
 	res.redirect('/panel')
 })
 
