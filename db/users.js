@@ -1,19 +1,8 @@
-var mysql = require('mysql');
-
-var db = mysql.createConnection({
-    host: "localhost",
-    database: "likepanel",
-    user: "root",
-    password: "666666z"
-});
-db.connect(function(err) {
-    if (err) throw err;
-    console.log("Database connected!");
-});
+var db = require('./index.js').db;
 
 exports.findById = function(id, cb) {
     process.nextTick(function() {
-        var sql = "SELECT * FROM `auth` WHERE `id`=" + id;
+        var sql = "SELECT * FROM `users` WHERE `id`=" + id;
         db.query(sql, function(err, rows) {
             if (!err && rows.length != 0) {
                 var data = JSON.parse(JSON.stringify(rows[0]))
@@ -27,7 +16,7 @@ exports.findById = function(id, cb) {
 
 exports.findByUsername = function(username, cb) {
     process.nextTick(function() {
-        var sql = "SELECT * FROM `auth` WHERE `username`='" + username+ "'";
+        var sql = "SELECT * FROM `users` WHERE `username`='" + username+ "'";
         db.query(sql, function(err, rows) {
             if (!err && rows.length != 0) {
                 var data = JSON.parse(JSON.stringify(rows[0]))
@@ -42,7 +31,7 @@ exports.findByUsername = function(username, cb) {
 
 exports.register = function(username, password, email, cb) {
     process.nextTick(function() {
-        var sql = "INSERT INTO `auth`(username, password, email) VALUES";
+        var sql = "INSERT INTO `users`(username, password, email) VALUES";
         sql += "('" + username + "','" + password + "','" + email + "')";
         db.query(sql, function(err, rows) {
             cb(err);
