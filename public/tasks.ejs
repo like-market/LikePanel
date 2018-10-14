@@ -155,107 +155,41 @@
                         </div>
                     </div>
 
-                    <div class="panel">
-                        <div class="panel-body">
-                            <div class="table-responsive">
-                            <table class="table table-vertical-align-middle">
-                                <thead>
-                                <tr>
-                                    <th>
-                                        Статус
-                                    </th>
-                                    <th>
-                                        Название и URL
-                                    </th>
-                                    <th>
-                                        Заказано лайков
-                                    </th>
-                                    <th>
-                                        Прогресс
-                                    </th>
-                                    <th class="text-right">
-                                        Действие
-                                    </th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>
-                                        <span class="label label-accent">Выполняется</span>
-                                    </td>
-                                    <td>
-                                        <a href="#">Тестовый пост</a>
-                                        <div class="small">https://vk.com/id266510818?w=wall266510818_65</div>
-                                    </td>
-                                    <td>
-                                        350
-                                    </td>
-                                    <td>
-                                        <div class="progress m-b-none full progress-small">
-                                            <div style="width: 35%" class="progress-bar progress-bar-warning"></div>
-                                        </div>
-                                        <small>35% завершено</small>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group pull-right">
-                                            <button class="btn btn-default btn-xs"><i class="fa fa-folder"></i> Показать </button>
-                                            <button class="btn btn-default btn-xs"><i class="fa fa-pencil"></i> Отменить </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <span class="label label-default">Ожидание</span>
-                                    </td>
-                                    <td>
-                                        <a>Смешной мемчик</a>
-                                        <div class="small">https://vk.com/id266510818?w=wall266510818_66</div>
-                                    </td>
-                                    <td>
-                                        120
-                                    </td>
-                                    <td>
-                                        <div class="progress m-b-none full progress-small">
-                                            <div style="width: 63%" class="progress-bar progress-bar-warning"></div>
-                                        </div>
-                                        <small>63% завершено</small>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group pull-right">
-                                            <button class="btn btn-default btn-xs"><i class="fa fa-folder"></i> Показать </button>
-                                            <button class="btn btn-default btn-xs"><i class="fa fa-pencil"></i> Отменить </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <span class="label label-default">Выполнена</span>
-                                    </td>
-                                    <td>
-                                        <a>Моя закрепленная запись</a>
-                                        <div class="small"></i>https://vk.com/id266510818?w=wall266510818_67</div>
-                                    </td>
-                                    <td>
-                                        50
-                                    </td>
-                                    <td>
-                                        <div class="progress m-b-none full progress-small">
-                                            <div style="width: 100%" class="progress-bar progress-bar-warning"></div>
-                                        </div>
-                                        <small>100% завершена</small>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group pull-right">
-                                            <button class="btn btn-default btn-xs"><i class="fa fa-folder"></i> Показать </button>
-                                            <button class="btn btn-default btn-xs"><i class="fa fa-pencil"></i> Отменить </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
+                    <% if (tasks != null) { %>
+                        <div class="panel">
+                            <div class="panel-body">
+                                <div class="table-responsive">
+                                <table class="table table-vertical-align-middle">
+                                    <thead>
+                                    <tr>
+                                        <th>
+                                            Статус
+                                        </th>
+                                        <th>
+                                            Название и URL
+                                        </th>
+                                        <th>
+                                            Заказано лайков
+                                        </th>
+                                        <th>
+                                            Прогресс
+                                        </th>
+                                        <th class="text-right">
+                                            Действие
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <%- include('taskslist', {tasks: tasks}); %>
+                                    </tbody>
+                                </table>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    <% }else { %>
+                        <h3>У вас еще нет задач</h3>
+                        <h5>Вы можете создать их <a href="addtask">здесь</a></h5>
+                    <% } %>
                 </div>
             </div>
             <!-- <div class="pull-right">

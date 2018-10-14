@@ -3,7 +3,8 @@ var db = require('./index.js').db;
 exports.findById = function(id, cb) {
 	process.nextTick(function() {
         var sql = "SELECT `name`, `url`, `like_need`, `like_now`, `status`, `create`"
-        sql += "FROM `tasks` WHERE `user_id`=" + id;
+        sql += " FROM `tasks` WHERE `user_id`=" + id;
+        sql += " ORDER BY `create` DESC";
         
         db.query(sql, function(err, rows) {
         	
