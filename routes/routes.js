@@ -19,4 +19,10 @@ router.use('/login', require('./login.js'));
 router.use('/register', require('./register.js'));
 router.use('/forgotPassword', require('./forgotPassword.js'));
 
+router.use('/news', require('./news.js'));
+router.use('/tasks', require('./tasks.js'));
+router.use('/support', require('./support.js'));
+router.use('/profile', require('./profile.js'));
+router.use('/addtask', require('./addTask.js'));
+
 module.exports = router
