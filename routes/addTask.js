@@ -5,7 +5,7 @@ var router = express.Router()
 
 router.get('/', function(req, res) {
 	if (!req.isAuthenticated()) return res.redirect('/login');
-	res.sendFile(path.join(__dirname + '/../public/addTask.htm'));
+	res.render('addTask', {login: req.user.username});
 });
 
 module.exports = router

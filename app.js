@@ -44,6 +44,9 @@ app.use(bodyParser.urlencoded({   // To support URL-encoded bodies
 	extended: true
 })); 
 
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, '/public'));
+
 app.use(session({
 	secret: 'KJjsdz',
 	resave: false,
