@@ -198,20 +198,7 @@
 
                             <div class="v-timeline vertical-container">
                                 
-                                <div class="vertical-timeline-block">
-                                    <div class="vertical-timeline-icon">
-                                        <i class="fa fa-file"></i>
-                                    </div>
-                                    <div class="vertical-timeline-content">
-                                        <div class="p-sm">
-                                            <span class="vertical-date pull-right"> <small>2 days ago</small> </span>
-
-                                            <h2>Add new documents to X project</h2>
-
-                                            <p>Project_document.docx, Contract_20_11_2016.docx, 10_08_2016.docx</p>
-                                        </div>
-                                    </div>
-                                </div>
+                                <%- include('recentActivity', {activities: activities}); %>
 
                             </div>
                         </div>
@@ -223,9 +210,9 @@
                     <div class="panel">
 
                         <div class="panel-body">
-                            <h4> Project this year</h4>
+                            <h4>Состояние счета</h4>
 
-                            <p class="small">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to
+                            <p class="small">График показывает состояние вашего счета с момента регистрации до текущего времени
                             </p>
 
                             <div class="flot-chart  m-t-md m-b-xl" style="height: 200px">
@@ -237,55 +224,33 @@
                                 <tr>
 
                                     <th>#</th>
-                                    <th>Project</th>
-                                    <th>Company</th>
-                                    <th>Task</th>
-                                    <th>Date</th>
-                                    <th>Action</th>
+                                    <th>Операция</th>
+                                    <th>Описание</th>
+                                    <th>Количество</th>
+                                    <th>Дата</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 <tr>
-                                    <td>1</td>
-                                    <td>Project
-                                        <small>This is example of project</small>
-                                    </td>
-                                    <td>Inceptos Hymenaeos Ltd</td>
-                                    <td>20%</td>
-                                    <td>Jul 14, 2016</td>
-                                    <td class="text-right"><a href="#"><i class="fa fa-edit"></i></a></td>
+                                    <td>62</td>
+                                    <td>Списание</td>
+                                    <td>Задача <a>#123</a></td>
+                                    <td>-50₽</td>
+                                    <td>Октябрь 18, 2016</td>
                                 </tr>
                                 <tr>
-                                    <td>2</td>
-                                    <td>Alpha project</td>
-                                    <td>Nec Euismod In Company</td>
-                                    <td>40%</td>
-                                    <td>Jul 16, 2016</td>
-                                    <td class="text-right"><a href="#"><i class="fa fa-edit"></i></a></td>
+                                    <td>44</td>
+                                    <td>Списание</td>
+                                    <td>Задача <a>#101</a></td>
+                                    <td>-25₽</td>
+                                    <td>Октябрь 10, 2016</td>
                                 </tr>
                                 <tr>
-                                    <td>3</td>
-                                    <td>Betha project</td>
-                                    <td>Erat Volutpat</td>
-                                    <td>75%</td>
-                                    <td>Jul 18, 2016</td>
-                                    <td class="text-right"><a href="#"><i class="fa fa-edit"></i></a></td>
-                                </tr>
-                                <tr>
-                                    <td>4</td>
-                                    <td>Gamma project</td>
-                                    <td>Tellus Ltd</td>
-                                    <td>18%</td>
-                                    <td>Jul 22, 2016</td>
-                                    <td class="text-right"><a href="#"><i class="fa fa-edit"></i></a></td>
-                                </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>Alpha project</td>
-                                    <td>Nec Euismod In Company</td>
-                                    <td>40%</td>
-                                    <td>Jul 16, 2016</td>
-                                    <td class="text-right"><a href="#"><i class="fa fa-edit"></i></a></td>
+                                    <td>26</td>
+                                    <td>Пополнение</td>
+                                    <td></td>
+                                    <td>+175₽</td>
+                                    <td>Октябрь 1, 2016</td>
                                 </tr>
 
 

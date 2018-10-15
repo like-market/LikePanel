@@ -1,0 +1,29 @@
+<% activities.forEach(function(activity) { %>
+    <div class="vertical-timeline-block">
+        <div class="vertical-timeline-icon">
+            <i class="fa fa-user"></i>
+        </div>
+        <div class="vertical-timeline-content">
+            <div class="p-sm">
+                <span class="vertical-date pull-right">
+                    <small><%= moment(activity.create).fromNow() %></small>
+                </span>
+
+                <% switch (activity.type) {
+                    case 1 : %>
+                        <h2>Регистрация на сайте</h2>
+                        <p>Произведена регистрация аккаунта с IP: <a><%= activity.data %></a></p>
+                        <% break;
+                    case 2 : %>
+                        <h2>Пополнение баланса</h2>
+                        <p>Пополнение баланса на сумму <a><%= activity.data %>₽</a></p>
+                        <% break;
+                    case 3 : %>
+                        <h2>Вход</h2>
+                        <p>Произведен вход в аккаунт с IP: <a><%= activity.data %></a></p>
+                        <% break;
+                } %>
+            </div>
+        </div>
+    </div>
+<% }) %>
