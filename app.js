@@ -4,7 +4,6 @@ var path    = require("path");
 var bodyParser = require('body-parser')
 var cookieParser = require('cookie-parser')
 var db = require('./db');
-
 var session = require('express-session')
 
 var passport = require('passport')

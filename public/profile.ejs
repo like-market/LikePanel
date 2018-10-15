@@ -122,66 +122,15 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="media">
-                                        <i class="pe pe-7s-user c-accent fa-3x"></i>
                                         <h2 class="m-t-xs m-b-none">
-                                            <%= user.username %>
+                                            Пользователь: <%= user.username %>
                                         </h2>
                                         <small>
-                                            There are many variations of passages of Lorem Ipsum available, but the majority
-                                            have suffered alteration in some form Ipsum available.
+                                            Здесь содержится основная информация о вашем аккаунте
                                         </small>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
-                                    <table class="table small m-t-sm">
-                                        <tbody>
-                                        <tr>
-                                            <td>
-                                                <strong class="c-white">122</strong> Projects
-                                            </td>
-                                            <td>
-                                                <strong class="c-white">42</strong> Active project
-                                            </td>
-
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <strong class="c-white">61</strong> Comments
-                                            </td>
-                                            <td>
-                                                <strong class="c-white">84</strong> Articles
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <strong class="c-white">244</strong> Tags
-                                            </td>
-                                            <td>
-                                                <strong class="c-white">42</strong> Friends
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div class="col-md-3 m-t-sm">
-                                <span class="c-white">
-                                    Contact with user
-                                </span>
-                                    <br>
-                                    <small>
-                                        Lorem Ipsum is simply dummy text of the printing and typesetting industry
-                                    </small>
-                                    <div class="btn-group m-t-sm">
-                                        <a href="#" class="btn btn-default btn-sm"><i class="fa fa-envelope"></i> Contact</a>
-                                        <a href="#" class="btn btn-default btn-sm"><i class="fa fa-check"></i> Check availability</a>
-                                    </div>
-
-
-                                </div>
-
-
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -212,7 +161,7 @@
                         <div class="panel-body">
                             <h4>Состояние счета</h4>
 
-                            <p class="small">График показывает состояние вашего счета с момента регистрации до текущего времени
+                            <p class="small">График показывает состояние вашего счета за последние 15 дней
                             </p>
 
                             <div class="flot-chart  m-t-md m-b-xl" style="height: 200px">
@@ -221,39 +170,45 @@
 
                             <table class="table table-striped">
                                 <thead>
-                                <tr>
-
-                                    <th>#</th>
-                                    <th>Операция</th>
-                                    <th>Описание</th>
-                                    <th>Количество</th>
-                                    <th>Дата</th>
-                                </tr>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Операция</th>
+                                        <th>Описание</th>
+                                        <th>Количество</th>
+                                        <th>Дата</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
-                                <tr>
-                                    <td>62</td>
-                                    <td>Списание</td>
-                                    <td>Задача <a>#123</a></td>
-                                    <td>-50₽</td>
-                                    <td>Октябрь 18, 2016</td>
-                                </tr>
-                                <tr>
-                                    <td>44</td>
-                                    <td>Списание</td>
-                                    <td>Задача <a>#101</a></td>
-                                    <td>-25₽</td>
-                                    <td>Октябрь 10, 2016</td>
-                                </tr>
-                                <tr>
-                                    <td>26</td>
-                                    <td>Пополнение</td>
-                                    <td></td>
-                                    <td>+175₽</td>
-                                    <td>Октябрь 1, 2016</td>
-                                </tr>
-
-
+                                    <% transactions.reverse().forEach(function(transaction) { 
+                                        console.log(transaction);
+                                        console.log(transaction.type)
+                                        %>
+                                        <tr>
+                                            <td><%= transaction.id %></td>
+                                            <td>
+                                                <% if (transaction.type == 2) { %>
+                                                    Пополнение
+                                                <% }else if (transaction.type == 4) { %>
+                                                    Списание
+                                                <% } %>
+                                            </td>
+                                            <td>
+                                                <% if (transaction.type == 4) { %>
+                                                    Задача <a>#<%= transaction.data2 %></a>
+                                                <% } %>
+                                            </td>
+                                            <td>
+                                                <% if (transaction.type == "2") { %>
+                                                    +<%= (transaction.data / 100).toFixed(2) %>₽
+                                                <% }else if (transaction.type == "4") { %>
+                                                    -<%= (transaction.data / 100).toFixed(2) %>₽
+                                                <% } %>
+                                            </td>
+                                            <td>
+                                                <%= moment(transaction.create).format("D MMMM YYYY") %>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
                                 </tbody>
                             </table>
 
@@ -272,27 +227,27 @@
                             <div class="row">
                                 <div class="col-md-3 col-xs-6 text-center">
                                     <h2 class="no-margins">
-                                        534
+                                        <%= statistic.tasks %>
                                     </h2>
-                                    <span class="c-white">Commits</span> in last week
+                                    <span class="c-white">Задач</span> создано
                                 </div>
                                 <div class="col-md-3 col-xs-6 text-center">
                                     <h2 class="no-margins">
-                                        126
+                                        <%= (statistic.money / 100).toFixed(2) %>
                                     </h2>
-                                    <span class="c-white">Public</span> gists
+                                    <span class="c-white">Рублей</span> пополнено
                                 </div>
                                 <div class="col-md-3 col-xs-6 text-center">
                                     <h2 class="no-margins">
-                                        680
+                                        <%= statistic.likes %>
                                     </h2>
-                                    <span class="c-white">New code</span> line
+                                    <span class="c-white">Лайков</span> заказано
                                 </div>
                                 <div class="col-md-3 col-xs-6 text-center">
                                     <h2 class="no-margins">
-                                        14
+                                        <%= statistic.comments %>
                                     </h2>
-                                    <span class="c-white">New</span> builds
+                                    <span class="c-white">Комментариев</span> заказано
                                 </div>
                             </div>
 
@@ -315,28 +270,36 @@
 <script src="vendor\flot\jquery.flot.min.js"></script>
 <script src="vendor\flot\jquery.flot.resize.min.js"></script>
 <script src="vendor\flot\jquery.flot.spline.js"></script>
+<script src="vendor\flot\jquery.flot.time.js"></script>
+
 
 <!-- App scripts -->
 <script src="scripts\luna.js"></script>
 
 <script>
     $(document).ready(function () {
-
-
-        var data = [
-            {
-                data: [ [1, 4], [2, 5], [3, 7], [4, 4], [5, 8], [6, 9],[7, 11], [8, 10], [9, 8], [10, 5], [11, 4], [12, 3] ]
-            }
-        ];
-
+        var data = [{
+            data: [ 
+            <% transactions.forEach(function(transaction) { %>
+                <%= '[' + moment(transaction.create).valueOf() + ', ' + (transaction.balance / 100).toFixed(2) + '],' %>
+            <% }) %> 
+            ]
+        }];
         var chartUsersOptions2 = {
+            xaxis: {
+                mode: "time",
+                timeformat: "%d"
+            },
             series: {
                 splines: {
                     show: true,
                     tension: 0.4,
                     lineWidth: 2,
-                    fill: false
+                    fill: true
                 },
+                points: {
+                    show: true
+                }
             },
             legend: {
                 show: false

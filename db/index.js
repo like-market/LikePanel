@@ -18,6 +18,7 @@ exports.db = db;
 
 exports.users = require('./users.js');
 exports.tasks = require('./tasks.js');
+exports.finance = require('./finance.js');
 exports.activity = require('./activity.js');
 
 exports.sessionStore = require('./session-store.js');

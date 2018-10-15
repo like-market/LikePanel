@@ -9,8 +9,17 @@ require('moment/locale/ru');
 router.get('/', function(req, res) {
 	if (!req.isAuthenticated()) return res.redirect('/login');
 
-	db.activity.getActivity(req.user.id, function(err, data) {
-		res.render('profile', {moment: moment, user: req.user, activities: data});
+	db.activity.getActivity(req.user.id, function(err, activities) {
+		db.finance.getIntervalBalance(req.user.id, function(err, transactions) {
+			db.users.getBasicStatistic(req.user.id, function(err, statistic) {
+				res.render('profile', {moment: moment,
+					user: req.user,
+					activities: activities,
+					transactions: transactions,
+					statistic: statistic
+				});
+			})
+		})
 	})
 });
 

@@ -3,13 +3,14 @@ var db = require('./index.js').db;
 const REGISTER = 1;
 const ADD_MONEY = 2;
 const AUTH = 3;
+const CREATE_TASK = 3;
+const REMOVE_MONEY = 4;
 
 
 exports.getActivity = function(id, cb) {
     process.nextTick(function() {
-        // Получаем список действий, за исключением пополнения баланса
         var sql = "SELECT * FROM `recent_activity` WHERE `user_id`=" + id;
-        sql += " ORDER BY `create` DESC LIMIT 10 ";
+        sql += " AND `type`<>4 ORDER BY `create` DESC LIMIT 5";
 
         db.query(sql, function(err, rows) {
             if (!err && rows.length != 0) {
