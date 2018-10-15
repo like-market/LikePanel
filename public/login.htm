@@ -95,16 +95,15 @@ $("#loginForm").submit(function(e) {
         type: "POST",
         url: '/login',
         data: form.serialize(), // serializes the form's elements.
-        error: function(jqXHR, textStatus, errorThrown) {
-            console.log(errorThrown, jqXHR)
-            if (errorThrown == 'Unauthorized') {
-                toastr.error('Логин или пароль введены неверно')
-            }else if (errorThrown == 'Bad Request') {
-                toastr.error('Заполните все поля')
-            }
-        },
         success: function(data) {
-            window.location.href = "/panel";
+            console.log(data)
+            if (data == 'Unauthorized') {
+                toastr.error('Логин или пароль введены неверно')
+            }else if (data == 'Bad Request') {
+                toastr.error('Заполните все поля')
+            }else if (data = 'Success') {
+                window.location.href = "/panel";
+            }
         }
     });
 
