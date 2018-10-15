@@ -47,8 +47,11 @@ app.use(bodyParser.urlencoded({   // To support URL-encoded bodies
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '/public'));
 
+
+
 app.use(session({
 	secret: 'KJjsdz',
+  store: db.sessionStore,
 	resave: false,
 	saveUninitialized: false,
 	cookie: { maxAge: 9999999 }
