@@ -9,7 +9,7 @@ router.get('/', function(req, res) {
 	db.tasks.findById(req.user.id, function(err, data) {
 		if (err) return console.log(err);
 
-		res.render('tasks', {login: req.user.username, tasks: data});
+		res.render('tasks', {user: req.user, tasks: data});
 	})
 });
 

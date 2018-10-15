@@ -4,7 +4,7 @@ var path    = require("path");
 
 router.get('/', function(req, res){
 	if (!req.isAuthenticated()) return res.redirect('/login');
-	res.render('index', {login: req.user.username});
+	res.render('index', {user: req.user});
 })
 
 module.exports = router

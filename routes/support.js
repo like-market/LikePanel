@@ -5,7 +5,7 @@ var router = express.Router()
 
 router.get('/', function(req, res) {
 	if (!req.isAuthenticated()) return res.redirect('/login');
-	res.render('support', {login: req.user.username});
+	res.render('support', {user: req.user});
 });
 
 module.exports = router
