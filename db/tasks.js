@@ -18,3 +18,19 @@ exports.findById = function(id, cb) {
         })
     });
 }
+
+exports.getCount = function(id, cb) {
+    process.nextTick(function() {
+        var sql = "SELECT COUNT(*) as COUNT FROM `tasks` WHERE `user_id`=" + id;
+        
+        db.query(sql, function(err, rows) {
+            if (!err && rows.length != 0) {
+                // Превращаем RowDataPacket в json
+                var data = JSON.parse(JSON.stringify(rows))[0]['COUNT'];
+                return cb(err, data)
+            }else {
+                return cb(err, null)
+            }
+        })
+    });
+}

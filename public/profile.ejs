@@ -51,12 +51,14 @@
                 <ul class="nav navbar-nav navbar-right">
                     <li class="dropdown">
                         <a href="versions.htm">Баланс
-                            <span class="label-balance label-warning"><%= user.balance.toFixed(2) %>₽</span>
+                            <span class="label-balance label-warning">
+                                <%= (user.balance / 100).toFixed(2) %>₽
+                            </span>
                         </a>
                     </li>
                     <li class=" profil-link">
                         <a href="login.htm">
-                            <span class="profile-address"><%= user.login %></span>
+                            <span class="profile-address"><%= user.username %></span>
                             <img src="images\profile.jpg" class="img-circle" alt="">
                         </a>
                     </li>
@@ -122,7 +124,7 @@
                                     <div class="media">
                                         <i class="pe pe-7s-user c-accent fa-3x"></i>
                                         <h2 class="m-t-xs m-b-none">
-                                            Luna user
+                                            <%= user.username %>
                                         </h2>
                                         <small>
                                             There are many variations of passages of Lorem Ipsum available, but the majority
@@ -192,23 +194,10 @@
 
                     <div class="panel">
                         <div class="panel-body">
-                            <h4> Recent Activity</h4>
+                            <h4> Последняя активность</h4>
 
                             <div class="v-timeline vertical-container">
-                                <div class="vertical-timeline-block">
-                                    <div class="vertical-timeline-icon">
-                                        <i class="fa fa-user"></i>
-                                    </div>
-                                    <div class="vertical-timeline-content">
-                                        <div class="p-sm">
-                                            <span class="vertical-date pull-right"> <small>1 day ago</small> </span>
-
-                                            <h2>Update profile</h2>
-
-                                            <p>Change profile name and set new profile description</p>
-                                        </div>
-                                    </div>
-                                </div>
+                                
                                 <div class="vertical-timeline-block">
                                     <div class="vertical-timeline-icon">
                                         <i class="fa fa-file"></i>
@@ -220,36 +209,6 @@
                                             <h2>Add new documents to X project</h2>
 
                                             <p>Project_document.docx, Contract_20_11_2016.docx, 10_08_2016.docx</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="vertical-timeline-block">
-                                    <div class="vertical-timeline-icon">
-                                        <i class="fa fa-file"></i>
-                                    </div>
-                                    <div class="vertical-timeline-content">
-                                        <div class="p-sm">
-                                            <span class="vertical-date pull-right"> <small>2 days ago</small> </span>
-
-                                            <h2>Contrary to popular belief</h2>
-
-                                            <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="vertical-timeline-block">
-                                    <div class="vertical-timeline-icon">
-                                        <i class="fa fa-calendar"></i>
-                                    </div>
-                                    <div class="vertical-timeline-content">
-                                        <div class="p-sm">
-                                            <span class="vertical-date pull-right"> <small>4 days ago</small> </span>
-
-                                            <h2>The generated Lorem Ipsum</h2>
-
-                                            <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to
-                                            </p>
                                         </div>
                                     </div>
                                 </div>

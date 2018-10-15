@@ -55,12 +55,14 @@
                 <ul class="nav navbar-nav navbar-right">
                     <li class="dropdown">
                         <a href="versions.htm">Баланс
-                            <span class="label-balance label-warning"><%= user.balance.toFixed(2) %>₽</span>
+                            <span class="label-balance label-warning">
+                                <%= (user.balance / 100).toFixed(2) %>₽
+                            </span>
                         </a>
                     </li>
                     <li class=" profil-link">
                         <a href="login.htm">
-                            <span class="profile-address"><%= user.login %></span>
+                            <span class="profile-address"><%= user.username %></span>
                             <img src="images\profile.jpg" class="img-circle" alt="">
                         </a>
                     </li>
