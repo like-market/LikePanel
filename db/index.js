@@ -16,6 +16,7 @@ db.connect(function(err) {
 
 exports.db = db;
 
+exports.vk = require('./account_vk.js');
 exports.users = require('./users.js');
 exports.tasks = require('./tasks.js');
 exports.finance = require('./finance.js');
