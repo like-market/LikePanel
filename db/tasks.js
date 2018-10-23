@@ -34,3 +34,12 @@ exports.getCount = function(id, cb) {
         })
     });
 }
+
+/*exports.addTask = function(user_id, type, name, url, like_need) {
+    var sql = "INSERT INTO `tasks`(`user_id`, `type`, `name`, `url`, `like_need`)"
+    sql += " VALUES(" + user_id + ", '" + type + "', '" + name + "', '" + url + "', '" + like_need + "')"
+
+    db.query(sql, function(err, rows) {
+        if (err) console.error(err)
+    })
+}*/

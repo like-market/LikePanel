@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="vendor\animate.css\animate.css">
     <link rel="stylesheet" href="vendor\bootstrap\css\bootstrap.css">
     <link rel="stylesheet" href="vendor\select2\dist\css\select2.min.css">
+    <link rel="stylesheet" href="vendor\toastr\toastr.min.css">
 
     <!-- App styles -->
     <link rel="stylesheet" href="styles\pe-icons\pe-icon-7-stroke.css">
@@ -49,9 +50,6 @@
                         <i class="stroke-hamburgermenu"></i>
                     </a>
                 </div>
-                <form class="navbar-form navbar-left">
-                    <input type="text" class="form-control" placeholder="Search data for analysis" style="width: 175px">
-                </form>
                 <ul class="nav navbar-nav navbar-right">
                     <li class="dropdown">
                         <a href="versions.htm">Баланс
@@ -120,16 +118,13 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="view-header">
-                        <div class="pull-right text-right" style="line-height: 14px">
-                            <small>UI Elements<br>Form controls<br> <span class="c-white">Basic elements</span></small>
-                        </div>
                         <div class="header-icon">
                             <i class="pe page-header-icon pe-7s-note2"></i>
                         </div>
                         <div class="header-title">
-                            <h3>Basic form elements</h3>
+                            <h3>Создать задачу</h3>
                             <small>
-                                Examples of various form controls.
+                                Здесь вы можете создать задачу на накрутку лайков.
                             </small>
                         </div>
                     </div>
@@ -138,332 +133,135 @@
             </div>
 
             <div class="row">
+                <div class="col-lg-6">
 
-                <div class="col-md-6">
-                    <div class="panel panel-filled">
-                        <div class="panel-heading">
-                            <div class="panel-tools">
-                                <a class="panel-toggle"><i class="fa fa-chevron-up"></i></a>
-                                <a class="panel-close"><i class="fa fa-times"></i></a>
-                            </div>
-                            Basic example
-                        </div>
-                        <div class="panel-body">
-
-                            <p>Individual form controls automatically receive some global styling. All textual <code>&lt;input&gt;</code>, <code>&lt;textarea&gt;</code>, and <code>&lt;select&gt;</code> elements with <code>.form-control</code> are set to <code>width: 100%;</code> by default. Wrap labels and controls in <code>.form-group</code> for optimum spacing.</p>
-
-                            <form>
-                                <div class="form-group"><label for="exampleInputName">Username</label> <input type="text" class="form-control" id="exampleInputName" placeholder="Name"></div>
-                                <div class="form-group"><label for="exampleInputEmail1">Email address</label> <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email"></div>
-                                <div class="form-group"><label for="exampleInputPassword1">Password</label> <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
-                                    <p class="help-block">Example block-level help text here.</p></div>
-
-                                <div><label> <input type="checkbox"> Check me out </label></div>
-                                <button type="submit" class="btn btn-default">Submit</button>
-                            </form>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="col-md-6">
-                    <div class="panel panel-filled">
-                        <div class="panel-heading">
-                            <div class="panel-tools">
-                                <a class="panel-toggle"><i class="fa fa-chevron-up"></i></a>
-                                <a class="panel-close"><i class="fa fa-times"></i></a>
-                            </div>
-                            Horizontal form
-                        </div>
-                        <div class="panel-body">
-
-                            <p>Use Bootstrap's predefined grid classes to align labels and groups of form controls in a horizontal layout by adding <code>.form-horizontal</code> to the form (which doesn't have to be a <code>&lt;form&gt;</code>). Doing so changes <code>.form-group</code>s to behave as grid rows, so no need for <code>.row</code>.</p>
-
-                            <form class="form-horizontal">
-                                <div class="form-group"><label for="inputEmail3" class="col-sm-2 control-label">Email</label>
-
-                                    <div class="col-sm-10"><input type="email" class="form-control" id="inputEmail3" placeholder="Email"></div>
-                                </div>
-                                <div class="form-group"><label for="inputPassword3" class="col-sm-2 control-label">Password</label>
-
-                                    <div class="col-sm-10"><input type="password" class="form-control" id="inputPassword3" placeholder="Password"></div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                    <div class="panel panel-filled">
-                        <div class="panel-heading">
-                            <div class="panel-tools">
-                                <a class="panel-toggle"><i class="fa fa-chevron-up"></i></a>
-                                <a class="panel-close"><i class="fa fa-times"></i></a>
-                            </div>
-                            Inline form
-                        </div>
-                        <div class="panel-body">
-                            <p>Add <code>.form-inline</code> to your form (which doesn't have to be a <code>&lt;form&gt;</code>) for left-aligned and inline-block controls. <strong>This only applies to forms within viewports that are at least 768px wide.</strong></p>
-
-                            <form class="form-inline">
-                                <div class="form-group"><label for="exampleInputName2">Name</label> <input type="text" class="form-control" id="exampleInputName2" placeholder="Jane Doe"></div>
-                                <div class="form-group"><label for="exampleInputEmail2">Email</label> <input type="email" class="form-control" id="exampleInputEmail2" placeholder="jane.doe@example.com"></div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="panel panel-filled">
-                        <div class="panel-heading">
-                            <div class="panel-tools">
-                                <a class="panel-toggle"><i class="fa fa-chevron-up"></i></a>
-                                <a class="panel-close"><i class="fa fa-times"></i></a>
-                            </div>
-                            Select options
-                        </div>
-                        <div class="panel-body">
-
-                            <div class="row">
-                                <div class="col-lg-4">
-                                    <p>
-                                        Select2 is a jQuery based replacement for select boxes. It can take a regular select box and turn it into:
-                                    </p>
-                                </div>
-                                <div class="col-lg-4">
-                                    <p>
-                                        A placeholder value can be defined and will be displayed until a selection is made.
-                                    </p>
-                                </div>
-                                <div class="col-lg-4">
-                                    <p>
-                                        Select2 also supports multi-value select boxes. The select below is declared with the multiple attribute.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-lg-4">
-                                    <select class="select2_demo_1 form-control" style="width: 100%">
-                                        <option value="1">Option 1
-                                        <option value="2">Option 2
-                                        <option value="3">Option 3
-                                        <option value="4">Option 4
-                                        <option value="5">Option 5
-                                    </select>
-                                </div>
-                                <div class="col-lg-4">
-                                    <select class="select2_demo_2 form-control" style="width: 100%">
-                                        <option>
-                                        <option value="Bahamas">Bahamas
-                                        <option value="Bahrain">Bahrain
-                                        <option value="Bangladesh">Bangladesh
-                                        <option value="Barbados">Barbados
-                                        <option value="Belarus">Belarus
-                                        <option value="Belgium">Belgium
-                                        <option value="Belize">Belize
-                                        <option value="Benin">Benin
-                                    </select>
-                                </div>
-                                <div class="col-lg-4">
-                                    <select class="select2_demo_3 form-control" multiple="multiple" style="width: 100%">
-                                        <option value="Mayotte">Mayotte
-                                        <option value="Mexico" selected="">Mexico
-                                        <option value="Micronesia, Federated States of">Micronesia, Federated States of
-                                        <option value="Moldova, Republic of">Moldova, Republic of
-                                        <option value="Monaco">Monaco
-                                        <option value="Mongolia">Mongolia
-                                        <option value="Montenegro">Montenegro
-                                        <option value="Montserrat">Montserrat
-                                        <option value="Morocco">Morocco
-                                        <option value="Mozambique">Mozambique
-                                        <option value="Myanmar">Myanmar
-                                        <option value="Namibia">Namibia
-                                        <option value="Nauru">Nauru
-                                        <option value="Nepal" selected="">Nepal
-                                        <option value="Netherlands">Netherlands
-                                        <option value="New Caledonia">New Caledonia
-                                        <option value="New Zealand">New Zealand
-                                        <option value="Nicaragua">Nicaragua
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="panel panel-filled">
-                        <div class="panel-heading">
-                            <div class="panel-tools">
-                                <a class="panel-toggle"><i class="fa fa-chevron-up"></i></a>
-                                <a class="panel-close"><i class="fa fa-times"></i></a>
-                            </div>
-                            File inputs
-                        </div>
-                        <div class="panel-body">
-
-                            <div class="row">
-
-                                <div class="col-lg-4">
-                                    <p>
-                                        Standard file input
-                                    </p>
+                    <div class="tabs-container">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a data-toggle="tab" href="#like" aria-expanded="true">Лайки</a></li>
+                            <li class=""><a data-toggle="tab" href="#comment" aria-expanded="false">Комментарии</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div id="like" class="tab-pane active">
+                                <div class="panel-body">
                                     <div class="form-group">
-                                        <input type="file" id="exampleInputFile">
-                                       </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <p>File input as a button with filename inside</p>
-                                    <label class="btn btn-accent" for="file-selector2">
-                                        <input id="file-selector2" type="file" style="display:none;" onchange="$('#upload-file-info2').html($(this).val());">
-                                        <span id="upload-file-info2">Upload file</span>
-                                    </label>
-                                </div>
-                                <div class="col-lg-4">
-                                    <p>File input with filename outside button </p>
-                                    <label class="btn btn-default" for="file-selector1">
-                                        <input id="file-selector1" type="file" style="display:none;" onchange="$('#upload-file-info').html($(this).val());">
-                                        Upload file
-                                    </label>
-                                    <span class='label label-default' id="upload-file-info"></span>
+                                        <p>Название задачи</p>
+                                        <input id="name" type="text" class="form-control" placeholder="Название задачи, чтобы не запутаться ">
+                                    </div>
+                                    <div class="form-group">
+                                        <p>Что будем лайкать?</p>
+                                        <select id="select_type" class="form-control">
+                                            <option value="post">Запись на стене пользователя или группы
+                                            <option value="photo" disabled>Фотография
+                                            <option value="video" disabled>Видеозапись
+                                            <option value="audio" disabled>Аудиозапись
+                                            <option value="market" disabled>Товар
+                                        </select>
+                                    </div>
+                                        
+                                    <div class="form-group">
+                                        <p>Введите URL записи</p>
+                                        <input id="url" type="text" class="form-control" placeholder="https://vk.com/wall-3223234_3423">
+                                    </div>
 
+                                    <div class="form-group">
+                                        <p>Количество лайков</p>
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <input id="like_count" type="number" class="form-control" placeholder="От 1 до <%= max_count %>" min="1" max="<%= max_count %>">
+                                            </div>
+                                            <div class="col-lg-6 ml-auto" style="height: 34px; padding-top: 7px">
+                                                Максимум <a><%= max_count %></a>   <small>(Учитывается ваш баланс и доступные аккаунты)</small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div id="total_cost" class="form-group">
+                                        Стоимость <mark>0.10₽</mark>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="col-md-6 col-md-offset-4">
+                                        <a id="create" class="btn btn-w-md btn-accent" style="align: center">Создать задачу</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="comment" class="tab-pane">
+                                <div class="panel-body">
+                                    <h4>Еще недоступно</h4>
+                                    <!-- <div class="form-group">
+                                        <p>Что будем комментировать?</p>
+                                        <select class="select2_demo_1 form-control" style="width: 100%">
+                                            <option value="topic_comment" disabled>Комментарий в обсуждении
+                                            <option value="photo_comment" disabled>Комментарий к фотографии
+                                            <option value="video_comment" disabled>Комментарий к видеозаписи
+                                            <option value="market_comment" disabled>Комментарий к товару
+                                        </select>
+                                    </div> -->
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="panel panel-filled">
-                        <div class="panel-heading">
-                            <div class="panel-tools">
-                                <a class="panel-toggle"><i class="fa fa-chevron-up"></i></a>
-                                <a class="panel-close"><i class="fa fa-times"></i></a>
-                            </div>
-                            Native supported controls
-                        </div>
-                        <div class="panel-body">
-
-                            <p>Most common form control, text-based input fields. Includes support for all HTML5 types: <code>text</code>, <code>password</code>, <code>datetime</code>, <code>datetime-local</code>, <code>date</code>, <code>month</code>, <code>time</code>, <code>week</code>, <code>number</code>, <code>email</code>, <code>url</code>, <code>search</code>, <code>tel</code>, and <code>color</code>.</p>
-
-
-                            <div class="row">
-                                <div class="col-lg-6">
-
-                                    <form>
-                                        <div class="form-group">
-                                            <label>Basic input</label>
-                                            <input type="text" class="form-control" placeholder="Text input">
-                                        </div>
-                                    </form>
-
-                                </div>
-                                <div class="col-lg-6">
-                                    <form>
-                                        <div class="form-group">
-                                            <label>Textarea</label>
-                                            <textarea class="form-control" rows="3" placeholder="Textarea example text"></textarea>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-6">
-
-                                    <form>
-                                        <div class="form-group">
-                                            <label>Checkbox</label>
-                                        </div>
-                                        <div><label> <input type="checkbox" value=""> Option one is this and that—be sure to include why it's great </label></div>
-                                        <div><label> <input type="checkbox" value="" disabled="disabled"> Option two is disabled </label></div>
-
-                                        <div><label> <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked="checked"> Option one is this and that—be sure to include why it's great </label></div>
-                                        <div><label> <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2"> Option two can be something else and selecting it will deselect option one </label></div>
-                                        <div><label> <input type="radio" name="optionsRadios" id="optionsRadios3" value="option3" disabled="disabled"> Option three is disabled </label></div>
-                                    </form>
-
-                                </div>
-                                <div class="col-lg-6">
-                                    <form>
-                                        <div class="form-group">
-                                            <label>Selects</label>
-                                        </div>
-                                        <select class="form-control">
-                                            <option>1
-                                            <option>2
-                                            <option>3
-                                            <option>4
-                                            <option>5
-                                        </select>
-                                        <br>
-                                        <select multiple="" class="form-control">
-                                            <option>1
-                                            <option>2
-                                            <option>3
-                                            <option>4
-                                            <option>5
-                                        </select>
-
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-
                 <div class="col-lg-6">
                     <div class="panel panel-filled">
                         <div class="panel-heading">
-                            <div class="panel-tools">
-                                <a class="panel-toggle"><i class="fa fa-chevron-up"></i></a>
-                                <a class="panel-close"><i class="fa fa-times"></i></a>
-                            </div>
-                            Control sizing
+                            <h4>Инструкции</h4>
                         </div>
                         <div class="panel-body">
-
-                            <p>Set heights using classes like <code>.input-lg</code>, and set widths using grid column classes like <code>.col-lg-*</code>.</p>
-
-                            <form>
-                                <input class="form-control input-lg m-t-sm" type="text" placeholder=".input-lg">
-                                <input class="form-control m-t-sm" type="text" placeholder="Default input">
-                                <input class="form-control input-sm m-t-sm" type="text" placeholder=".input-sm">
-
-                            </form>
-
+                            <p>1. Введите url, вида</p>
+                            <code>https://vk.com/id266510818?w=wall266510818_67</code>
+                            или
+                            <code>https://vk.com/ngc666?w=wall-52884277_1020</code>
+                            <p>2. Введите количество лайков</p>
+                            <p>3. Нажмите на кнопку "Создать задачу"</p>
                         </div>
                     </div>
-
-                </div>
-                <div class="col-lg-6">
-
-                    <div class="panel panel-filled">
-                        <div class="panel-heading">
-                            <div class="panel-tools">
-                                <a class="panel-toggle"><i class="fa fa-chevron-up"></i></a>
-                                <a class="panel-close"><i class="fa fa-times"></i></a>
-                            </div>
-                            Disabled state
-                        </div>
-                        <div class="panel-body">
-
-                            <p>Add the <code>disabled</code> boolean attribute on an input to prevent user interactions. Disabled inputs appear lighter and add a <code>not-allowed</code> cursor.</p>
-
-                            <form>
-                                <input class="form-control" id="disabledInput" type="text" placeholder="Disabled input here..." disabled="">
-                            </form>
-
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </div>
     </section>
     <!-- End main content-->
 
+    <!-- Start modal -->
+    <!-- <div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <h4 class="modal-title">Modal title</h4>
+                    <small>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</small>
+                </div>
+                <div class="modal-body">
+                    <h4 class="m-t-none">Lorem Ipsum is simply</h4>
+                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever.</p>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <small class="stat-label">Today</small>
+                            <h4 class="m-t-xs">170,20 <i class="fa fa-level-up text-accent"></i></h4>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="stat-label">Last month %</small>
+                            <h4 class="m-t-xs">%20,20 <i class="fa fa-level-down c-white"></i></h4>
+                        </div>
+                        <div class="col-md-4">
+                            <small class="stat-label">Last year</small>
+                            <h4 class="m-t-xs">246,40 <i class="fa fa-level-up text-accent"></i></h4>
+                        </div>
+                    </div>
+                    <div class="progress m-t-xs full progress-small">
+                        <div style="width: 65%" aria-valuemax="100" aria-valuemin="0" aria-valuenow="65" role="progressbar" class=" progress-bar progress-bar-warning">
+                            <span class="sr-only">65% Complete (success)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-accent">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div> -->
+    <!-- End modal -->
 </div>
 <!-- End wrapper-->
 
@@ -472,19 +270,99 @@
 <script src="vendor\jquery\dist\jquery.min.js"></script>
 <script src="vendor\bootstrap\js\bootstrap.min.js"></script>
 <script src="vendor\select2\dist\js\select2.js"></script>
+<script src="vendor\toastr\toastr.min.js"></script>
 
 <!-- App scripts -->
 <script src="scripts\luna.js"></script>
 
 <script>
-    $(document).ready(function(){
-        $(".select2_demo_1").select2();
-        $(".select2_demo_2").select2({
-            placeholder: "Select a state",
-            allowClear: true
-        });
-        $(".select2_demo_3").select2();
-    })
+toastr.options = {
+    "debug": false,
+    "newestOnTop": false,
+    "positionClass": "toast-bottom-right",
+    "closeButton": true,
+    "progressBar": true
+};
+
+// Цена каждого лайка
+let price = <%= like_price %>;
+// Баланс пользователя
+let balance = <%= (user.balance / 100).toFixed(2) %>;
+
+// При изменении выбора, куда ставить лайки
+$('#select_type').change(function() {
+    console.log('change');
+})
+
+// При изменении кол-ва лайков
+$('#like_count').change(function() {
+    $(this).css('border', '')
+    var new_cost = ($(this).val() * price).toFixed(2)
+    var text = "Стоимость <mark>" + new_cost + "₽</mark>"
+
+    $('#total_cost').html(text)
+})
+
+$('#url').change(function() {
+    $(this).css('border', '')
+})
+
+// При клике на 'создание задачи'
+$('#create').click(function() {
+    if ($('#like_count').val() == '') {
+        toastr.error('Введите количество лайков')
+        $('#like_count').css('border', '1px solid red')
+        return;
+    }
+
+
+    var cost = like_count * price;
+    if (cost > balance) {
+        toastr.error('У вас не хватает средств')
+        return;
+    }
+
+    var url = $('#url').val()
+
+    //const regex = /(https?:\/\/)?vk.com\/(.*)\?w=wall([0-9-]*)_([0-9]*)(%2Fall)?(\?.*)?/gm;
+    const regex = /(https?:\/\/)?vk.com\/(.*)\?w=wall(-?[0-9-]*_[0-9]*)(%2Fall)?(\?.*)?/gm;
+    match = regex.exec(url)
+
+    if (match == null) {
+        toastr.error('Неверный URL записи на стене')
+        $('#url').css('border', '1px solid red')
+        return;
+    }
+    post_id = match[3]
+    console.log(post_id)
+
+    $.ajax({
+        type: 'POST',
+        url: 'http://127.0.0.1/addtask/get_wall',
+        data: JSON.stringify({
+            name: $('#name').val(),
+            post_id: post_id,
+            like_count: $('#like_count').val(),
+            type: $('#select_type').val()
+        }),
+        contentType: 'application/json',
+        success: function(res) {
+            switch(res) {
+                case 'Post not found':
+                    toastr.error('Запись не найдена')
+                    break;
+                case 'Success':
+                    toastr.success('Задание успешно добавлено')
+                    setTimeout(function() {
+                        window.location.href = "/panel";
+                    }, 2000)
+                    break;
+                default:
+                    toastr.error("ERROR: " + res);
+            }
+        }
+    });
+})
 </script>
 
 </body>
