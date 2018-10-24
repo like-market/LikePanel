@@ -1,21 +1,21 @@
 <% tasks.forEach(function(task) { %>
     <tr>
         <td>
-            <% if (task.status == 2) { %>
+            <% if (task.status == 'run') { %>
                 <span class="label label-accent">
             <% } else { %>
                 <span class="label label-default">
             <% } %>
                 <% switch (task.status) {
-                    case 1 : %>
+                    case 'finish' : %>
                         Выполнена
                         <% break;
 
-                    case 2 : %>
+                    case 'run' : %>
                         Выполняется
                         <% break;
 
-                    case 3 : %>
+                    case 'wait' : %>
                         Ожидание
                         <% break;
                     } %>

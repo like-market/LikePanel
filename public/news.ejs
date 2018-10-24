@@ -96,6 +96,11 @@
                 <li>
                     <a href="support">Помощь</a>
                 </li>
+                <% if (user.admin) { %>
+                    <li>
+                        <a href="admin">Админка</a>
+                    </li>
+                <% } %>
 
                 <li class="nav-info">
                     <div class="m-t-xs">

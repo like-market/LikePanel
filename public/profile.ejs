@@ -96,6 +96,11 @@
                 <li>
                     <a href="support">Помощь</a>
                 </li>
+                <% if (user.admin) { %>
+                    <li>
+                        <a href="admin">Админка</a>
+                    </li>
+                <% } %>
 
                 <li class="nav-info">
                     <div class="m-t-xs">
@@ -186,21 +191,21 @@
                                         <tr>
                                             <td><%= transaction.id %></td>
                                             <td>
-                                                <% if (transaction.type == 2) { %>
+                                                <% if (transaction.type == 'refill') { %>
                                                     Пополнение
-                                                <% }else if (transaction.type == 4) { %>
+                                                <% }else if (transaction.type == 'spend') { %>
                                                     Списание
                                                 <% } %>
                                             </td>
                                             <td>
-                                                <% if (transaction.type == 4) { %>
+                                                <% if (transaction.type == 'spend') { %>
                                                     Задача <a>#<%= transaction.data2 %></a>
                                                 <% } %>
                                             </td>
                                             <td>
-                                                <% if (transaction.type == "2") { %>
+                                                <% if (transaction.type == 'refill') { %>
                                                     +<%= (transaction.data / 100).toFixed(2) %>₽
-                                                <% }else if (transaction.type == "4") { %>
+                                                <% }else if (transaction.type == 'spend') { %>
                                                     -<%= (transaction.data / 100).toFixed(2) %>₽
                                                 <% } %>
                                             </td>

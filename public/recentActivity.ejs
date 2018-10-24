@@ -10,19 +10,23 @@
                 </span>
 
                 <% switch (activity.type) {
-                    case 1 : %>
+                    case 'register' : %>
                         <h2>Регистрация на сайте</h2>
                         <p>Произведена регистрация аккаунта с IP: <a><%= activity.data %></a></p>
                         <% break;
-                    case 2 : %>
+                    case 'refill' : %>
                         <h2>Пополнение баланса</h2>
                         <p>
                             Пополнение баланса на сумму <a><%= (activity.data / 100).toFixed(2); %>₽</a>
                         </p>
                         <% break;
-                    case 3 : %>
+                    case 'auth' : %>
                         <h2>Вход</h2>
                         <p>Произведен вход в аккаунт с IP: <a><%= activity.data %></a></p>
+                        <% break;
+                    case 'create_task' : %>
+                        <h2>Создана задача</h2>
+                        <p>Создана задача <a><%= activity.data %></a></p>
                         <% break;
                 } %>
             </div>
