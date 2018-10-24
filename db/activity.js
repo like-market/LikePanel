@@ -3,14 +3,14 @@ var db = require('./index.js').db;
 const REGISTER = 1;
 const ADD_MONEY = 2;
 const AUTH = 3;
-const CREATE_TASK = 3;
-const REMOVE_MONEY = 4;
+const CREATE_TASK = 4;
+const REMOVE_MONEY = 5;
 
 
 exports.getActivity = function(id, cb) {
     process.nextTick(function() {
         var sql = "SELECT * FROM `recent_activity` WHERE `user_id`=" + id;
-        sql += " AND `type`<>4 ORDER BY `create` DESC LIMIT 5";
+        sql += " AND `type`<>'spend' ORDER BY `create` DESC LIMIT 5";
 
         db.query(sql, function(err, rows) {
             if (!err && rows.length != 0) {
@@ -24,13 +24,58 @@ exports.getActivity = function(id, cb) {
 }
 
 // Вызывается при успешной авторизации
-exports.auth = function(user, ip) {
+exports.auth = function(user_id, ip) {
     process.nextTick(function() {
-        var sql = "INSERT INTO `recent_activity`(`user_id`, `type`, `data`)"
-        sql += " VALUES(" + user.id + "," + AUTH + ",'" + ip + "')";
+        var sql = "INSERT INTO `recent_activity`(`type`, `user_id`, `data`)"
+        sql += " VALUES('auth', " + user_id + ", '" + ip + "')";
 
         db.query(sql, function(err, rows) {
-            if (err) console.log(err);
+            if (err) console.error(err);
+        })
+    })
+}
+
+// Вызывается при успешной регистрации
+exports.register = function(user_id, ip) {
+    process.nextTick(function() {
+        var sql = "INSERT INTO `recent_activity`(`type`, `user_id`, `data`)"
+        sql += " VALUES('register', " + user_id + ", '" + ip + "')";
+
+        db.query(sql, function(err, rows) {
+            if (err) console.error(err);
+        })
+    })
+}
+
+exports.createTask = function(user_id, task_id) {
+    process.nextTick(function() {
+        var sql = "INSERT INTO `recent_activity`(`type`, `user_id`, `data`)"
+        sql += " VALUES('create_task', " + user_id + ", '" + task_id + "')"
+
+        db.query(sql, function(err, rows) {
+            if (err) console.error(err);
+        })
+    })
+}
+
+exports.spendMoney = function(user_id, count) {
+    process.nextTick(function() {
+        var sql = "INSERT INTO `recent_activity`(`type`, `user_id`, `data`)"
+        sql += " VALUES('spend', " + user_id + ", '" + count + "')"
+
+        db.query(sql, function(err, rows) {
+            if (err) console.error(err);
+        })
+    })
+}
+
+exports.addMoney = function(user_id, count) {
+    process.nextTick(function() {
+        var sql = "INSERT INTO `recent_activity`(`type`, `user_id`, `data`)"
+        sql += " VALUES('refill', " + user_id + ", '" + count + "')"
+
+        db.query(sql, function(err, rows) {
+            if (err) console.error(err);
         })
     })
 }

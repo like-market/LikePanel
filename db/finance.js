@@ -3,15 +3,11 @@ var db = require('./index.js').db;
 var moment = require('moment');
 require('moment/locale/ru');
 
-const ADD_MONEY = 2;
-const REMOVE_MONEY = 4;
-
-
 // time - new Date(), например 2018-10-15T12:04:27.000Z
 exports.getBalanceAtDate = function(id, date, cb) {
 	process.nextTick(function() {
 		var sql = "SELECT `data`, `type` FROM `recent_activity` WHERE `user_id`=" + id;
-		sql += " AND (`type`=" + ADD_MONEY + " OR `type`=" + REMOVE_MONEY + ")";
+		sql += " AND (`type`='refill' OR `type`='spend')";
 		sql += " AND `create`<='" + date + "'";
 
 		db.query(sql, function(err, rows) {
@@ -22,9 +18,9 @@ exports.getBalanceAtDate = function(id, date, cb) {
             var transactions = JSON.parse(JSON.stringify(rows));
             var balance = 0;
             transactions.forEach(function(transaction) {
-            	if (transaction.type == REMOVE_MONEY) {
+            	if (transaction.type == 'spend') {
             		balance -= parseInt(transaction.data);
-            	}else if (transaction.type == ADD_MONEY) {
+            	}else if (transaction.type == 'refill') {
             		balance += parseInt(transaction.data);
             	}
             })
@@ -42,7 +38,7 @@ exports.getIntervalBalance = function(id, cb) {
 			let balance = parseInt(data);
 
 			var sql = "SELECT * FROM `recent_activity` WHERE `user_id`=" + id;
-			sql += " AND (`type`=" + ADD_MONEY + " OR `type`=" + REMOVE_MONEY + ")";
+			sql += " AND (`type`='refill' OR `type`='spend')";
 			sql += " AND `create`>='" + from + "' AND `create`<='" + to + "'";
 			sql += " ORDER BY `create` ASC";
 
@@ -56,9 +52,9 @@ exports.getIntervalBalance = function(id, cb) {
 
 				var transactions = JSON.parse(JSON.stringify(transactions));
 				transactions.forEach(function(transaction) {
-					if (transaction.type == ADD_MONEY) {
+					if (transaction.type == 'refill') {
 						balance += parseInt(transaction.data);
-					}else if (transaction.type == REMOVE_MONEY) {
+					}else if (transaction.type == 'spend') {
 						balance -= parseInt(transaction.data);
 					}
 					transaction.balance = balance;
@@ -66,6 +62,28 @@ exports.getIntervalBalance = function(id, cb) {
 				})
 				return cb(err, balances);
 			})
+		})
+	})
+}
+
+exports.spend = function(user_id, count) {
+	process.nextTick(function() {
+		var sql = "UPDATE `users` SET `balance` = `balance` - " + count
+		sql += " WHERE `id` = " + user_id;
+
+		db.query(sql, function(err, rows) {
+			if (err) console.log(err);
+		})
+	})
+}
+
+exports.AddBalance = function(user_id, count) {
+	process.nextTick(function() {
+		var sql = "UPDATE `users` SET `balance` = `balance` + " + count
+		sql += " WHERE `id` = " + user_id;
+
+		db.query(sql, function(err, rows) {
+			if (err) console.log(err);
 		})
 	})
 }
