@@ -1,3 +1,5 @@
+var worker = require('./worker.js')
+
 var express = require('express');
 var router = express.Router()
 var path    = require("path");
@@ -9,14 +11,13 @@ var session = require('express-session')
 var passport = require('passport')
 var Strategy = require('passport-local').Strategy;
 
-
 passport.use(new Strategy(
     function(username, password, cb) {
         db.users.findByUsername(username, function(err, user) {
-                    if (err) { return cb(err); }
-                    if (!user) { return cb(null, false); }
-                    if (user.password != password) { return cb(null, false); }
-                    return cb(null, user);
+                if (err) { return cb(err); }
+                if (!user) { return cb(null, false); }
+                if (user.password != password) { return cb(null, false); }
+                return cb(null, user);
             });
         }
 ));
@@ -49,7 +50,7 @@ app.use(session({
     store: db.sessionStore,
     resave: false,
     saveUninitialized: false,
-    cookie: { maxAge: 9999999 }
+    cookie: { maxAge: 1000 * 60 * 60 * 24 * 5 } // 5 дней
 }))
 
 app.use(passport.initialize());
@@ -64,9 +65,3 @@ app.use(function (req, res) {
 })
 
 app.listen(80);
-
-exports.addTask = function(user_id, name, type, url, like_need) {
-    console.log('Пришел запрос на добавление нового задания')
-    console.log('UID: ' + user_id + '  type: ' + type + '  like_need: ' + like_need)
-    console.log('URL: ' + url)
-}
