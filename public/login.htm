@@ -59,7 +59,7 @@
                             <span class="help-block small">Ваш сложный пароль</span>
                         </div>
                         <div>
-                            <button class="btn btn-accent">Вход</button>
+                            <button id="button" class="btn btn-accent">Вход</button>
                             <a class="btn btn-default" href="register">Регистрация</a>
                         </div>
                     </form>
@@ -79,40 +79,9 @@
 <script src="vendor\bootstrap\js\bootstrap.min.js"></script>
 <script src="vendor\toastr\toastr.min.js"></script>
 
-<script>
-$("#loginForm").submit(function(e) {
-    toastr.options = {
-        "debug": false,
-        "newestOnTop": false,
-        "positionClass": "toast-bottom-right",
-        "closeButton": true,
-        "progressBar": true
-    };
-
-    var form = $(this);
-
-    $.ajax({
-        type: "POST",
-        url: '/login',
-        data: form.serialize(), // serializes the form's elements.
-        success: function(data) {
-            console.log(data)
-            if (data == 'Unauthorized') {
-                toastr.error('Логин или пароль введены неверно')
-            }else if (data == 'Bad Request') {
-                toastr.error('Заполните все поля')
-            }else if (data = 'Success') {
-                window.location.href = "/panel";
-            }
-        }
-    });
-
-    e.preventDefault(); // avoid to execute the actual submit of the form.
-});
-</script>
-
 <!-- App scripts -->
 <script src="scripts\luna.js"></script>
+<script src="scripts\login.js"></script>
 
 </body>
 
