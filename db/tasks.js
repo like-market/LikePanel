@@ -1,4 +1,6 @@
 var db = require('./index.js').db;
+var utils = require('../utils');
+const promise = require('promise');
 
 exports.findById = function(id, cb) {
 	process.nextTick(function() {
@@ -35,11 +37,50 @@ exports.getCount = function(id, cb) {
     });
 }
 
-/*exports.addTask = function(user_id, type, name, url, like_need) {
+exports.createTask = function(user_id, type, name, url, like_need, cb) {
     var sql = "INSERT INTO `tasks`(`user_id`, `type`, `name`, `url`, `like_need`)"
     sql += " VALUES(" + user_id + ", '" + type + "', '" + name + "', '" + url + "', '" + like_need + "')"
 
     db.query(sql, function(err, rows) {
-        if (err) console.error(err)
+        if (err) return console.error(err)
+        
+        sql = "SELECT LAST_INSERT_ID() AS id"
+
+        db.query(sql, function(err, rows) {
+            var id = JSON.parse(JSON.stringify(rows[0]))['id'];
+
+            cb(null, id)
+        })
     })
-}*/
+}
+
+exports.inrementLikes = function(task_id) {
+    process.nextTick(function() {
+        var sql = "UPDATE `tasks` SET `like_now` = `like_now` + 1"
+        sql += " WHERE `id` = " + task_id;
+ 
+        db.query(sql, function(err, rows) {
+            if (err) console.error(err)
+        })
+    })    
+}
+
+exports.setFinish = function(task_id) {
+    process.nextTick(function() {
+        var sql = "UPDATE `tasks` SET `status` = 'finish' WHERE `id` = " + task_id;
+
+        db.query(sql, function(err, rows) {
+            if (err) console.error(err)
+        })
+    })
+}
+
+exports.setWait = function(task_id) {
+    process.nextTick(function() {
+        var sql = "UPDATE `tasks` SET `status` = 'wait' WHERE `id` = " + task_id;
+        
+        db.query(sql, function(err, rows) {
+            if (err) console.error(err)
+        })
+    })
+}

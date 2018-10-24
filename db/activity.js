@@ -58,10 +58,16 @@ exports.createTask = function(user_id, task_id) {
     })
 }
 
-exports.spendMoney = function(user_id, count) {
+exports.spendMoney = function(user_id, count, task_id = null) {
     process.nextTick(function() {
-        var sql = "INSERT INTO `recent_activity`(`type`, `user_id`, `data`)"
-        sql += " VALUES('spend', " + user_id + ", '" + count + "')"
+        var sql = "INSERT INTO `recent_activity`(`type`, `user_id`, `data`, `data2`)"
+        sql += " VALUES('spend', " + user_id + ", '" + count + "', "
+        
+        if (task_id != null) {
+            sql += task_id + ")"
+        }else {
+            sql += "NULL)"
+        }
 
         db.query(sql, function(err, rows) {
             if (err) console.error(err);

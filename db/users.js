@@ -20,7 +20,6 @@ exports.findByUsername = function(username, cb) {
         db.query(sql, function(err, rows) {
             if (!err && rows.length != 0) {
                 var data = JSON.parse(JSON.stringify(rows[0]))
-                console.log(data);
                 return cb(err, data)
             }else {
                 return cb(err, null)
@@ -32,19 +31,20 @@ exports.findByUsername = function(username, cb) {
 exports.getBasicStatistic = function(id, cb) {
     process.nextTick(function() {
         var sql = "SELECT COUNT(*) AS data FROM `tasks` WHERE `user_id`=" + id;
-        sql += " UNION SELECT COALESCE(SUM(`data`), -1) FROM `recent_activity` WHERE `type`=2 AND `user_id`=" + id;
+        sql += " UNION SELECT COALESCE(SUM(`data`), -1) FROM `recent_activity` WHERE `type`='refill' AND `user_id`=" + id;
         sql += " UNION SELECT COALESCE(SUM(`like_need`), -2) FROM `tasks` WHERE `user_id`=" + id;
 
         db.query(sql, function(err, rows) {
-            console.log(err);
-            console.log(rows);
             if (!err && rows.length != 0) {
                 var data = JSON.parse(JSON.stringify(rows))
 
                 var statistic = {};
                 statistic.tasks = data[0].data;
                 // Говнокод - чтобы делать один запрос, а не три
-                statistic.money = data[1].data != -1 ? data[1].data : 0 ;
+                statistic.money = data[1].data != -1 ? data[1].data : 0;
+
+                // TODO: Если кол-во лайков равно кол-ву тасков
+                if (data[2] == undefined) data[2] = data[1]
                 statistic.likes = data[2].data != -2 ? data[2].data : 0;
                 statistic.comments = 0;
 
