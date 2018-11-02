@@ -55,7 +55,7 @@ $('#create').click(function() {
 
     $.ajax({
         type: 'POST',
-        url: 'http://127.0.0.1/addtask/add_task',
+        url: '/addtask/add_task',
         data: JSON.stringify({
             name: $('#name').val(),
             url: url,

@@ -72,7 +72,7 @@ $("#add-account").click(function() {
 
     $.ajax({
         type: 'POST',
-        url: 'http://127.0.0.1/admin/add_account',
+        url: '/admin/add_account',
         data: JSON.stringify({
             accounts: accounts
         }),
@@ -110,7 +110,7 @@ $('#change-balance').click(function() {
 
      $.ajax({
         type: 'POST',
-        url: 'http://127.0.0.1/admin/change_balance',
+        url: '/admin/change_balance',
         data: JSON.stringify({
             username: username,
             count: count,
