@@ -1,15 +1,23 @@
 var worker = require('./worker.js')
+var db = require('./db');
+
+const fs = require('fs');
+
+const http = require('http');
+const https = require('https');
 
 var express = require('express');
 var router = express.Router()
-var path    = require("path");
+
 var bodyParser = require('body-parser')
 var cookieParser = require('cookie-parser')
-var db = require('./db');
 var session = require('express-session')
 
 var passport = require('passport')
 var Strategy = require('passport-local').Strategy;
+
+var path    = require("path");
+
 
 passport.use(new Strategy(
     function(username, password, cb) {
@@ -43,8 +51,6 @@ app.use(bodyParser.urlencoded({   // To support URL-encoded bodies
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '/public'));
 
-
-
 app.use(session({
     secret: 'KJjsdz',
     store: db.sessionStore,
@@ -64,4 +70,28 @@ app.use(function (req, res) {
     res.redirect('/panel')
 })
 
-app.listen(80);
+
+// Сертификаты
+const privateKey = fs.readFileSync('/etc/letsencrypt/live/like-market.ru-0001/privkey.pem', 'utf8');
+const certificate = fs.readFileSync('/etc/letsencrypt/live/like-market.ru-0001/cert.pem', 'utf8');
+const ca = fs.readFileSync('/etc/letsencrypt/live/like-market.ru-0001/chain.pem', 'utf8');
+
+const credentials = {
+    key: privateKey,
+    cert: certificate,
+    ca: ca
+};
+
+const httpServer = http.createServer(function (req, res) {
+    res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
+    res.end();
+})
+const httpsServer = https.createServer(credentials, app);
+
+httpServer.listen(80, () => {
+    console.log('HTTP Server running on port 80');
+});
+
+httpsServer.listen(443, () => {
+    console.log('HTTPS Server running on port 443');
+});
