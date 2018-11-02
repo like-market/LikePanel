@@ -172,7 +172,11 @@
                                         <p>Количество лайков</p>
                                         <div class="row">
                                             <div class="col-lg-6">
-                                                <input id="like_count" type="number" class="form-control" placeholder="От 1 до <%= max_count %>" min="1" max="<%= max_count %>">
+                                                <% if (max_count == 0) { %>
+                                                    <input id="like_count" type="number" class="form-control" placeholder="Недостаточно средств" min="0" max="0">
+                                                <% } else { %>
+                                                    <input id="like_count" type="number" class="form-control" placeholder="От 1 до <%= max_count %>" min="1" max="<%= max_count %>">
+                                                <% } %>
                                             </div>
                                             <div class="col-lg-6 ml-auto" style="height: 34px; padding-top: 7px">
                                                 Максимум <a><%= max_count %></a>   <small>(Учитывается ваш баланс и доступные аккаунты)</small>
@@ -181,7 +185,11 @@
                                     </div>
 
                                     <div id="total_cost" class="form-group">
-                                        Стоимость <mark>0.10₽</mark>
+                                        <% if (max_count == 0) { %>
+                                            Стоимость <mark>0.00₽</mark>
+                                        <% } else { %>
+                                            Стоимость <mark>0.10₽</mark>
+                                        <% } %>
                                     </div>
 
                                     <div class="form-group">
@@ -218,6 +226,8 @@
                             <code>https://vk.com/id266510818?w=wall266510818_67</code>
                             или
                             <code>https://vk.com/ngc666?w=wall-52884277_1020</code>
+                            или
+                            <code>https://vk.com/wall-52884277_1020</code>
                             <p>2. Введите количество лайков</p>
                             <p>3. Нажмите на кнопку "Создать задачу"</p>
                         </div>

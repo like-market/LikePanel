@@ -26,4 +26,22 @@ router.post('/change_balance', function(req, res) {
 	}
 	res.send('Success')
 })
+
+router.post('/add_account', function(req, res) {
+	if (!req.isAuthenticated()) return res.redirect('/login');
+	if (!req.user.admin) return res.redirect('/panel');
+
+	var accounts = [];
+	var data = req.body.accounts.split("\n");
+	for (i = 0; i < data.length; i++) {
+		data[i] = data[i].split(':')
+		accounts.push({login: data[i][0], password: data[i][1]});
+	}
+	console.log(accounts);
+	
+	utils.vk.addAccount(accounts);
+
+	res.send('Success')
+})
+
 module.exports = router

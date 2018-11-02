@@ -14,6 +14,7 @@ router.get('/logout', function(req, res){
 });
 
 
+router.use('/admin', require('./admin.js'));
 router.use('/panel', require('./panel.js'));
 router.use('/login', require('./login.js'));
 router.use('/register', require('./register.js'));

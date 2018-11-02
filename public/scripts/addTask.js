@@ -32,8 +32,8 @@ $('#create').click(function() {
         return;
     }
 
-
-    var cost = like_count * price;
+    var cost = ($('#like_count').val() * price).toFixed(2);
+    console.log(cost, balance)
     if (cost > balance) {
         toastr.error('У вас не хватает средств')
         return;
@@ -42,7 +42,7 @@ $('#create').click(function() {
     var url = $('#url').val()
 
     //const regex = /(https?:\/\/)?vk.com\/(.*)\?w=wall([0-9-]*)_([0-9]*)(%2Fall)?(\?.*)?/gm;
-    const regex = /(https?:\/\/)?vk.com\/(.*)\?w=wall(-?[0-9-]*_[0-9]*)(%2Fall)?(\?.*)?/gm;
+    const regex = /(https?:\/\/)?vk.com\/(.*)(\?w=)?wall([0-9-]*_[0-9]*)(%2Fall)?(\?.*)?/gm;
     match = regex.exec(url)
 
     if (match == null) {
@@ -50,12 +50,12 @@ $('#create').click(function() {
         $('#url').css('border', '1px solid red')
         return;
     }
-    // post_id = match[3]
+    // post_id = match[4]
     // console.log(post_id)
 
     $.ajax({
         type: 'POST',
-        url: 'http://127.0.0.1/addtask/get_wall',
+        url: 'http://127.0.0.1/addtask/add_task',
         data: JSON.stringify({
             name: $('#name').val(),
             url: url,
@@ -73,6 +73,15 @@ $('#create').click(function() {
                     setTimeout(function() {
                         //window.location.href = "/panel";
                     }, 2000)
+                    break;
+                case 'Not enough money':
+                    toastr.error('У вас не хватает средств')
+                    break;
+                case 'Error url':
+                    toastr.error('Неверный URL записи на стене')
+                    break;
+                case 'Invalid amount likes':
+                    toastr.error('Неверное количество лайков')
                     break;
                 default:
                     toastr.error("ERROR: " + res);

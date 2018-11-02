@@ -7,7 +7,7 @@ router.get('/', function(req, res) {
 	if (!req.isAuthenticated()) return res.redirect('/login');
 
 	db.tasks.findById(req.user.id, function(err, data) {
-		if (err) return console.log(err);
+		if (err) return console.error(err);
 
 		res.render('tasks', {user: req.user, tasks: data});
 	})

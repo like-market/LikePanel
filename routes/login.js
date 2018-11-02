@@ -15,16 +15,17 @@ router.post('/', function(req, res, next) {
 	passport.authenticate('local', function(err, user, info) {
 		if (err) return next(err);
 		
-		if (info == 'Missing credentials') {
-			return res.send('Bad Request');
-		}else if (!user) {
+		// Если не найден пользователь
+		if (!user) {
 			return res.send('Unauthorized');
 		}
+
+		// Пытаемся авторизовать
 		req.logIn(user, function(err) {
       		if (err) return next(err);
       		res.send('Success')
       		ip = req.connection.remoteAddress.split(':').pop();
-      		db.activity.auth(user, ip);
+      		db.activity.auth(user.id, ip);
     	});
   	})(req, res, next);
 });
