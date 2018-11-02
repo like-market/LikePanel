@@ -1,0 +1,50 @@
+<% /**
+    * Панелька слева
+    * @param isAdmin [bool] - привилегия пользователя 
+    * @param page [string] - название страницы
+    */ %>
+<aside class="navigation">
+    <nav>
+        <ul class="nav luna-nav">
+            <li class="nav-category">
+                Основное меню
+            </li>
+            <li <% if (page == 'panel') { %> class="active" <% } %>>
+                <a href="index">Главная</a>
+            </li>
+            <li <% if (page == 'addtask' || page == 'tasks') { %> class="active" <% } %>>
+                <a href="#uielements" data-toggle="collapse" aria-expanded="false">
+                    Накрутка<span class="sub-nav-icon"> <i class="stroke-arrow"></i> </span>
+                </a>
+                <ul id="uielements" class="nav nav-second collapse <% if (page == 'addtask' || page == 'tasks') { %>in<% } %>">
+                    <li <% if (page == 'tasks') { %> class="active" <% } %>>
+                        <a href="tasks">Все задачи</a>
+                    </li>
+                    <li <% if (page == 'addtask') { %> class="active" <% } %>>
+                        <a href="addtask">Создать задачу</a>
+                    </li>
+                </ul>
+            </li>
+            <li <% if (page == 'profile') { %> class="active" <% } %>>
+                <a href="profile">Профиль</a>
+            </li> 
+            <li <% if (page == 'news') { %> class="active" <% } %>>
+                <a href="news">Новости</a>
+            </li>
+            <li <% if (page == 'support') { %> class="active" <% } %>>
+                <a href="support">Помощь</a>
+            </li>
+            <% if (isAdmin) { %>
+                <li <% if (page == 'admin') { %> class="active" <% } %>>
+                    <a href="admin">Админка</a>
+                </li>
+            <% } %>
+
+            <li class="nav-info">
+                <div class="m-t-xs">
+                    <span class="c-white">LikePanel</span> сервис для накрутки лайков.
+                </div>
+            </li>
+        </ul>
+    </nav>
+</aside>
