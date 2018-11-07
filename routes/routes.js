@@ -25,5 +25,6 @@ router.use('/tasks', require('./tasks.js'));
 router.use('/support', require('./support.js'));
 router.use('/profile', require('./profile.js'));
 router.use('/addtask', require('./addTask.js'));
+router.use('/comments', require('./comments.js'));
 
 module.exports = router
