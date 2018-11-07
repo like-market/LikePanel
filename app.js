@@ -16,8 +16,15 @@ var session = require('express-session')
 var passport = require('passport')
 var Strategy = require('passport-local').Strategy;
 
-var path    = require("path");
-
+async function test() {
+    try {
+    var vk = await db.vk.getOutdated()
+    }catch (e) {
+        console.log(e)
+    }
+    console.log(vk)
+}
+test()
 
 passport.use(new Strategy(
     function(username, password, cb) {
@@ -49,7 +56,7 @@ app.use(bodyParser.urlencoded({   // To support URL-encoded bodies
 })); 
 
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, '/public'));
+app.set('views', require("path").join(__dirname, '/public'));
 
 app.use(session({
     secret: 'KJjsdz',
@@ -66,9 +73,6 @@ app.use(passport.session());
 
 app.use(require('./routes/routes.js'))
 
-app.use(function (req, res) {
-    res.redirect('/panel')
-})
 
 
 // Сертификаты

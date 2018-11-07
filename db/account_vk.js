@@ -1,5 +1,8 @@
 var db = require('./index.js').db;
 
+/**
+ * Добавляем аккаунт в бд
+ */
 exports.addAccount = function(user_id, login, password, access_token = null, cb) {
 	process.nextTick(function() {
 		var sql = "INSERT INTO `account_vk`(user_id, login, password, access_token, status) VALUES('"
@@ -18,6 +21,9 @@ exports.addAccount = function(user_id, login, password, access_token = null, cb)
 	})
 }
 
+/**
+ * Получаем токены активных аккаунтов
+ */
 exports.getActiveAccounts = function(cb) {
 	process.nextTick(function() {
 		var sql = "SELECT `user_id`, `access_token` FROM `account_vk`";
@@ -34,6 +40,9 @@ exports.getActiveAccounts = function(cb) {
 	})
 }
 
+/**
+ * Получаем количество активных аккаунтов
+ */
 exports.getActiveAccountsCount = function(cb) {
 	process.nextTick(function() {
 		var sql = "SELECT COUNT(*) FROM `account_vk`"
@@ -62,6 +71,20 @@ exports.getAllAccounts = function(cb) {
 			cb(err, accounts)
         })
 	})
+}
+
+exports.getOutdated = function () {
+	return new Promise(function(resolve, reject){
+		var sql = "SELECT `access_token` FROM `account_vk` WHERE `access_token` IS NOT NULL"
+		sql += " AND `status` = 'active' ORDER BY RAND() LIMIT 1";
+
+		db.query(sql, function(err, rows) {
+			if (err) reject(err)
+reject('asdasd')
+			var access_token = JSON.parse(JSON.stringify(rows[0])).access_token
+			resolve(access_token)
+        })
+    })
 }
 
 exports.getRandomAccessToken = function(cb) {

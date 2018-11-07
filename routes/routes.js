@@ -13,6 +13,10 @@ router.get('/logout', function(req, res){
 	res.redirect('/login');
 });
 
+// Вывод главной страницы
+router.get('/', function(req, res) {
+	res.render('index')
+})
 
 router.use('/admin', require('./admin.js'));
 router.use('/panel', require('./panel.js'));
@@ -26,5 +30,10 @@ router.use('/support', require('./support.js'));
 router.use('/profile', require('./profile.js'));
 router.use('/addtask', require('./addTask.js'));
 router.use('/comments', require('./comments.js'));
+
+// Вывод страницы 404
+router.use(function(req, res) {
+	res.render('error')
+})
 
 module.exports = router

@@ -1,0 +1,44 @@
+h1, h2, h3, h4, h5, h6 {
+    color: #FFFFFF;
+}
+
+.panel.panel-filled {
+  background-color: rgba(68, 70, 79, 0.5);
+}
+
+.desc {
+  margin-top: 90px;
+  margin-bottom: 90px;
+  padding: 30px 25px;
+}
+
+.prime {
+  background-color: #2a2d35;
+  padding-top: 30px;
+  padding-bottom: 30px;
+  text-align: center;
+}
+
+.primes {
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+
+.content:before {
+  content: '';
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  z-index: -2;
+  left: 0;
+  right: 0;
+  background-image: radial-gradient(center, circle cover, #393b45 0%, #2d3038 70%);
+  background-image: -webkit-radial-gradient(top, circle cover, #393b45 0%, #2d3038 70%);
+  background-image: -moz-radial-gradient(center, circle cover, #393b45 0%, #2d3038 70%);
+  background-image: -o-radial-gradient(center, circle cover, #393b45 0%, #2d3038 70%);
+  background-position: 50%, 50%;
+}
+
+.navbar__main {
+  background-color: #f6a821 !important;
+}

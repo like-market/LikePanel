@@ -73,7 +73,7 @@ taskQueue.process('post', function(job, done){
 		if (like_now == data.like_need) {
 			db.tasks.setFinish(data.task_id)
 		}else {
-			db.task.setWait(data.task_id)
+			db.tasks.setWait(data.task_id)
 		}
 		done()
 	})

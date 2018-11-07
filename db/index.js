@@ -5,7 +5,7 @@ var db = mysql.createConnection({
     database: "likepanel",
     user: "root",
     password: "666666z",
-    timezone: '+7'
+    timezone: "+7"
 });
 
 db.connect(function(err) {
