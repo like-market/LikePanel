@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="shortcut icon" type="image/png" href="/images/favicon.png"/>
-    <link href='http://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900' rel='stylesheet' type='text/css'>
 
     <!-- Page title -->
     <title>LikeMarket | Накрутка лайков</title>
@@ -107,10 +107,9 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <% transactions.reverse().forEach(function(transaction) { 
-                                        console.log(transaction);
-                                        console.log(transaction.type)
-                                        %>
+                                    <% transactions.reverse().forEach(function(transaction) {
+                                        // если нет типа транзакции - выходим из перебора транзакции
+                                        if (transaction.type == null) return; %>
                                         <tr>
                                             <td><%= transaction.id %></td>
                                             <td>
@@ -216,7 +215,10 @@
         var chartUsersOptions = {
             xaxis: {
                 mode: "time",
-                timeformat: "%d"
+                timeformat: "%d.%m"
+            },
+            yaxis: {
+                min: 0
             },
             series: {
                 splines: {

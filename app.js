@@ -1,5 +1,8 @@
+var logger = require('./logger.js')
 var worker = require('./worker.js')
 var db = require('./db');
+
+const utils = require('./utils')
 
 const fs = require('fs');
 
@@ -16,35 +19,27 @@ var session = require('express-session')
 var passport = require('passport')
 var Strategy = require('passport-local').Strategy;
 
-async function test() {
-    try {
-    var vk = await db.vk.getOutdated()
-    }catch (e) {
-        console.log(e)
-    }
-    console.log(vk)
-}
-test()
+
 
 passport.use(new Strategy(
-    function(username, password, cb) {
-        db.users.findByUsername(username, function(err, user) {
-                if (err) { return cb(err); }
-                if (!user) { return cb(null, false); }
-                if (user.password != password) { return cb(null, false); }
-                return cb(null, user);
-            });
+    async function(username, password, cb) {
+        user = await db.users.findByUsername(username);
+        if (!user) { 
+            return cb(null, false);
         }
+        if (user.password != password) {
+            return cb(null, false);
+        }
+        return cb(null, user);
+    }
 ));
 passport.serializeUser(function(user, cb) {
     cb(null, user.id);
 });
 
-passport.deserializeUser(function(id, cb) {
-    db.users.findById(id, function (err, user) {
-        if (err) { return cb(err); }
-        cb(null, user);
-    });
+passport.deserializeUser(async function(id, cb) {
+    user = await db.users.findById(id)
+    cb(null, user);
 });
 
 var app = express();
@@ -93,9 +88,15 @@ const httpServer = http.createServer(function (req, res) {
 const httpsServer = https.createServer(credentials, app);
 
 httpServer.listen(80, () => {
-    console.log('HTTP Server running on port 80');
+    logger.info('HTTP Server running on port 80');
 });
 
 httpsServer.listen(443, () => {
-    console.log('HTTPS Server running on port 443');
+    logger.info('HTTPS Server running on port 443');
 });
+
+// Получаем рандомный валидный токен
+utils.vk.getRandomToken()
+
+// Обновляем аккаунты в бд, у которых статус 'need_token'
+utils.vk.updateAccounts()

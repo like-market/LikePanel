@@ -1,3 +1,4 @@
+const logger = require('../logger.js')
 var mysql = require('mysql');
 
 var db = mysql.createConnection({
@@ -5,18 +6,18 @@ var db = mysql.createConnection({
     database: "likepanel",
     user: "root",
     password: "666666z",
-    timezone: "+7"
+    //timezone: "+7"
 });
 
 db.connect(function(err) {
     if (err) throw err;
-    console.log("Database connected!");
+    logger.info("Database connected!");
 });
 
 
 exports.db = db;
 
-exports.vk = require('./account_vk.js');
+exports.vk = require('./vk.js');
 exports.users = require('./users.js');
 exports.tasks = require('./tasks.js');
 exports.finance = require('./finance.js');

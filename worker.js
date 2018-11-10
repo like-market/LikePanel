@@ -1,3 +1,4 @@
+var logger = require('./logger.js')
 var db = require('./db')
 var vkapi = require('./vkapi')
 
@@ -16,65 +17,70 @@ exports.addTask = function(user_id, type, url, like_need, task_id) {
 		task_id: task_id
 	}).save(function(err) {
 		if (err) console.error(err)
-		else console.log('Создана задача в воркере с id: ' + job.id)
+		else logger.info('Создана задача')
 	});
 }
-function sleep(ms){
-    return new Promise(resolve=>{
-        setTimeout(resolve,ms)
-    })
-}
-taskQueue.process('post', function(job, done){
+
+taskQueue.process('post', async function(job, done){
 	let data = job.data // { user_id: 12, type: 'post', url: '266510818_67', like_need: '2', task_id: 12 }
 
 	const regex = /(https?:\/\/)?vk.com\/(.*)(\?w=)?wall([0-9-]*_[0-9]*)(%2Fall)?(\?.*)?/gm;
     match = regex.exec(data.url)
 
+    // Получаем данные о посте 
+    var post = match[4].split('_')
+    var owner_id = post[0]
+    var item_id  = post[1]
 
-    let post = match[4].split('_')
-    let owner_id = post[0]
-    let item_id  = post[1]
+    // Получаем все аккаунты
+	accounts = await db.vk.getActiveAccounts();
 
-	db.vk.getActiveAccounts(async function(err, accounts) {
-		if (err) return done(err)
+	var account_index = 0; // Аккаунт, который будет лайкать
 
-		var account_index = 0;
+	for (var like_now = 0; like_now < data.like_need;) {
+		var access_token = accounts[account_index].access_token;
 
-		for (var like_now = 0; like_now < data.like_need;) {
-			await sleep(500)
-			var access_token = accounts[account_index].access_token;
-			account_index++;
+		// Пытаемся поставить лайк
+		var result = await vkapi.addLike(data.type, owner_id, item_id, access_token);
 
-			var result = await vkapi.addLike(data.type, owner_id, item_id, access_token);
-			if (result.data.hasOwnProperty('error')) {
-				msg = result.data.error.error_msg
-				if (msg.indexOf('User authorization failed: invalid session.')) {
-					db.vk.setAccountStatus(accounts[account_index].user_id, 'need_token')
-					console.log('Нужно запросить токен (1)')
-				}
-				if (msg.indexOf('User authorization failed: invalid access_token (2).')) {
-					db.vk.setAccountStatus(accounts[account_index].user_id, 'need_token')
-					console.log('Нужно запросить токен (2)')
-				}else {
-					console.error(msg);
-				}
-				console.log('Account user_id: ' + accounts[account_index].user_id)
+		console.log(result)
+		return;
+		
+		// Если есть ошибка
+		if (result.hasOwnProperty('error')) {
+			msg = result.error.error_msg
+			if (msg.indexOf('User authorization failed: invalid session.')) {
+				db.vk.setAccountStatus(accounts[account_index].user_id, 'need_token')
+				logger.error('Невалидная сессия у акк:' + accounts[account_index].user_id)
+			}
+			if (msg.indexOf('User authorization failed: invalid access_token (2).')) {
+				db.vk.setAccountStatus(accounts[account_index].user_id, 'need_token')
+				logger.error('Невалидный токен у акк: ' + accounts[account_index].user_id)
 			}else {
-				like_now++
-				db.tasks.inrementLikes(data.task_id);
-				console.log('Поставлен лайк')
+				logger.error('Неизвестная ошибка')
+				logger.error(msg);
 			}
-			if (accounts[account_index] == undefined) {
-				console.error('Не получается завершить задачу ' + data.task_id)
-				break;
-			}
+
+		// Если лайк успешно поставлен
+		}else if (result.hasOwnProperty('response')) {
+			like_now++; // Увеличиваем кол-во лайков
+			db.tasks.inrementLikes(data.task_id);
+			logger.info('Поставлен лайк')
 		}
-		// Если все лайки поставлены - завершаем задачу
-		if (like_now == data.like_need) {
-			db.tasks.setFinish(data.task_id)
-		}else {
-			db.tasks.setWait(data.task_id)
+
+		// Перемещаемся к следующему аккаунта
+		account_index++;
+
+		if (accounts[account_index] == undefined) {
+			console.error('Не получается завершить задачу ' + data.task_id)
+			break;
 		}
-		done()
-	})
+	}
+	// Если все лайки поставлены - завершаем задачу
+	if (like_now == data.like_need) {
+		db.tasks.setFinish(data.task_id)
+	}else {
+		db.tasks.setWait(data.task_id)
+	}
+	done()
 });

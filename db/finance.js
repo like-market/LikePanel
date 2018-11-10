@@ -4,15 +4,15 @@ var moment = require('moment');
 require('moment/locale/ru');
 
 // time - new Date(), например 2018-10-15T12:04:27.000Z
-exports.getBalanceAtDate = function(id, date, cb) {
-	process.nextTick(function() {
+exports.getBalanceAtDate = function(id, date) {
+	return new Promise(function(resolve, reject){
 		var sql = "SELECT `data`, `type` FROM `recent_activity` WHERE `user_id`=" + id;
 		sql += " AND (`type`='refill' OR `type`='spend')";
 		sql += " AND `create`<='" + date + "'";
 
 		db.query(sql, function(err, rows) {
-            if (err) return cb(err, null);
-            if (rows.length == 0) return cb(null, 0) 
+            if (err) return reject(err)
+            if (rows.length == 0) return resolve(0) 
 
             // Превращаем RowDataPacket в json
             var transactions = JSON.parse(JSON.stringify(rows));
@@ -24,66 +24,78 @@ exports.getBalanceAtDate = function(id, date, cb) {
             		balance += parseInt(transaction.data);
             	}
             })
-            return cb(err, balance)
+            return resolve(balance)
         })
 	})
 }
 
 // Получить баланс за последние 15 дней
-exports.getIntervalBalance = function(id, cb) {
-	process.nextTick(function() {
+exports.getIntervalBalance = function(id) {
+	return new Promise(async function(resolve, reject){
 		var from = moment().hour(0).minute(0).second(0).subtract(14, 'days').format();
 		var to = moment().format();
-		exports.getBalanceAtDate(id, from, function(err, data) {
-			let balance = parseInt(data);
 
-			var sql = "SELECT * FROM `recent_activity` WHERE `user_id`=" + id;
-			sql += " AND (`type`='refill' OR `type`='spend')";
-			sql += " AND `create`>='" + from + "' AND `create`<='" + to + "'";
-			sql += " ORDER BY `create` ASC";
+		var balance = await exports.getBalanceAtDate(id, from);
+		balance = parseInt(balance);
 
-			db.query(sql, function(err, transactions) {
-				if (err) return cb(err, null)
-				if (transactions.length == 0) {
-					return cb(err, []);
-					return;
+		var sql = "SELECT * FROM `recent_activity` WHERE `user_id`=" + id;
+		sql += " AND (`type`='refill' OR `type`='spend')";
+		sql += " AND `create`>='" + from + "' AND `create`<='" + to + "'";
+		sql += " ORDER BY `create` ASC";
+
+		db.query(sql, function(err, transactions) {
+			if (err) return reject(err)
+
+			var balances = []
+
+			// Если нет транзакций - то и а начале и в конце периода счет был нулевым 
+			if (transactions.length == 0) {
+				balances.push({create: from, balance: 0})
+				balances.push({create: to,   balance: 0})
+			}
+
+			// Если есть только одна транзакция, то вначале баланс был нулевым
+			if (transactions.length == 1) {
+				balances.push({create: from, balance: 0})
+			}
+
+			var transactions = JSON.parse(JSON.stringify(transactions));
+			transactions.forEach(function(transaction) {
+				if (transaction.type == 'refill') {
+					balance += parseInt(transaction.data);
+				}else if (transaction.type == 'spend') {
+					balance -= parseInt(transaction.data);
 				}
-				var balances = []
-
-				var transactions = JSON.parse(JSON.stringify(transactions));
-				transactions.forEach(function(transaction) {
-					if (transaction.type == 'refill') {
-						balance += parseInt(transaction.data);
-					}else if (transaction.type == 'spend') {
-						balance -= parseInt(transaction.data);
-					}
-					transaction.balance = balance;
-					balances.push( transaction );
-				})
-				return cb(err, balances);
+				transaction.balance = balance;
+				balances.push( transaction );
 			})
+			resolve(balances);
 		})
 	})
 }
 
 exports.spend = function(user_id, count) {
-	process.nextTick(function() {
+	return new Promise(function(resolve, reject){
 		var sql = "UPDATE `users` SET `balance` = `balance` - " + count
 		sql += " WHERE `id` = " + user_id;
 
 		db.query(sql, function(err, rows) {
-			if (err) console.log(err);
+			if (err) reject(error)
+			
+			resolve()
 		})
 	})
 }
 
-exports.AddBalance = function(user_id, count) {
-	process.nextTick(function() {
+exports.addBalance = function(user_id, count) {
+	return new Promise(function(resolve, reject){
 		var sql = "UPDATE `users` SET `balance` = `balance` + " + count
 		sql += " WHERE `id` = " + user_id;
 
 		db.query(sql, function(err, rows) {
-			if (err) console.log(err);
+			if (err) reject(err)
+			
+			resolve()
 		})
 	})
 }
