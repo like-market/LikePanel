@@ -1,4 +1,7 @@
-$(document).ready(function () {
+/**
+ * Графики
+ */
+/*$(document).ready(function () {
     var tasks = [{
         data: [ 
                 [1540376659000, 1.30],
@@ -47,7 +50,7 @@ $(document).ready(function () {
 
     $.plot($("#tasks-create"), tasks, chartUsersOptions);
     $.plot($("#refill-balance"), balance, chartUsersOptions);
-});
+});*/
 
 toastr.options = {
     "debug": false,
@@ -130,3 +133,73 @@ $('#change-balance').click(function() {
         }
     });
 })
+
+/********
+ ********
+ * Дальше идет работа с комментариями пользователей
+ * Функции next(), accept(), reject()
+ ********
+ ********/
+function clear() {
+    $('#comments-count').text('')
+    $('#comments-text').val('')
+    $('#comments-date').text('')
+}
+
+function next() {
+    var offset = $('#comments-id').text();
+
+    clear();
+
+    $.ajax({
+        type: 'POST',
+        url: '/comments/getnext',
+        data: JSON.stringify({
+            offset: offset
+        }),
+        contentType: 'application/json',
+        success: function(res) {
+            switch(res) {
+                case 'Does not exist':
+                    toastr.error("Нет непроверенных комментариев");
+                    break;
+                default:
+                    var comments = JSON.parse(res)
+                    console.log(comments)
+                    $('#comments-id').text(comments.id);
+                    $('#comments-count').text(comments.count)
+                    $('#comments-text').val(comments.text)
+                    $('#comments-date').text(comments.create)
+            }
+        }
+    });
+}
+
+/**
+ * @param status - 'accept' or 'reject'
+ */
+function setStatus(status) {
+    var id = $('#comments-id').text();
+
+    $.ajax({
+        type: 'POST',
+        url: '/comments/setstatus',
+        data: JSON.stringify({
+            id: id,
+            status: status
+        }),
+        contentType: 'application/json',
+        success: function(res) {
+            switch(res) {
+                case 'Success':
+                    if (status == 'accept') toastr.success("Комментарий подтвержден");
+                    if (status == 'reject') toastr.success("Комментарий откнонен");        
+                    clear();
+                    break;
+                default:
+                    console.error('Untraceable error')
+                    console.error(res);
+            }
+        }
+    });
+}

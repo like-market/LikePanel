@@ -9,10 +9,13 @@
             <li class="nav-category">
                 Основное меню
             </li>
-            <li <% if (page == 'panel') { %> class="active" <% } %>>
+            <!-- <li <% if (page == 'panel') { %> class="active" <% } %>>
                 <a href="/panel">Главная</a>
+            </li> -->
+            <li <% if (page == 'panel') { %> class="active" <% } %>>
+                <a href="panel">Главная</a>
             </li>
-            <li <% if (page == 'addtask' || page == 'tasks') { %> class="active" <% } %>>
+            <!-- <li <% if (page == 'addtask' || page == 'tasks') { %> class="active" <% } %>>
                 <a href="#uielements" data-toggle="collapse" aria-expanded="false">
                     Накрутка<span class="sub-nav-icon"> <i class="stroke-arrow"></i> </span>
                 </a>
@@ -24,6 +27,12 @@
                         <a href="addtask">Создать задачу</a>
                     </li>
                 </ul>
+            </li> -->
+            <li <% if (page == 'addtask') { %> class="active" <% } %>>
+                <a href="addtask">Создать задачу</a>
+            </li>
+            <li <% if (page == 'comments') { %> class="active" <% } %>>
+                <a href="comments">Комментарии</a>
             </li>
             <li <% if (page == 'profile') { %> class="active" <% } %>>
                 <a href="profile">Профиль</a>
@@ -32,7 +41,7 @@
                 <a href="news">Новости</a>
             </li>
             <li <% if (page == 'support') { %> class="active" <% } %>>
-                <a href="support">Помощь</a>
+                <a href="support">Помощь и условия</a>
             </li>
             <% if (isAdmin) { %>
                 <li <% if (page == 'admin') { %> class="active" <% } %>>
@@ -43,6 +52,9 @@
             <li class="nav-info">
                 <div class="m-t-xs">
                     <span class="c-white">LikeMarket</span> сервис для накрутки лайков.
+                </div>
+                <div class="m-t-xs">
+                    Мы в телеграмм <a class="c-white" href="https://tgdo.me/like_market">@like_market</a>
                 </div>
             </li>
         </ul>

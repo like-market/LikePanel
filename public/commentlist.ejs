@@ -1,0 +1,46 @@
+<tr>
+    <th>Статус</th>
+    <th>Название</th>
+    <th>Кол-во комментариев</th>
+    <th>Создана</th>
+    <th>Действия</th>
+</tr>
+</thead>
+<tbody>
+
+
+<% /**
+    * Вывод данных у таблицы с наборами комментариев
+    * @param comments [object] - список наоборов комментариев
+    * @param moment [module] - модуль для работы со временем
+    */ %>
+<% comments.forEach(function(comment) { %>
+    <tr>
+        <td>
+            <% if (comment.status == 'accept') { %>
+                <span class="label label-success">Проверено</span>
+            <% }else if (comment.status == 'checking') { %>
+                <span class="label label-accent">Проверяется</span>            
+            <% }else if (comment.status == 'reject') { %>
+                <span class="label label-danger">Отклонено</span>
+            <% } %>
+        </td>
+        <td>
+            <%= comment.name %>
+        </td>
+        <td>
+            <%= comment.count %>
+        </td>
+        <td>
+            <%= moment(comment.create).format("D MMMM YYYY") %>
+        </td>
+        <td>
+            <button class="btn btn-default btn-xs" onclick="editComments(<%= comment.id %>, <%= comment.owner_id %>);">
+                <i class="fa fa-pencil"></i> Редактировать
+            </button>
+            <button class="btn btn-default btn-xs" onclick="deleteComments(<%= comment.id %>, <%= comment.owner_id %>);">
+                <i class="fa fa-trash"></i> Удалить
+            </button>
+        </td>
+    </tr>
+<% }); %>
