@@ -1,112 +1,240 @@
-<!DOCTYPE html>
 <html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<head>
+    <!-- Page title -->
+    <title>LikeMarket | Накрутка лайков</title>
 
-  <meta charset="utf-8">
+    <link
+      rel="shortcut icon"
+      type="image/png"
+      href="https://like-market.ru/images/favicon.png"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900"
+      rel="stylesheet"
+      type="text/css"
+    />
 
-  <title>LikeMarket</title>
-  <meta name="description" content="">
+    <!-- CSS -->
+    <link
+      rel="stylesheet"
+      href="https://like-market.ru/vendor\bootstrap\css\bootstrap.css"
+    />
 
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+      type="text/css"
+      rel="stylesheet"
+      media="screen,projection"
+    />
 
-  <link rel="shortcut icon" type="image/png" href="/images/favicon.png"/>
-  
-  <!-- Custom Browsers Color Start -->
-  <meta name="theme-color" content="#000">
-  <!-- Custom Browsers Color End -->
+    <link
+      href="./styles/index.css"
+      type="text/css"
+      rel="stylesheet"
+      media="screen,projection"
+    />
+  </head>
 
-  <link rel="stylesheet" href="https://bootswatch.com/4/lux/bootstrap.min.css">
-  <link rel="stylesheet" href="/styles/index.css">
-
-</head>
-
-<body>
-
-  <div class="content">
-
-    <nav class="navbar__main navbar navbar-expand-lg navbar-dark bg-primary">
-      <a class="navbar-brand" href="#">LikeMarket</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="collapse navbar-collapse" id="navbarColor01">
-        <ul class="navbar-nav mr-auto">
-<!--           <li class="nav-item active">
-            <a class="nav-link" href="#">Главная <span class="sr-only">(current)</span></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">FAQ</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Регистрация</a>
-          </li> -->
-        </ul>
-        <form class="form-inline my-2 my-lg-0" on>
-          <button class="btn btn-secondary my-2 my-sm-0" type="submit">Вход</button>
-        </form>
-      </div>
-    </nav>
-
-    <div class="container">
-      <div class="panel panel-filled">
-        <div class="desc panel-body">
-          <h1>LikeMarket - удобный сервис для накрутки ВКонтакте</h1>
-          <hr>
-          <h4>Накручивай комментарии, репосты, лайки в один клик!</h4>
+  <body>
+    <div class="section no-pad-bot" style="background: #2f323b">
+      <div class="container">
+        <center>
+          <img
+            width="155px"
+            src="./images/like1.png"
+          />
+        </center>
+        <h1
+          style="color: #FFFFFF !important"
+          class="header center teal-text text-lighten-2"
+        >
+          Сервис для накрутки лайков
+        </h1>
+        <div class="row center">
+          <h5 class="header col s12" style="color: #949ba2;">
+            Накручивай комментарии, репосты, лайки в один клик!
+          </h5>
         </div>
+        <div class="row center">
+          <a
+            href="login"
+            style="background: transparent!important; box-shadow: none; border: 1px solid #f6a821; color: #f6a821;"
+            class="btn-large waves-effect waves-light main-btn auth"
+            >Авторизация</a
+          >
+          <a
+            href="register"
+            style="background-color: #f6a821 !important;"
+            class="btn-register btn-large waves-effect waves-light main-btn"
+            >Регистрация</a
+          >
+        </div>
+        <br /><br /><br />
       </div>
-
-
     </div>
-
-  </div>
-
-  <div class="prime">
-    <div class="container">
-      <div class="section">
-        <h2>Что мы умеем накручивать?</h2>
-        <div class="primes">
+    <div class="sec-2" style="background: #24262d;">
+      <div class="container">
+        <div class="section">
+          <h3 style="color: #FFFFFF;">Что мы умеем накручивать?</h3>
           <div class="row">
             <div class="col s12 m4">
-              <div class="icon-block">
+              <div class="icon-block ">
                 <h2 class="center brown-text">
-                  <img src="https://i.imgur.com/NTiPQAd.png" alt="" width="70px">
+                  <img width="70px" src="./images/like3.png" />
                 </h2>
-                <h5 class="center">Репосты</h5>
-                <p class="light">Какой-то текст про репосты</p>
+                <h5 class="center" style="color: #949ba2;">Репосты</h5>
+
+                <!-- <p class="light">Какой то текст про репосты.</p> -->
+              </div>
+            </div>
+            <div class="col s12 m4">
+              <div
+                class="icon-block sec-info"
+                style="background-color: #2f323b;"
+              >
+                <h2 class="center brown-text">
+                  <img width="70px" src="./images/like2.png" />
+                </h2>
+                <h5 class="center" style="color: #949ba2;">Лайки</h5>
+
+                <!-- <p class="light">Какой то текст про лайки.</p> -->
               </div>
             </div>
             <div class="col s12 m4">
               <div class="icon-block">
                 <h2 class="center brown-text">
-                  <img src="https://i.imgur.com/3O7Xsb6.png" alt="" width="70px">
+                  <img width="70px" src="./images/like4.png" />
                 </h2>
-                <h5 class="center">Лайки</h5>
-                <p class="light">Какой-то текст про репосты</p>
-              </div>
-            </div>
-            <div class="col s12 m4">
-              <div class="icon-block">
-                <h2 class="center brown-text">
-                  <img src="https://i.imgur.com/pBXsvot.png" alt="" width="70px">
-                </h2>
-                <h5 class="center">Комментарии</h5>
-                <p class="light">Какой-то текст про репосты</p>
+                <h5 class="center" style="color: #949ba2;">Комментарии</h5>
+
+                <!-- <p class="light">Какой то текст про комментарии.</p> -->
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-
-  <script
-  src="https://code.jquery.com/jquery-3.3.1.min.js"
-  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-  crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
-</body>
+    <div class="counters" style="background: #2f323b">
+      <div class="container">
+        <div class="row counters" style="padding: 50px 0; color: #f6a821;">
+          <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+            <div class="crumina-module crumina-counter-item">
+              <div
+                class="counter-numbers counter c-yellow"
+                style="font-size: 46px;"
+              >
+                <span
+                  data-speed="2000"
+                  data-refresh-interval="3"
+                  data-to="30"
+                  data-from="2"
+                  >30</span
+                >
+                <div class="units" style="display: inline-block;">M+</div>
+              </div>
+              <span
+                style="font-size: 25px; color: #949ba2;"
+                class="counter-title"
+                >Лайков</span
+              >
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+            <div class="crumina-module crumina-counter-item">
+              <div
+                class="counter-numbers counter c-yellow"
+                style="font-size: 46px;"
+              >
+                <span
+                  data-speed="2000"
+                  data-refresh-interval="3"
+                  data-to="8"
+                  data-from="2"
+                  >8</span
+                >
+                <div class="units" style="display: inline-block;">M+</div>
+              </div>
+              <span
+                style="font-size: 25px; color: #949ba2;"
+                class="counter-title"
+                >Комментариев</span
+              >
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+            <div class="crumina-module crumina-counter-item">
+              <div
+                class="counter-numbers counter c-yellow"
+                style="font-size: 46px;"
+              >
+                <span
+                  data-speed="2000"
+                  data-refresh-interval="3"
+                  data-to="4"
+                  data-from="2"
+                  >4</span
+                >
+                <div class="units" style="display: inline-block;">M+</div>
+              </div>
+              <span
+                style="font-size: 25px; color: #949ba2;"
+                class="counter-title"
+                >Репостов</span
+              >
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+            <div class="crumina-module crumina-counter-item">
+              <div
+                class="counter-numbers counter c-yellow"
+                style="font-size: 46px;"
+              >
+                <span
+                  data-speed="2000"
+                  data-refresh-interval="3"
+                  data-to="50000"
+                  data-from="2"
+                  >50000</span
+                >
+              </div>
+              <span
+                style="font-size: 25px; color: #949ba2;"
+                class="counter-title"
+                >Заданий</span
+              >
+            </div>
+          </div>
+          <div
+            class="col-lg-12 col-md-12 col-sm-12 col-xs-12"
+            style="margin-top: 30px"
+          >
+            <span style="font-size: 25px" class="c-white"
+              >Стабильная работа сервиса</span
+            >
+            <p class="c-semitransparent-white" style="color: #949ba2;">
+              Благодаря мощности и защищенности серверов, а также
+              профессионализму команды наш сервис выполняет большие объемы
+              заказов без сбоев и задержек
+            </p>
+          </div>
+          <div
+            class="col-lg-12 col-md-12 col-sm-12 col-xs-12"
+            style="text-align: center; margin-top: 30px"
+          >
+            <a
+              href="https://passport.webmoney.ru/asp/certview.asp?wmid=127547141810"
+            >
+              <img src="./images/webmoney.png" alt="webmoney" />
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Vendor scripts -->
+    <script src="https://like-market.ru\vendor\jquery\dist\jquery.min.js"></script>
+  </body>
 </html>

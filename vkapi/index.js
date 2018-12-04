@@ -26,7 +26,7 @@ exports.authorize = function(login, password) {
  * Функция проверяет наличие записи на стене
  * Использует рандомный токен
  */
-exports.getWallData = function(post_id, cb) {
+exports.getWallData = function(post_id) {
     return axios.get('https://api.vk.com/method/wall.getById', {
         params: {
             posts: post_id,
@@ -43,7 +43,7 @@ exports.getWallData = function(post_id, cb) {
 /**
  * @return promise
  */
-exports.addLike = function(type, owner_id, item_id, access_token, cb) {
+exports.addLike = function(type, owner_id, item_id, access_token) {
     return axios.get('https://api.vk.com/method/likes.add', {
         params: {
             type: type,
@@ -57,4 +57,25 @@ exports.addLike = function(type, owner_id, item_id, access_token, cb) {
     }).catch(function (error) {
         return error.response.data
     });
+}
+
+/**
+ * Получить список пользователей, кто поставил лайк записи
+ */
+exports.getLikeList = function(type, owner_id, item_id) {
+    return axios.get('https://api.vk.com/method/likes.getList', {
+        params: {
+            type: type,
+            owner_id: owner_id,
+            item_id: item_id,
+            access_token: utils.vk.random_access_token,
+            filter: 'likes', // Возвращаем только лайки
+            count: 1000, 
+            v: 5.56
+        }
+    }).then(function (response) {
+        return response.data.response.items
+    }).catch(function (error) {
+        return error.response.data
+    });    
 }

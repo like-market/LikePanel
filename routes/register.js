@@ -1,41 +1,43 @@
-var express = require('express');
-var db = require('../db');
+var express = require("express");
+var db = require("../db");
 var router = express.Router();
-var path    = require("path");
+var path = require("path");
 
+router.get("/", function(req, res) {
+  if (req.isAuthenticated()) return res.redirect("/tasks");
 
-router.get('/', function(req, res){
-	if (req.isAuthenticated()) return res.redirect('/panel');
+  res.sendFile(path.join(__dirname + "/../public/register.htm"));
+});
 
-	res.sendFile(path.join(__dirname + '/../public/register.htm'));
-})
+router.post("/", async function(req, res) {
+  // Если одно из полей - пустое
+  if (
+    req.body.password == "" ||
+    req.body.username == "" /*|| req.body.email == ""*/
+  ) {
+    return res.send("Empty field");
+  }
 
-router.post('/', async function(req, res){
-	// Если одно из полей - пустое
-	if (req.body.password == "" || req.body.username == "" /*|| req.body.email == ""*/) {
-		return res.send('Empty field');
-	}
+  // Если пароли не совпадают
+  if (req.body.password != req.body.repeatpassword) {
+    return res.send("Password no match");
+  }
 
-	// Если пароли не совпадают
-	if (req.body.password != req.body.repeatpassword) {
-		return res.send('Password no match');
-	}
-	
-	// Проверка на то, что ник уже занят
-	user = await db.users.findByUsername(req.body.username)
-	if (user != null) return res.send('User already exist');
-	
-	// Регестрируем клиента		
-	await db.users.register(req.body.username, req.body.password, req.body.email)
-	user = await db.users.findByUsername(req.body.username);
+  // Проверка на то, что ник уже занят
+  user = await db.users.findByUsername(req.body.username);
+  if (user != null) return res.send("User already exist");
 
-	req.login(user, function(err) {
-		if (err) return console.error(err);
-		res.send('Success')
+  // Регестрируем клиента
+  await db.users.register(req.body.username, req.body.password, req.body.email);
+  user = await db.users.findByUsername(req.body.username);
 
-		ip = req.connection.remoteAddress.split(':').pop();
-		db.activity.register(user.id, ip);
-	})
-})
+  req.login(user, function(err) {
+    if (err) return console.error(err);
+    res.send("Success");
 
-module.exports = router
+    ip = req.connection.remoteAddress.split(":").pop();
+    db.activity.register(user.id, ip);
+  });
+});
+
+module.exports = router;

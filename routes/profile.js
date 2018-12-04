@@ -14,7 +14,8 @@ router.get('/', async function(req, res) {
 
 	statistic    = await db.users.getBasicStatistic(req.user.id);
 
-	res.render('profile', {moment: moment,
+	res.render('profile', {
+		moment: moment,
 		user: req.user,
 		activities: activities,
 		transactions: transactions,

@@ -33,7 +33,22 @@ taskQueue.process('post', async function(job, done){
     var item_id  = post[1]
 
     // Получаем все аккаунты
-	accounts = await db.vk.getActiveAccounts();
+	all_accounts = await db.vk.getActiveAccounts();
+
+	// Аккаунты, которые еще не поставили лайки
+	accounts = [];
+
+	// Получаем аккаунты, которые уже поставили лайки
+	already_set = await vkapi.getLikeList('post', owner_id, item_id);
+	console.log(already_set)
+	all_accounts.forEach(function(account) {
+		// Если аккаунт не поставил лайк, добавляем его в массив аккаунтов
+		if (already_set.indexOf(account.user_id) == -1) {
+			accounts.push(account);
+		} else {
+			console.log('Аккаунт уже поставил лайк : ' + account.user_id )
+		}
+	})
 
 	var account_index = 0; // Аккаунт, который будет лайкать
 
@@ -43,9 +58,6 @@ taskQueue.process('post', async function(job, done){
 		// Пытаемся поставить лайк
 		var result = await vkapi.addLike(data.type, owner_id, item_id, access_token);
 
-		console.log(result)
-		return;
-		
 		// Если есть ошибка
 		if (result.hasOwnProperty('error')) {
 			msg = result.error.error_msg
@@ -71,8 +83,10 @@ taskQueue.process('post', async function(job, done){
 		// Перемещаемся к следующему аккаунта
 		account_index++;
 
+		// Если больще нету аккаунтов, а задача не завершена
 		if (accounts[account_index] == undefined) {
-			console.error('Не получается завершить задачу ' + data.task_id)
+			logger.error('Не получается завершить задачу ' + data.task_id)
+
 			break;
 		}
 	}

@@ -1,277 +1,305 @@
 ﻿<!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <link rel="shortcut icon" type="image/png" href="/images/favicon.png"/>
-    <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900' rel='stylesheet' type='text/css'>
+    <link rel="shortcut icon" type="image/png" href="/images/favicon.png" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900"
+      rel="stylesheet"
+      type="text/css"
+    />
 
     <!-- Page title -->
     <title>LikeMarket | Накрутка лайков</title>
 
     <!-- Vendor styles -->
-    <link rel="stylesheet" href="vendor\fontawesome\css\font-awesome.css">
-    <link rel="stylesheet" href="vendor\animate.css\animate.css">
-    <link rel="stylesheet" href="vendor\bootstrap\css\bootstrap.css">
+    <link rel="stylesheet" href="vendor\fontawesome\css\font-awesome.css" />
+    <link rel="stylesheet" href="vendor\animate.css\animate.css" />
+    <link rel="stylesheet" href="vendor\bootstrap\css\bootstrap.css" />
 
     <!-- App styles -->
-    <link rel="stylesheet" href="styles\pe-icons\pe-icon-7-stroke.css">
-    <link rel="stylesheet" href="styles\pe-icons\helper.css">
-    <link rel="stylesheet" href="styles\stroke-icons\style.css">
-    <link rel="stylesheet" href="styles\style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="styles\pe-icons\pe-icon-7-stroke.css" />
+    <link rel="stylesheet" href="styles\pe-icons\helper.css" />
+    <link rel="stylesheet" href="styles\stroke-icons\style.css" />
+    <link rel="stylesheet" href="styles\style.css" />
+  </head>
+  <body>
+    <!-- Wrapper -->
+    <div class="wrapper">
+      <!-- Header -->
+      <%- include('header', {user:user}); %>
+      <!-- End header -->
 
-<!-- Wrapper-->
-<div class="wrapper">
+      <!-- Navigation -->
+      <%- include('navigation', {isAdmin: user.admin, page: 'support'}); %>
+      <!-- End navigation -->
 
-    <!-- Header-->
-     <%- include('header', {user:user}); %>
-    <!-- End header-->
-
-    <!-- Navigation-->
-    <%- include('navigation', {isAdmin: user.admin, page: 'support'}); %>
-    <!-- End navigation-->
-
-
-    <!-- Main content-->
-    <section class="content">
+      <!-- Main content -->
+      <section class="content">
         <div class="container-fluid">
-
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="view-header">
-                        <div class="header-icon">
-                            <i class="pe page-header-icon pe-7s-help2"></i>
-                        </div>
-                        <div class="header-title">
-                            <h3>Помощь</h3>
-                            <small>
-                                Ответы на частозадаваемые вопросы
-                            </small>
-                        </div>
-                    </div>
-                    <hr>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="view-header">
+                <div class="header-icon">
+                  <i class="pe page-header-icon pe-7s-help2"></i>
                 </div>
+                <div class="header-title">
+                  <h3>Помощь</h3>
+                  <small> Ответы на часто задаваемые вопросы </small>
+                </div>
+              </div>
+              <hr />
             </div>
+          </div>
 
-            <div class="row">
-
-                <div class="col-md-12">
-
-                    <div class="panel panel-filled">
-
-                        <div class="panel-body">
-
-                            <h3>Support </h3>
-
-                            <p>
-                                Fill the form and find answer to your question or contact with us on support email.
-                            </p>
-
-                            <div class="form-group">
-                                <input class="form-control" placeholder="What are you looking for ?">
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="panel-group">
+                <ul class="list-unstyled">
+                  <li class="panel panel-filled support-question active">
+                    <a href="#answer1" data-toggle="tab">
+                      <div class="panel-body">
+                        <p class="font-bold c-white">Условия пользования</p>
+                        <p>
+                          Используя сервис like-market.ru, пользователь
+                          безусловно соглашается с изложенными правилами.
+                        </p>
+                      </div>
+                    </a>
+                  </li>
+                  <li class="panel panel-filled support-question">
+                    <a href="#answer2" data-toggle="tab">
+                      <div class="panel-body">
+                        <p class="font-bold c-white">Ответственность</p>
+                        <p>
+                          Мы являемся независимым предприятием, оказывающим
+                          услуги, и самостоятельно принимаем решения о ценах и
+                          предложениях.
+                        </p>
+                      </div>
+                    </a>
+                  </li>
+                  <li class="panel panel-filled support-question">
+                    <a href="#answer3" data-toggle="tab">
+                      <div class="panel-body">
+                        <p class="font-bold c-white">Support question 3</p>
+                        <p>
+                          Various have evolved over the years, sometimes by
+                          accident.
+                        </p>
+                      </div>
+                    </a>
+                  </li>
+                  <li class="panel panel-filled support-question">
+                    <a href="#answer4" data-toggle="tab">
+                      <div class="panel-body">
+                        <p class="font-bold c-white">Support question 4</p>
+                        <p>
+                          Versions have evolved over the years, sometimes by
+                          accident, sometimes on purpose
+                        </p>
+                      </div>
+                    </a>
+                  </li>
+                </ul>
+              </div>
             </div>
-            <div class="row">
-
-                <div class="col-md-4">
-
-                    <div class="panel-group">
-
-                        <ul class="list-unstyled">
-                            <li class="panel panel-filled support-question active">
-                                <a href="#answer1" data-toggle="tab">
-                                    <div class="panel-body">
-                                        <p class="font-bold c-white">Support question 1</p>
-                                        <p>
-                                            Various versions have evolved over the years, sometimes by accident, sometimes on purpose.
-                                        </p>
-                                    </div>
-                                </a>
-                            </li>
-                            <li class="panel panel-filled support-question">
-                                <a href="#answer2" data-toggle="tab">
-                                    <div class="panel-body">
-                                        <p class="font-bold c-white">Support question 2</p>
-                                        <p>
-                                            Have evolved over the years, sometimes by accident, sometimes.
-                                        </p>
-                                    </div>
-                                </a>
-                            </li>
-                            <li class="panel panel-filled support-question">
-                                <a href="#answer3" data-toggle="tab">
-                                    <div class="panel-body">
-                                        <p class="font-bold c-white">Support question 3</p>
-                                        <p>
-                                            Various have evolved over the years, sometimes by accident.
-                                        </p>
-                                    </div>
-                                </a>
-                            </li>
-                            <li class="panel panel-filled support-question">
-                                <a href="#answer4" data-toggle="tab">
-                                    <div class="panel-body">
-                                        <p class="font-bold c-white">Support question 4</p>
-                                        <p>
-                                            Versions have evolved over the years, sometimes by accident, sometimes on purpose
-                                        </p>
-                                    </div>
-                                </a>
-                            </li>
-                        </ul>
-
+            <div class="col-md-8">
+              <div class="panel">
+                <div class="panel-body">
+                  <div class="tab-content">
+                    <div id="answer1" class="tab-pane active">
+                      <h3>Условия пользования сайтом</h3>
+                      <ul>
+                        <li>
+                          Like-market.ru может быть использован для добавления
+                          лайков, подписчиков и просмотров к материалам на
+                          сервисах Вконтакте, Одноклассники, Instagram, YouTube.
+                          Такого рода активность противоречит правилам
+                          перечисленных сервисов. Пользователь понимает и
+                          соглашается с тем, что все риски, связанные с этим
+                          фактом, он целиком и полностью берет на себя.
+                          Like-market.ru старается обеспечить максимальное
+                          качество добавляемых лайков, подписчиков и просмотров.
+                          Однако всегда существует вероятность действий третьих
+                          сторон, например, администрации сайта, которые могут
+                          привести к блокировке подписавшихся или проставивших
+                          лайки аккаунтов, а также их удалению. Like-market.ru
+                          не несет ответственности за такие действия, и все
+                          подобные риски принимает пользователь.
+                        </li>
+                        <li>
+                          Используя сервис Like-market.ru, пользователь
+                          обязуется не предпринимать никаких действий, которые
+                          могут принести вред аккаунтам, от которых получены
+                          лайки, подписки или просмотры, включая занесение их в
+                          черный список своей страницы и удаление лайков, что
+                          также приводит к автоматическому занесению аккаунта,
+                          от которого получен лайк, в черный список страницы. В
+                          случае выявления таких, или других действий, носящих
+                          деструктивный характер, допустившим нарушение
+                          страницам будет навсегда запрещено использование
+                          сервиса Like-market.ru
+                        </li>
+                        <li>
+                          Работоспособность Like-market.ru полностью связана с
+                          работоспособностью социальных сетей. В случае, если
+                          социальные сети недоступны или качество сервиса
+                          соцсети деградировало, в работе Like-market.ru также
+                          могут наблюдаться перебои вплоть до полной
+                          неработоспособности. Like-market.ru не несет
+                          ответственности за любые нереализованные пользователем
+                          возможности в таком случае.
+                        </li>
+                        <li>
+                          Пользователь соглашается с тем, что Like-market.ru -
+                          это ПО, не свободное от ошибок. В ходе его работы,
+                          возможны сбои, ошибки и другие ситуации, которые
+                          приводят к невозможности нормально воспользоваться
+                          сервисом. Like-market.ru снимает с себя
+                          ответственность за возможные потери или упущенные
+                          возможности во всех случаях.
+                        </li>
+                      </ul>
                     </div>
 
-                </div>
-                <div class="col-md-8">
-
-                    <div class="panel">
-                        <div class="panel-body">
-                            <div class="tab-content">
-                                <div id="answer1" class="tab-pane active">
-                                    <h3>
-                                        Question 1
-                                    </h3>
-                                    <p>
-                                        Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy.
-                                    </p>
-                                    <ul>
-                                        <li>Lorem ipsum dolor sit amet, comes from</li>
-                                        <li>There are many variations of passages of Lorem Ipsum available</li>
-                                        <li>All the Lorem Ipsum generators on the Internet</li>
-                                    </ul>
-                                    <p class="font-bold c-white">
-                                        Contrary to popular belief, Lorem Ipsum is not
-                                    </p>
-                                    <p>
-                                        McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source.
-                                    </p>
-                                    <p>
-                                        It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.
-                                    </p>
-                                    <p>Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
-                                    </p>
-
-                                </div>
-
-                                <div id="answer2" class="tab-pane">
-                                    <h3>
-                                        Question 2
-                                    </h3>
-                                    <p>
-                                        Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy.
-                                    </p>
-                                    <ul>
-                                        <li>Lorem ipsum dolor sit amet, comes from</li>
-                                        <li>There are many variations of passages of Lorem Ipsum available</li>
-                                        <li>All the Lorem Ipsum generators on the Internet</li>
-                                        <li>Lorem ipsum dolor sit amet, comes from</li>
-                                        <li>All the Lorem Ipsum generators on the Internet</li>
-                                        <li>There are many variations of passages of Lorem Ipsum</li>
-                                        <li>All the Lorem Ipsum generators on the Internet</li>
-                                    </ul>
-                                    <p class="font-bold c-white">
-                                        Contrary to popular belief, Lorem Ipsum is not
-                                    </p>
-                                    <p>
-                                        McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source.
-                                    </p>
-                                    <p>
-                                        McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source.
-                                    </p>
-
-                                </div>
-                                <div id="answer3" class="tab-pane">
-                                    <h3>
-                                        Question 3
-                                    </h3>
-                                    <p>
-                                        Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy.
-                                    </p>
-                                    <ul>
-                                        <li>Lorem ipsum dolor sit amet, comes from</li>
-                                        <li>There are many variations of passages of Lorem Ipsum available</li>
-                                        <li>All the Lorem Ipsum generators on the Internet</li>
-                                    </ul>
-                                    <p class="font-bold c-white">
-                                        Contrary to popular belief, Lorem Ipsum is not
-                                    </p>
-                                    <p>
-                                        McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source.
-                                    </p>
-                                    <p>
-                                        It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.
-                                    </p>
-                                    <p>Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
-                                    </p>
-
-                                </div>
-                                <div id="answer4" class="tab-pane">
-                                    <h3>
-                                        Question 4
-                                    </h3>
-                                    <p>
-                                        Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy.
-                                    </p>
-                                    <ul>
-                                        <li>Lorem ipsum dolor sit amet, comes from</li>
-                                        <li>There are many variations of passages of Lorem Ipsum available</li>
-                                        <li>All the Lorem Ipsum generators on the Internet</li>
-                                        <li>Lorem ipsum dolor sit amet, comes from</li>
-                                        <li>All the Lorem Ipsum generators on the Internet</li>
-                                        <li>There are many variations of passages of Lorem Ipsum</li>
-                                        <li>All the Lorem Ipsum generators on the Internet</li>
-                                    </ul>
-                                    <p class="font-bold c-white">
-                                        Contrary to popular belief, Lorem Ipsum is not
-                                    </p>
-                                    <p>
-                                        McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source.
-                                    </p>
-                                    <p>
-                                        McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source.
-                                    </p>
-
-                                </div>
-                            </div>
-
-
-
-
-                        </div>
-
+                    <div id="answer2" class="tab-pane">
+                      <h3>Проверить аттестат</h3>
+                      <p>
+                        <a
+                          href="https://passport.webmoney.ru/asp/certview.asp?wmid=127547141810"
+                        >
+                          <img src="./images/webmoney.png" alt="webmoney" />
+                        </a>
+                      </p>
+                      <h3>Правила оплаты</h3>
+                      <p>
+                        Вы пополняете баланс и деньги сразу же будут доступны на
+                        балансе сервиса Like-market. Использовать услуги сервиса
+                        можно сразу же после оплаты. Возврат не производим. Все
+                        деньги будут потрачены на услуги сервис.
+                      </p>
+                      <h3>Увудомление об ответственности</h3>
+                      <p>
+                        Предлагаемые товары и услуги предоставляются не по
+                        заказу лица либо предприятия, эксплуатирующего систему
+                        WebMoney Transfer. Мы являемся независимым предприятием,
+                        оказывающим услуги, и самостоятельно принимаем решения о
+                        ценах и предложениях. Предприятия, эксплуатирующие
+                        систему WebMoney Transfer, не получают комиссионных
+                        вознаграждений или иных вознаграждений за участие в
+                        предоставлении услуг и не несут никакой ответственности
+                        за нашу деятельность. Аттестация, произведенная со
+                        стороны WebMoney Transfer, лишь подтверждает наши
+                        реквизиты для связи и удостоверяет личность. Она
+                        осуществляется по нашему желанию и не означает, что мы
+                        каким-либо образом связаны с продажами операторов
+                        системы WebMoney.
+                      </p>
                     </div>
-
+                    <div id="answer3" class="tab-pane">
+                      <h3>Question 3</h3>
+                      <p>
+                        Many desktop publishing packages and web page editors
+                        now use Lorem Ipsum as their default model text, and a
+                        search for 'lorem ipsum' will uncover many web sites
+                        still in their infancy.
+                      </p>
+                      <ul>
+                        <li>Lorem ipsum dolor sit amet, comes from</li>
+                        <li>
+                          There are many variations of passages of Lorem Ipsum
+                          available
+                        </li>
+                        <li>All the Lorem Ipsum generators on the Internet</li>
+                      </ul>
+                      <p class="font-bold c-white">
+                        Contrary to popular belief, Lorem Ipsum is not
+                      </p>
+                      <p>
+                        McClintock, a Latin professor at Hampden-Sydney College
+                        in Virginia, looked up one of the more obscure Latin
+                        words, consectetur, from a Lorem Ipsum passage, and
+                        going through the cites of the word in classical
+                        literature, discovered the undoubtable source.
+                      </p>
+                      <p>
+                        It is a long established fact that a reader will be
+                        distracted by the readable content of a page when
+                        looking at its layout. The point of using Lorem Ipsum is
+                        that it has a more-or-less normal distribution of
+                        letters, as opposed to using 'Content here, content
+                        here', making it look like readable English.
+                      </p>
+                      <p>
+                        Many desktop publishing packages and web page editors
+                        now use Lorem Ipsum as their default model text, and a
+                        search for 'lorem ipsum' will uncover many web sites
+                        still in their infancy. Various versions have evolved
+                        over the years, sometimes by accident, sometimes on
+                        purpose (injected humour and the like).
+                      </p>
+                    </div>
+                    <div id="answer4" class="tab-pane">
+                      <h3>Question 4</h3>
+                      <p>
+                        Many desktop publishing packages and web page editors
+                        now use Lorem Ipsum as their default model text, and a
+                        search for 'lorem ipsum' will uncover many web sites
+                        still in their infancy.
+                      </p>
+                      <ul>
+                        <li>Lorem ipsum dolor sit amet, comes from</li>
+                        <li>
+                          There are many variations of passages of Lorem Ipsum
+                          available
+                        </li>
+                        <li>All the Lorem Ipsum generators on the Internet</li>
+                        <li>Lorem ipsum dolor sit amet, comes from</li>
+                        <li>All the Lorem Ipsum generators on the Internet</li>
+                        <li>
+                          There are many variations of passages of Lorem Ipsum
+                        </li>
+                        <li>All the Lorem Ipsum generators on the Internet</li>
+                      </ul>
+                      <p class="font-bold c-white">
+                        Contrary to popular belief, Lorem Ipsum is not
+                      </p>
+                      <p>
+                        McClintock, a Latin professor at Hampden-Sydney College
+                        in Virginia, looked up one of the more obscure Latin
+                        words, consectetur, from a Lorem Ipsum passage, and
+                        going through the cites of the word in classical
+                        literature, discovered the undoubtable source.
+                      </p>
+                      <p>
+                        McClintock, a Latin professor at Hampden-Sydney College
+                        in Virginia, looked up one of the more obscure Latin
+                        words, consectetur, from a Lorem Ipsum passage, and
+                        going through the cites of the word in classical
+                        literature, discovered the undoubtable source.
+                      </p>
+                    </div>
+                  </div>
                 </div>
+              </div>
             </div>
-
-
+          </div>
         </div>
-    </section>
-    <!-- End main content-->
+      </section>
+      <!-- End main content -->
+    </div>
+    <!-- End wrapper -->
 
-</div>
-<!-- End wrapper-->
+    <!-- Vendor scripts -->
+    <script src="vendor\pacejs\pace.min.js"></script>
+    <script src="vendor\jquery\dist\jquery.min.js"></script>
+    <script src="vendor\bootstrap\js\bootstrap.min.js"></script>
 
-<!-- Vendor scripts -->
-<script src="vendor\pacejs\pace.min.js"></script>
-<script src="vendor\jquery\dist\jquery.min.js"></script>
-<script src="vendor\bootstrap\js\bootstrap.min.js"></script>
-
-<!-- App scripts -->
-<script src="scripts\luna.js"></script>
-
-
-</body>
-
+    <!-- App scripts -->
+    <script src="scripts\luna.js"></script>
+  </body>
 </html>
