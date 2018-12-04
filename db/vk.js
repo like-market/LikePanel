@@ -2,18 +2,37 @@ var db = require('./index.js').db;
 
 /**
  * Функция нужна для получения данных аккаунта
+ * @param key - либо user_id, либо login 
  */
-exports.getAccount = function(user_id) {
+exports.getAccount = function(key) {
 	return new Promise(function(resolve, reject){
-		var sql = "SELECT * FROM `account_vk` WHERE `user_id` = '" + user_id + "'";
+		var sql = "SELECT * FROM `account_vk` WHERE `user_id` = '" + key + "'";
+		sql += " OR `login` = '" + key +"'";
 
 		db.query(sql, function(err, rows) {
 			if (err) return reject(err);
 
+			if (rows.length == 0) return resolve(null)
+			
 			var account = JSON.parse(JSON.stringify(rows))[0]
 			return resolve(account)
         })
     })
+}
+
+/**
+ * Удаляем аккаунт из бд
+ */
+exports.removeAccount = function(user_id) {
+	return new Promise(function(resolve, reject) {
+		var sql = "DELETE FROM `account_vk` WHERE `user_id` = '" + user_id + "'";
+
+		db.query(sql, function(err, rows) {
+			if (err) return reject(err);
+
+			return resolve()
+        })
+	})
 }
 
 /**
@@ -30,9 +49,7 @@ exports.addAccount = function(user_id, login, password, access_token = null) {
 		}
 
 		db.query(sql, function(err, rows) {
-			if (err) return reject(err);
-
-			return resolve(rows)
+			if (err) console.log(err);
         })
 	})
 }
