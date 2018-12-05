@@ -43,7 +43,7 @@ router.post('/add_account', function(req, res) {
 		accounts.push({login: data[i][0], password: data[i][1]});
 	}
 	
-	utils.vk.addAccount(accounts);
+	utils.vk.addAccounts(accounts);
 
 	res.send('Success')
 })

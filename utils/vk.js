@@ -93,7 +93,7 @@ exports.updateUserToken = function(user_id) {
  * 2. Авторизовать аккаунт
  * 3. Добавить в бд
  */
-exports.addAccount = async function(accounts) {
+exports.addAccounts = async function(accounts) {
 	for (account of accounts) {
 		// Проверяем аккаунт в бд
 		var row = await db.vk.getAccount(account.login)

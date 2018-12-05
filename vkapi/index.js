@@ -1,25 +1,52 @@
 const logger = require('../logger.js')
 const utils = require('../utils')
-const axios = require('axios');
-var db = require('../db');
+const axios = require('axios')
+const db    = require('../db')
 
-exports.authorize = function(login, password) {
-    return axios.get('https://oauth.vk.com/token', {
-        params: {
-            client_id:     2274003, // Данные от приложения андроид
-            client_secret: 'hHbZxrka2uZ6jB1inYsH', // Данные от приложения андроид
-            grant_type:    'password',
-            username:      login,
-            password:      password,
-            scope:         'notify,friends,photos,audio,video,pages,status,notes,messages,wall,ads,offline,docs,groups,notifications,stats,email,market',
-            v: 5.56
+/**
+ * Авторизация пользователя
+ * Алгоритм:
+ *    1. Авторизуем пользователя
+ *    2. Если попросят ввести капчу
+ *        2.1 Скачиваем base64 капчу
+ *        2.2 Формируем запрос к anticaptcha 
+ */
+exports.authorize = async function(login, password, captcha_sid = null, captcha_key = null) {
+    // Стандартные параметры запроса
+    var params = {
+        client_id:     2274003,                // Данные от приложения андроид
+        client_secret: 'hHbZxrka2uZ6jB1inYsH', // Данные от приложения андроид
+        grant_type:    'password',
+        username:      login,
+        password:      password,
+        scope:         'notify,friends,photos,audio,video,pages,status,notes,messages,wall,ads,offline,docs,groups,notifications,stats,email,market',
+        v: 5.56
+    }
+    // Если нужно ввести капчу (т.е. есть данные капчи), то добавляем их
+    if (captcha_sid && captcha_key) {
+        params.captcha_sid = captcha_sid
+        params.captcha_key = captcha_key // текст капчи
+    }
+
+    try {
+        const response = await axios.get('https://oauth.vk.com/token', {params});
+        return response.data;
+    }catch (error) {
+        // Если нужно ввести капчу
+        if (error.response.data.error == 'need_captcha') {
+            logger.debug('Нужно ввести капчу')
+            var captcha_img = error.response.data.captcha_img
+            var captcha_sid = error.response.data.captcha_sid
+
+            var [error, captcha_key] = await utils.anticaptcha.getCaptcha(captcha_img)
+            logger.debug('Получена капча ' + captcha_key)
+            if (!error) {
+                return exports.authorize(login, password, captcha_sid, captcha_key);
+            }
         }
-    }).then(function (response) {
-        return response.data
-    }).catch(function (error) {
+
         return error.response.data;
-        //return Promise.reject(error)
-    });
+    }
 }
 
 /**
