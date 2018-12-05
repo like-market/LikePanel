@@ -43,15 +43,8 @@ exports.createTask = function(user_id, type, name, url, like_need) {
 
         db.query(sql, function(err, rows) {
             if (err) return reject(err)
-            
-            sql = "SELECT LAST_INSERT_ID() AS id"
 
-            db.query(sql, function(err, rows) {
-                if (err) reject(err)
-
-                var id = JSON.parse(JSON.stringify(rows[0]))['id'];
-                resolve(id)
-            })
+            resolve(rows.insertId)
         })
     })
 }
