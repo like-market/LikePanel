@@ -1,5 +1,4 @@
 var logger = require('./logger.js')
-var worker = require('./worker.js')
 var db = require('./db');
 
 const utils = require('./utils')

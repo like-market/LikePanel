@@ -1,6 +1,6 @@
 var logger = require('../logger.js')
 var db = require('../db');
-var worker = require('../worker.js');
+var worker = require('../worker');
 
 // String => Id
 exports.types = {
@@ -29,5 +29,5 @@ exports.add = async function(user_id, name, type, url, like_need) {
     db.activity.createTask(user_id, task_id)
     
     // Добавляем задачу в воркер
-    worker.addTask(user_id, type, url, like_need, task_id);
+    worker.like.addTask(user_id, type, url, like_need, task_id);
 }

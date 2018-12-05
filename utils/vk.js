@@ -1,6 +1,7 @@
 const logger = require('../logger.js')
 const db = require('../db');
-const vkapi = require('../vkapi');
+const vkapi  = require('../vkapi');
+const worker = require('../worker');
 
 const utils = require('../utils')
 
@@ -87,52 +88,10 @@ exports.updateUserToken = function(user_id) {
 
 /**
  * Добавляем новые аккаунты
- * Для этого нужно
- * 1. Проверить что аккаунта нет в БД
- *    Обновляем данные только когда аккаунт не валидный
- * 2. Авторизовать аккаунт
- * 3. Добавить в бд
  */
 exports.addAccounts = async function(accounts) {
 	for (account of accounts) {
-		// Проверяем аккаунт в бд
-		var row = await db.vk.getAccount(account.login)
-		if (row && row.length != 0) {
-			// Изменились ли какие-нибудь данные (пароль)
-			if (row.password == account.password) {
-				logger.warn('Попытка добавления существующего аккаунта ' + account.login)
-				continue
-			}
-		}
-
-		var data = await vkapi.authorize(account.login, account.password)
-
-		// Если неправильный логин или пароль
-		if (data.error_type && data.error_type == 'username_or_password_is_incorrect') {
-			logger.warn('Не удалось добавить новый аккаунт ' + account.login + ' - неверый пароль')
-			continue
-		}
-		if (data.error && data.error == 'need_captcha') {
-			logger.error('Нужна капча для авторизации ' + account.login)
-			continue
-		}
-
-		// Если нет токена - значит произошла какая-то ошибка
-		if (!data.access_token) {
-			logger.error('Неотслеживаемая ошибка')
-			console.log(data)
-			continue
-		}
-
-		// На этом этапе авторизация прошла успешно
-		if (row && row.length != 0) {
-			await db.vk.removeAccount(data.user_id) // Удаляем старую инфу о клиенте
-			db.vk.addAccount(data.user_id, account.login, account.password, data.access_token)
-			logger.info('Обновили данные о пользователе ' + data.user_id)
-		}else {
-			db.vk.addAccount(data.user_id, account.login, account.password, data.access_token)
-			logger.info('Добавили нового пользователя ' + data.user_id)
-		}
+		worker.queue.create('vk_auth', account).save()
 	}
 }
 

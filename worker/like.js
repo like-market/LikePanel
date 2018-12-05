@@ -1,9 +1,7 @@
-var logger = require('./logger.js')
-var db = require('./db')
-var vkapi = require('./vkapi')
-
-var kue = require('kue')
-let taskQueue = kue.createQueue()
+var taskQueue = require('./index.js').queue;
+var logger = require('../logger.js')
+var db = require('../db')
+var vkapi = require('../vkapi')
 
 
 // TODO Получить все незавершенные задачи из БД и поместить их в очередь
