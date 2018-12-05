@@ -1,7 +1,8 @@
 const logger = require('../logger.js')
 var mysql = require('mysql');
 
-var db = mysql.createConnection({
+var db = mysql.createPool({
+    connectionLimit : 5,
     host: "localhost",
     database: "likepanel",
     user: "root",
@@ -9,17 +10,14 @@ var db = mysql.createConnection({
     //timezone: "+7"
 });
 
-db.connect(function(err) {
-    if (err) throw err;
-    logger.info("Database connected!");
-
+db.on('connection', function (connection) {
     var options = "SET character_set_client='utf8mb4';"
     options += "SET character_set_connection='utf8mb4';"
     options += "SET character_set_results='utf8mb4';"
     options += "SET NAMES utf8mb4;"
 
-    db.query(options, function(err, rows) {});
-}); 
+    connection.query(options)
+});
 
 
 
