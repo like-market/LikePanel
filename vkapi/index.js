@@ -34,14 +34,15 @@ exports.authorize = async function(login, password, captcha_sid = null, captcha_
     }catch (error) {
         // Если нужно ввести капчу
         if (error.response.data.error == 'need_captcha') {
-            logger.debug('Нужно ввести капчу')
+            logger.debug('Нужно ввести капчу для ' + login)
             var captcha_img = error.response.data.captcha_img
             var captcha_sid = error.response.data.captcha_sid
 
             var [error, captcha_key] = await utils.anticaptcha.getCaptcha(captcha_img)
-            logger.debug('Получена капча ' + captcha_key)
+            logger.debug('Получена капча ' + captcha_key + ' для ' + login)
             if (!error) {
-                return exports.authorize(login, password, captcha_sid, captcha_key);
+                const response = await exports.authorize(login, password, captcha_sid, captcha_key);
+                return response;
             }
         }
 

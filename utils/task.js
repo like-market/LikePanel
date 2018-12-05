@@ -28,6 +28,20 @@ exports.add = async function(user_id, name, type, url, like_need) {
     // Добавляем в активность создание задачи
     db.activity.createTask(user_id, task_id)
     
-    // Добавляем задачу в воркер
-    worker.like.addTask(user_id, type, url, like_need, task_id);
+    // Получаем данные о записи
+    const regex = /(https?:\/\/)?vk.com\/(.*)(\?w=)?wall([0-9-]*_[0-9]*)(%2Fall)?(\?.*)?/gm;
+    match = regex.exec(url)
+
+    // Получаем данные о посте 
+    const post_data = match[4].split('_')
+
+    worker.queue.create(type, {
+        user_id: user_id,
+        type: type,
+        owner_id: post_data[0],
+        item_id:  post_data[1],
+        like_need: like_need,
+        task_id: task_id
+    }).save();
+
 }
