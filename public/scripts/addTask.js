@@ -55,7 +55,7 @@ $('#create').click(function() {
 
     $.ajax({
         type: 'POST',
-        url: '/addtask/add_task',
+        url: '/addtask/add_likes',
         data: JSON.stringify({
             name: $('#name').val(),
             url: url,

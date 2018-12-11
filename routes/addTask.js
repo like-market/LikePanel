@@ -24,7 +24,7 @@ router.get('/', async function(req, res) {
 	res.render('addTask', {user: req.user, like_price: 0.10, max_count: maxCount});
 });
 
-router.post('/add_task', async function(req, res) {
+router.post('/add_likes', async function(req, res) {
 	if (!req.isAuthenticated()) return res.redirect('/login');
 
 	const regex = /(https?:\/\/)?vk.com\/(.*)(\?w=)?wall([0-9-]*_[0-9]*)(%2Fall)?(\?.*)?/gm;
@@ -65,9 +65,13 @@ router.post('/add_task', async function(req, res) {
 		return res.send('Post not found')
 	}
 
-	utils.task.add(req.user.id, name, type, url, like_need);
+	utils.task.addLikes(req.user.id, name, type, url, like_need);
 
 	return res.send('Success')
+})
+
+router.post('/add_comments', async function(req, res) {
+
 })
 
 module.exports = router

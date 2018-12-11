@@ -19,8 +19,9 @@ const vkapi = require('../vkapi')
  * @parallel 5
  * @params {login, password}
  */
-queue.process('vk_auth', 5, async function(job, done) {
+queue.process('vk_auth', 1, async function(job, done) {
 	const login = job.data.login
+
 	const password = job.data.password
 
 	// Проверяем аккаунт в бд

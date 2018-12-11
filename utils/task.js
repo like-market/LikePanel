@@ -12,8 +12,8 @@ exports.isCorrectType = function(type) {
 }
 
 
-exports.add = async function(user_id, name, type, url, like_need) {
-    logger.debug('Пришел запрос на добавление нового задания')
+exports.addLikes = async function(user_id, name, type, url, like_need) {
+    logger.debug('Пришел запрос на лайканье')
     logger.debug('UID: ' + user_id + '  type: ' + type + '  like_need: ' + like_need)
     logger.debug('URL: ' + url)
 
