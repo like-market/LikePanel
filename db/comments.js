@@ -2,11 +2,13 @@ var db = require('./index.js').db;
 
 /**
  * Возвращаем наборы комментариев, которые доступны пользователю
+ * @param activeOnly - получаем только активные наборы
  */
-exports.getUserComments = function(user_id) {
+exports.getUserComments = function(user_id, activeOnly = false) {
 	return new Promise(function(resolve, reject){
 		var sql = "SELECT * FROM `comments` WHERE (`owner_id`=" + user_id + " OR `owner_id`=0)";
-		sql += " AND `status`<>'inactive'";
+		if (activeOnly) sql += " AND `status`='accept'";
+		else sql += " AND `status`<>'inactive'";
 
 		db.query(sql, function(err, rows) {
             if (err) return reject(err) 
@@ -19,6 +21,31 @@ exports.getUserComments = function(user_id) {
     })
 }
 
+/**
+ * Получаем массив комментариев
+ * @param ids - список id наборов комментариев
+ */
+exports.getComments = function(ids) {
+	return new Promise(async function(resolve, reject) {
+		var sql = "SELECT `text` FROM `comments` WHERE "
+		for (i = 0; i < (ids.length - 1); i++) {
+			sql += "`id`=" + ids[i] + " OR "
+		}
+		sql += "`id`=" + ids[ids.length - 1]
+
+		db.query(sql, function(err, rows) {
+        	if (err) console.log(err);
+        	const comments = JSON.parse(JSON.stringify(rows));
+			
+			// Склеиваем все комментарии
+        	var result = [];
+        	for (comment of comments) {
+        		result = result.concat(comment.text.split('|'))
+        	}
+        	resolve(result);
+		});
+	})
+}
 /**
  * Добавляем новый набор комментариев
  */

@@ -19,7 +19,6 @@ router.get('/', function(req, res) {
 })
 
 router.use('/admin', require('./admin.js'));
-router.use('/panel', require('./panel.js'));
 router.use('/login', require('./login.js'));
 router.use('/register', require('./register.js'));
 router.use('/forgotPassword', require('./forgotPassword.js'));

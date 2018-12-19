@@ -73,42 +73,32 @@
                                 <div class="panel-body">
                                     <div class="form-group">
                                         <p>Название задачи</p>
-                                        <input id="name" type="text" class="form-control" placeholder="Название задачи, чтобы не запутаться ">
-                                    </div>
-                                    <div class="form-group">
-                                        <p>Что будем лайкать?</p>
-                                        <select id="select_type" class="form-control">
-                                            <option value="post">Запись на стене пользователя или группы
-                                            <option value="photo" disabled>Фотография
-                                            <option value="video" disabled>Видеозапись
-                                            <option value="audio" disabled>Аудиозапись
-                                            <option value="market" disabled>Товар
-                                        </select>
+                                        <input id="task_name_like" type="text" class="form-control" placeholder="Название задачи, чтобы не запутаться ">
                                     </div>
                                         
                                     <div class="form-group">
                                         <p>Введите URL записи</p>
-                                        <input id="url" type="text" class="form-control" placeholder="https://vk.com/wall-3223234_3423">
+                                        <input id="url_like" type="text" class="form-control" placeholder="https://vk.com/wall-3223234_3423">
                                     </div>
 
                                     <div class="form-group">
                                         <p>Количество лайков</p>
                                         <div class="row">
                                             <div class="col-lg-6">
-                                                <% if (max_count == 0) { %>
+                                                <% if (maxLikeCount == 0) { %>
                                                     <input id="like_count" type="number" class="form-control" placeholder="Недостаточно средств" min="0" max="0">
                                                 <% } else { %>
-                                                    <input id="like_count" type="number" class="form-control" placeholder="От 1 до <%= max_count %>" min="1" max="<%= max_count %>">
+                                                    <input id="like_count" type="number" class="form-control" placeholder="От 1 до <%= maxLikeCount %>" min="1" max="<%= maxLikeCount %>">
                                                 <% } %>
                                             </div>
                                             <div class="col-lg-6 ml-auto" style="height: 34px; padding-top: 7px">
-                                                Максимум <a><%= max_count %></a>   <small>(Учитывается ваш баланс и доступные аккаунты)</small>
+                                                Максимум <a><%= maxLikeCount %></a>   <small>(Учитывается ваш баланс и доступные аккаунты)</small>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div id="total_cost" class="form-group">
-                                        <% if (max_count == 0) { %>
+                                        <% if (maxLikeCount == 0) { %>
                                             Стоимость <mark>0.00₽</mark>
                                         <% } else { %>
                                             Стоимость <mark>0.10₽</mark>
@@ -117,23 +107,61 @@
 
                                     <div class="form-group">
                                         <div class="col-md-6 col-md-offset-4">
-                                        <a id="create" class="btn btn-w-md btn-accent" style="align: center">Создать задачу</a>
+                                        <a id="createLikes" class="btn btn-w-md btn-accent" style="align: center">Создать задачу</a>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div id="comment" class="tab-pane">
                                 <div class="panel-body">
-                                    <h4>Еще недоступно</h4>
-                                    <!-- <div class="form-group">
-                                        <p>Что будем комментировать?</p>
-                                        <select class="select2_demo_1 form-control" style="width: 100%">
-                                            <option value="topic_comment" disabled>Комментарий в обсуждении
-                                            <option value="photo_comment" disabled>Комментарий к фотографии
-                                            <option value="video_comment" disabled>Комментарий к видеозаписи
-                                            <option value="market_comment" disabled>Комментарий к товару
+                                    <div class="form-group">
+                                        <p>Название задачи</p>
+                                        <input id="task_name_comment" type="text" class="form-control" placeholder="Название задачи, чтобы не запутаться ">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <p>Введите URL записи</p>
+                                        <input id="url_comment" type="text" class="form-control" placeholder="https://vk.com/wall-3223234_3423">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <p>Наборы комментариев</p>
+                                        <select id="comments" class="form-control" multiple="multiple" style="width: 100%">
+                                            <% comments.forEach(function(comment) { %>
+                                                <option value="<%= comment.id %>"><%= comment.name %>
+                                            <% }) %>
                                         </select>
-                                    </div> -->
+                                    </div>
+
+                                    <div class="form-group">
+                                        <p>Количество комментариев</p>
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <% if (maxCommentCount == 0) { %>
+                                                    <input id="comment_count" type="number" class="form-control" placeholder="Недостаточно средств" min="0" max="0">
+                                                <% } else { %>
+                                                    <input id="comment_count" type="number" class="form-control" placeholder="От 1 до <%= maxCommentCount %>" min="1" max="<%= maxLikeCount %>">
+                                                <% } %>
+                                            </div>
+                                            <div class="col-lg-6 ml-auto" style="height: 34px; padding-top: 7px">
+                                                Максимум <a><%= maxCommentCount %></a>   <small>(Учитывается ваш баланс)</small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div id="total_comment_cost" class="form-group">
+                                        <% if (maxCommentCount == 0) { %>
+                                            Стоимость <mark>0.00₽</mark>
+                                        <% } else { %>
+                                            Стоимость <mark>0.10₽</mark>
+                                        <% } %>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="col-md-6 col-md-offset-4">
+                                        <a id="createComments" class="btn btn-w-md btn-accent" style="align: center">Создать задачу</a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -212,8 +240,9 @@
 
 <!-- App scripts -->
 <script>
-let price = <%= like_price %>; // Цена каждого лайка
-let balance = <%= (user.balance / 100).toFixed(2) %>; // Баланс пользователя
+const likePrice = <%= likePrice %>; // Цена каждого лайка
+const commentPrice = <%= commentPrice %> // Цена каждого комментария
+const balance = <%= (user.balance / 100).toFixed(2) %>; // Баланс пользователя
 </script>
 
 <script src="scripts\luna.js"></script>

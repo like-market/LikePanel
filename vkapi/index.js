@@ -68,8 +68,12 @@ exports.getWallData = function(post_id) {
     });
 }
 
+exports.getPhotoData = function() {
+    
+}
+
 /**
- * @return promise
+ * Добавить лайк
  */
 exports.addLike = function(type, owner_id, item_id, access_token) {
     return axios.get('https://api.vk.com/method/likes.add', {
@@ -106,4 +110,43 @@ exports.getLikeList = function(type, owner_id, item_id) {
     }).catch(function (error) {
         return error.response.data
     });    
+}
+
+/**
+ * Добавляем комментарий
+ * @param type - тип комментария (пока доступен только 'post')
+ * @param owner_id - идентификатор пользователя или сообщества, на чьей стене находится запись
+ * @param post_id  - идентификатор записи на стене
+ * @param message  - текст комментария
+ * @param access_token - токен юзера
+ */
+exports.createComment = async function(type, owner_id, post_id, message, access_token, captcha_sid = null, captcha_key = null) {
+    // TODO: комментарий ставится в зависимости от типа
+    var params = { owner_id, post_id, message, access_token, v: 5.56 }
+
+    // Если нужно ввести капчу (т.е. есть данные капчи), то добавляем их
+    if (captcha_sid && captcha_key) {
+        params.captcha_sid = captcha_sid
+        params.captcha_key = captcha_key // текст капчи
+    }
+
+    const response = await axios.get('https://api.vk.com/method/wall.createComment', {params});
+
+    // Если нужно ввести капчу
+    if (response.data.error && response.data.error.error_code == 14) {
+        logger.debug('Нужно ввести капчу')
+        var captcha_img = response.data.error.captcha_img
+        var captcha_sid = response.data.error.captcha_sid
+
+        var [error, captcha_key] = await utils.anticaptcha.getCaptcha(captcha_img)
+        logger.debug('Получена капча ' + captcha_key)
+        if (!error) {
+            const response = await exports.createComment(type, owner_id, post_id, message, access_token, captcha_sid, captcha_key);
+            return response;
+        }else {
+            logger.error("Ошибка от капчи")
+        }
+    }
+
+    return response.data
 }

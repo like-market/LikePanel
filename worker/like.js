@@ -15,7 +15,7 @@ var vkapi = require('../vkapi')
  * @parallel 1
  * @job params {user_id, owner_id, item_id, type, like_need, task_id}
  */
-queue.process('post', async function(job, done){
+queue.process('like', async function(job, done){
 	const data = job.data
 
     // Получаем все аккаунты
