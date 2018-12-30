@@ -1,20 +1,3 @@
-// Рисуем таблицу
-$(document).ready(function () {
-    $('#table').DataTable({
-        "language": {
-            "search": "Поиск",
-            "lengthMenu": "Вывод _MENU_ наборов на странице",
-            "paginate": {
-                "next": "Следующая",
-                "previous": "Предыдущая"
-            }
-        },
-        dom: "<'row'<'col-sm-4'l><'col-sm-4 text-center'B><'col-sm-4'f>>tp",
-        "lengthMenu": [ [5, 10, 15, -1], [5, 10, 15, "All"] ],
-        buttons: []
-    });
-});
-
 toastr.options = {
     "debug": false,
     "newestOnTop": false,
