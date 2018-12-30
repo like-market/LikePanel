@@ -1,16 +1,10 @@
 var db = require('./index.js').db;
 
-const REGISTER = 1;
-const ADD_MONEY = 2;
-const AUTH = 3;
-const CREATE_TASK = 4;
-const REMOVE_MONEY = 5;
-
 
 exports.get = function(id) {
     return new Promise(function(resolve, reject){
         var sql = "SELECT * FROM `recent_activity` WHERE `user_id`=" + id;
-        sql += " AND `type`<>'spend' ORDER BY `create` DESC LIMIT 5";
+        sql += " AND (`type`='auth' OR `type`='register') ORDER BY `create` DESC LIMIT 5";
 
         db.query(sql, function(err, rows) {
             if (err || rows.length == 0) reject(err)

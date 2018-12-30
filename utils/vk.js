@@ -14,7 +14,7 @@ exports.random_access_token = null;
  * Функция нужна для получения любого валидного токена из бд
  * Токен нужен в процессе работы скрипта - чтобы проверять записи, например
  */
-exports.getRandomToken = async function() {
+exports.getRandomToken = async function(cb) {
     while (exports.random_access_token == null) {
         var account = await db.vk.getRandomAccount()
 
@@ -26,8 +26,9 @@ exports.getRandomToken = async function() {
         }else {
             exports.random_access_token = account.access_token
             logger.info('Random access token: ' + exports.random_access_token.substring(0, 15) + "...")
-        }   
+        }
     }
+    cb();
 }
 
 
@@ -74,10 +75,24 @@ exports.updateUserToken = function(user_id) {
 		switch(data.error) {
 			case 'invalid_client':
 				db.vk.setAccountStatus(user_id, 'invalid')
-				logger.info('У аккаунта ' + user_id + ' неверный логин')
+				logger.warn('У аккаунта ' + user_id + ' неверный логин')
 				break;
+			case 'invalid_request':
+				// Слишком много запросов. Нужно попробовать позже.
+				if (data.error_type == 'too_much_tries') {
+					logger.warn('Авторизоваться ' + user_id + ' можно через пару часов')
+					break;
+				}
+			case 'need_validation':
+				// Скорее всего аккаунт потерян - нужно привязать номер телефона
+				if (data.error_description == 'please open redirect_uri in browser [3]') {
+					logger.warn('Аккаунт ' + user_id + ' требует валидации')
+					logger.warn(data.redirect_uri)
+					db.vk.setAccountStatus(user_id, 'invalid')
+					break;
+				}
 			default:
-			db.vk.setAccountStatus(user_id, 'error')
+				db.vk.setAccountStatus(user_id, 'error')
 				logger.warn('Неотслеживаемая ошибка у аккаунта ' + user_id)
 				console.log(data)
 		}
@@ -108,5 +123,5 @@ exports.updateAccounts = async function() {
 			await utils.sleep(500)
 		}
 	}
-	logger.info('Все токены обновлены')
+	// logger.info('Все токены обновлены')
 }
