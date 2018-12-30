@@ -6,40 +6,24 @@
 <aside class="navigation">
     <nav>
         <ul class="nav luna-nav">
-            <li class="nav-category">
-                Основное меню
-            </li>
-            <!-- <li <% if (page == 'panel') { %> class="active" <% } %>>
-                <a href="/panel">Главная</a>
-            </li> -->
-            <!-- <li <% if (page == 'panel') { %> class="active" <% } %>>
-                <a href="panel">Главная</a>
-            </li> -->
             <li <% if (page == 'tasks') { %> class="active" <% } %>>
-                <a href="tasks">Все задачи</a>
+                <a href="tasks">Мои задачи</a>
             </li>
-            <!-- <li <% if (page == 'addtask' || page == 'tasks') { %> class="active" <% } %>>
-                <a href="#uielements" data-toggle="collapse" aria-expanded="false">
-                    Накрутка<span class="sub-nav-icon"> <i class="stroke-arrow"></i> </span>
-                </a>
-                <ul id="uielements" class="nav nav-second collapse <% if (page == 'addtask' || page == 'tasks') { %>in<% } %>">
-                    <li <% if (page == 'tasks') { %> class="active" <% } %>>
-                        <a href="tasks">Все задачи</a>
-                    </li>
-                    <li <% if (page == 'addtask') { %> class="active" <% } %>>
-                        <a href="addtask">Создать задачу</a>
-                    </li>
-                </ul>
-            </li> -->
             <li <% if (page == 'addtask') { %> class="active" <% } %>>
                 <a href="addtask">Создать задачу</a>
+            </li>
+            <li <% if (page == 'posthunter') { %> class="active" <% } %>>
+                <a href="posthunter">Постхантер</a>
             </li>
             <li <% if (page == 'comments') { %> class="active" <% } %>>
                 <a href="comments">Комментарии</a>
             </li>
             <li <% if (page == 'profile') { %> class="active" <% } %>>
                 <a href="profile">Профиль</a>
-            </li> 
+            </li>
+            <!-- <li <% if (page == 'refer') { %> class="active" <% } %>>
+                <a href="refer">Партнерка</a>
+            </li>  -->
             <li <% if (page == 'news') { %> class="active" <% } %>>
                 <a href="news">Новости</a>
             </li>
@@ -54,20 +38,10 @@
 
             <li class="nav-info">
                 <div class="m-t-xs">
-                    <span class="c-white">LikeMarket</span> сервис для накрутки лайков.
+                    <span class="c-white">LikeMarket</span> сервис для накрутки лайков
                 </div>
                 <div class="m-t-xs">
-                    Мы в телеграмм <a class="c-white" href="https://tgdo.me/like_market">@like_market</a>
-                </div>
-                <div
-                    class="m-t-xs"
-                    style="margin-top: 15px"
-                >
-                    <a
-                    href="https://passport.webmoney.ru/asp/certview.asp?wmid=127547141810"
-                    >
-                    <img src="./images/webmoney.png" alt="webmoney" />
-                    </a>
+                    Мы в телеграмм <a class="c-white" href="https://tgdo.me/like_market" target="_blank">@like_market</a>
                 </div>
             </li>
         </ul>

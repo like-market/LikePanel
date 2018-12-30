@@ -30,5 +30,6 @@ exports.tasks = require('./tasks.js');
 exports.finance = require('./finance.js');
 exports.comments = require('./comments.js');
 exports.activity = require('./activity.js');
+exports.posthunter = require('./posthunter.js');
 
 exports.sessionStore = require('./session-store.js');

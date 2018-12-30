@@ -3,6 +3,18 @@ var db = require('./index.js').db;
 var moment = require('moment');
 require('moment/locale/ru');
 
+exports.getBalance = function(user_id) {
+	return new Promise(function(resolve, reject) {
+		var sql = "SELECT `balance` FROM `users` WHERE `id`=" + user_id;
+		db.query(sql, function(err, rows) {
+			if (err) console.log(err)
+
+			var balance = JSON.parse(JSON.stringify(rows));
+			return resolve(balance)
+		})
+	})
+}
+
 // time - new Date(), например 2018-10-15T12:04:27.000Z
 exports.getBalanceAtDate = function(id, date) {
 	return new Promise(function(resolve, reject){
@@ -80,7 +92,7 @@ exports.spend = function(user_id, count) {
 		sql += " WHERE `id` = " + user_id;
 
 		db.query(sql, function(err, rows) {
-			if (err) reject(error)
+			if (err) console.log(err)
 			
 			resolve()
 		})

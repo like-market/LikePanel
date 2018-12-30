@@ -1,0 +1,48 @@
+<thead>
+    <tr>
+        <th>Статус</th>
+        <th>Группа</th>
+        <th>Накручено</th>
+        <th class="text-right">Действия</th>
+    </tr>
+</thead>
+<tbody>
+<% /**
+    * Вывод данных у таблицы с наборами групп в постхантере
+    * @param groups [object] - список груп
+    * @param moment [module] - модуль для работы со временем
+    */ %>
+<% groups.forEach(function(group) { %>
+    <tr>
+        <td>
+            <% if (group.status == 'enable') { %>
+                <span id="status_<%= group.id %>" class="label label-success">Включено</span>
+            <% }else { %>
+                <span id="status_<%= group.id %>" class="label label-danger">Отключено</span>
+            <% } %>
+        </td>
+        <td>
+            <a href="#"><%= group.name %></a>
+            <div class="small"><i class="fa fa-clock-o"></i>
+                Добавлена <%= moment(group.create).format("D MMMM YYYY") %>
+            </div>
+        </td>
+        <td>
+            <i class="fa pe-7s-like"></i>&nbsp;&nbsp;<%= group.total_likes %>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <i class="fa fa-commenting-o"></i>&nbsp;&nbsp;<%= group.total_comments %>
+        </td>
+        <td>
+            <div class="btn-group pull-right">
+                <% if (group.status == 'enable') { %>
+                    <button id="button_<%= group.id %>" onclick="updateStatus(<%= group.id %>, 'disable')" class="btn btn-danger btn-xs"><i class="fa fa-pencil"></i> Отключить </button>
+                <% }else { %>
+                    <button id="button_<%= group.id %>" onclick="updateStatus(<%= group.id %>, 'enable')" class="btn btn-success btn-xs"><i class="fa fa-pencil"></i> Включить </button>
+                <% } %>
+                <button oncklick="stat(<%= group.id %>)" class="btn btn-default btn-xs"><i class="fa fa-folder"></i> Статистика </button>
+                <button oncklick="edit(<%= group.id %>)" class="btn btn-default btn-xs"><i class="fa fa-folder"></i> Изменить </button>
+            </div>
+        </td>
+    </tr>
+<% }) %>
+</tbody>

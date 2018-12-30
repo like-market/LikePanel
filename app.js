@@ -95,7 +95,11 @@ httpsServer.listen(443, () => {
 });
 
 // Получаем рандомный валидный токен
-utils.vk.getRandomToken()
+utils.vk.getRandomToken(async function() {
+    // Обновляем аккаунты в бд,
+    await utils.vk.updateAccounts()
+    await utils.posthunter.updateAll();
 
-// Обновляем аккаунты в бд, у которых статус 'need_token'
-utils.vk.updateAccounts()
+    setInterval(utils.vk.updateAccounts, 1000 * 60 * 5)
+    setInterval(utils.posthunter.updateAll,  1000 * 30)
+})
