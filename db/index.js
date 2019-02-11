@@ -13,7 +13,7 @@ const db = mysql.createPool({
 
 db.on('connection', function (connection) {
     logger.info("Подключение к БД прошло успешно");
-    
+ 
     var options = "SET character_set_client='utf8mb4';"
     options += "SET character_set_connection='utf8mb4';"
     options += "SET character_set_results='utf8mb4';"
@@ -27,7 +27,6 @@ db.on('error', function(err) {
     console.log(err);
     process.exit(1);
 })
-
 
 
 

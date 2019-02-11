@@ -6,5 +6,8 @@
 .profile
 .ssh/
 dump.sql
-log/
 node_modules/
+.Trash-1000/
+package-lock.json
+package.json
+log/

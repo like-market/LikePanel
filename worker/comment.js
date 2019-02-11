@@ -31,7 +31,6 @@ queue.process('comment', 1, async function(job, done){
 		var message = comments.random()
 		var account = accounts.random()
 
-
 		// Пытаемся добавить комментарий
 		const response = await vkapi.createComment(data.type, data.owner_id, data.item_id, message, account);
 
@@ -44,8 +43,6 @@ queue.process('comment', 1, async function(job, done){
 		}
 		if (response.error && response.error.error_code == 10) {
 			logger.warn('Внутренняя ошибка сервера')
-			console.log(response);
-			console.log(response.error.request_params)
 			continue
 		}
 		if (response.error && response.error.error_code == 5) {
@@ -58,7 +55,7 @@ queue.process('comment', 1, async function(job, done){
 			console.log(response.error)
 			continue;
 		}
-		
+
 		// Если лайк успешно поставлен
 		if (response.response) {
 			now++; // Увеличиваем количество поставленных комментов
@@ -70,7 +67,6 @@ queue.process('comment', 1, async function(job, done){
 			continue;
 		}
 	}
-
 
 	db.tasks.setFinish(data.task_id)
 	logger.info('Задача ' + data.task_id + ' выполнена')
