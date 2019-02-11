@@ -1,0 +1,143 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="shortcut icon" type="image/png" href="/images/favicon.png"/>
+    <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900' rel='stylesheet' type='text/css'>
+
+    <!-- Page title -->
+    <title>LikeMarket | Накрутка лайков</title>
+
+    <!-- Vendor styles -->
+    <link rel="stylesheet" href="vendor\fontawesome\css\font-awesome.css">
+    <link rel="stylesheet" href="vendor\animate.css\animate.css">
+    <link rel="stylesheet" href="vendor\bootstrap\css\bootstrap.css">
+
+    <!-- App styles -->
+    <link rel="stylesheet" href="styles\pe-icons\pe-icon-7-stroke.css">
+    <link rel="stylesheet" href="styles\pe-icons\helper.css">
+    <link rel="stylesheet" href="styles\stroke-icons\style.css">
+    <link rel="stylesheet" href="styles\style.css">
+</head>
+<body>
+
+<!-- Wrapper-->
+<div class="wrapper">
+
+    <!-- Header-->
+     <%- include('header', {user:user}); %>
+    <!-- End header-->
+
+    <!-- Navigation-->
+    <%- include('navigation', {isAdmin: user.admin, page: 'news'}); %>
+    <!-- End navigation-->
+
+
+    <!-- Main content-->
+    <section class="content">
+        <div class="container-fluid">
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="view-header">
+                        <div class="header-icon">
+                            <i class="pe page-header-icon pe-7s-date"></i>
+                        </div>
+                        <div class="header-title">
+                            <h3>Новости</h3>
+                            <small>
+                                Последние события и обновления.
+                            </small>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-12">
+                    <div class="panel">
+                        <div class="panel-body">
+
+                            <div class="v-timeline vertical-container">
+                                <div class="vertical-timeline-block">
+                                    <div class="vertical-timeline-icon">
+                                        <i class="fa fa-calendar c-accent"></i>
+                                    </div>
+                                    <div class="vertical-timeline-content">
+                                        <div class="p-sm">
+                                            <span class="vertical-date pull-right"> Вторник <br> <small>12:17:43</small> </span>
+
+                                            <h2>Серверная часть перенесена на NodeJS</h2>
+                                            <p>Теперь наш сервер выдержит любые нагрузки
+                                            </p>
+                                        </div>
+                                        <div class="panel-footer">
+                                            LikePanel с вами днем и ночью
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="vertical-timeline-block">
+                                    <div class="vertical-timeline-icon ">
+                                        <i class="fa fa-briefcase c-accent"></i>
+                                    </div>
+                                    <div class="vertical-timeline-content">
+                                        <div class="p-sm">
+                                            <span class="vertical-date pull-right"> Суббота <br> <small>21:23:44</small> </span>
+
+                                            <h2>Обновлен дизайн</h2>
+                                            <p>Теперь сервисом по накрутке лайков стало пользоваться не только удобно, но и приятно - ведь у нас новый дизайн в черно-оранжевом тоне.
+                                            </p>
+                                        </div>
+                                        <div class="panel-footer">
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="vertical-timeline-block">
+                                    <div class="vertical-timeline-icon">
+                                        <i class="fa fa-coffee c-accent"></i>
+                                    </div>
+                                    <div class="vertical-timeline-content">
+                                        <div class="p-sm">
+                                            <span class="vertical-date pull-right"> Понедельник <br> <small>05:10:39</small> </span>
+
+                                            <h2>Создана панель для накрутки лайков</h2>
+                                            <p>Создан сервис для накрутки лайков.
+                                            </p>
+                                        </div>
+                                        <div class="panel-footer">
+                                            Теперь каждый может показать миру, что он популярен
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- End main content-->
+
+</div>
+<!-- End wrapper-->
+
+<!-- Vendor scripts -->
+<script src="vendor\pacejs\pace.min.js"></script>
+<script src="vendor\jquery\dist\jquery.min.js"></script>
+<script src="vendor\bootstrap\js\bootstrap.min.js"></script>
+
+<!-- App scripts -->
+<script src="scripts\luna.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,10 @@
+.bash_history
+.bash_logout
+.bashrc
+.cache/
+.npm/
+.profile
+.ssh/
+dump.sql
+log/
+node_modules/

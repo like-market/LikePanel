@@ -1,0 +1,249 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="shortcut icon" type="image/png" href="/images/favicon.png"/>
+    <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900' rel='stylesheet' type='text/css'>
+
+    <!-- Page title -->
+    <title>LikeMarket | Накрутка лайков</title>
+
+    <!-- Vendor styles -->
+    <link rel="stylesheet" href="vendor\fontawesome\css\font-awesome.css">
+    <link rel="stylesheet" href="vendor\animate.css\animate.css">
+    <link rel="stylesheet" href="vendor\bootstrap\css\bootstrap.css">
+
+    <!-- App styles -->
+    <link rel="stylesheet" href="styles\pe-icons\pe-icon-7-stroke.css">
+    <link rel="stylesheet" href="styles\pe-icons\helper.css">
+    <link rel="stylesheet" href="styles\stroke-icons\style.css">
+    <link rel="stylesheet" href="styles\style.css">
+</head>
+<body>
+
+<!-- Wrapper-->
+<div class="wrapper">
+
+    <!-- Header-->
+     <%- include('header', {user:user}); %>
+    <!-- End header-->
+
+    <!-- Navigation-->
+    <%- include('navigation', {isAdmin: user.admin, page: 'profile'}); %>
+    <!-- End navigation-->
+
+
+    <!-- Main content-->
+    <section class="content">
+        <div class="container-fluid">
+
+            <div class="row m-t-sm">
+
+                <div class="col-md-12">
+                    <div class="panel panel-filled">
+
+                        <div class="panel-body">
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="media">
+                                        <h2 class="m-t-xs m-b-none">
+                                            Пользователь: <%= user.username %>
+                                        </h2>
+                                        <small>
+                                            Здесь содержится основная информация о вашем аккаунте
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row">
+
+                <div class="col-md-6">
+
+                    <div class="panel">
+                        <div class="panel-body">
+                            <h4> Последняя активность</h4>
+
+                            <div class="v-timeline vertical-container">
+                                
+                                <%- include('recentActivity', {activities: activities}); %>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="col-md-6">
+                    <div class="panel">
+
+                        <div class="panel-body">
+                            <h4>Состояние счета</h4>
+
+                            <p class="small">График показывает состояние вашего счета за последние 15 дней
+                            </p>
+
+                            <div class="flot-chart  m-t-md m-b-xl" style="height: 200px">
+                                <div class="flot-chart-content" id="flotProfile"></div>
+                            </div>
+
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Операция</th>
+                                        <th>Описание</th>
+                                        <th>Количество</th>
+                                        <th>Дата</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% transactions.reverse().forEach(function(transaction) {
+                                        // если нет типа транзакции - выходим из перебора транзакции
+                                        if (transaction.type == null) return; %>
+                                        <tr>
+                                            <td><%= transaction.id %></td>
+                                            <td>
+                                                <% if (transaction.type == 'refill') { %>
+                                                    Пополнение
+                                                <% }else if (transaction.type == 'spend') { %>
+                                                    Списание
+                                                <% } %>
+                                            </td>
+                                            <td>
+                                                <% if (transaction.type == 'spend') { %>
+                                                    Задача <a>#<%= transaction.data2 %></a>
+                                                <% } %>
+                                            </td>
+                                            <td>
+                                                <% if (transaction.type == 'refill') { %>
+                                                    +<%= (transaction.data / 100).toFixed(2) %>₽
+                                                <% }else if (transaction.type == 'spend') { %>
+                                                    -<%= (transaction.data / 100).toFixed(2) %>₽
+                                                <% } %>
+                                            </td>
+                                            <td>
+                                                <%= moment(transaction.create).format("D MMMM YYYY") %>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-12">
+                    <div class="panel panel-filled">
+
+                        <div class="panel-body">
+
+                            <div class="row">
+                                <div class="col-md-3 col-xs-6 text-center">
+                                    <h2 class="no-margins">
+                                        <%= statistic.tasks %>
+                                    </h2>
+                                    <span class="c-white">Задач</span> создано
+                                </div>
+                                <div class="col-md-3 col-xs-6 text-center">
+                                    <h2 class="no-margins">
+                                        <%= (statistic.money / 100).toFixed(2) %>
+                                    </h2>
+                                    <span class="c-white">Рублей</span> пополнено
+                                </div>
+                                <div class="col-md-3 col-xs-6 text-center">
+                                    <h2 class="no-margins">
+                                        <%= statistic.likes %>
+                                    </h2>
+                                    <span class="c-white">Лайков</span> заказано
+                                </div>
+                                <div class="col-md-3 col-xs-6 text-center">
+                                    <h2 class="no-margins">
+                                        <%= statistic.comments %>
+                                    </h2>
+                                    <span class="c-white">Комментариев</span> заказано
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+    <!-- End main content-->
+
+</div>
+<!-- End wrapper-->
+
+<!-- Vendor scripts -->
+<script src="vendor\pacejs\pace.min.js"></script>
+<script src="vendor\jquery\dist\jquery.min.js"></script>
+<script src="vendor\bootstrap\js\bootstrap.min.js"></script>
+<script src="vendor\flot\jquery.flot.min.js"></script>
+<script src="vendor\flot\jquery.flot.resize.min.js"></script>
+<script src="vendor\flot\jquery.flot.spline.js"></script>
+<script src="vendor\flot\jquery.flot.time.js"></script>
+
+
+<!-- App scripts -->
+<script src="scripts\luna.js"></script>
+
+<script>
+    $(document).ready(function () {
+        var data = [{
+            data: [ 
+            <% transactions.forEach(function(transaction) { %>
+                <%= '[' + moment(transaction.create).valueOf() + ', ' + (transaction.balance / 100).toFixed(2) + '],' %>
+            <% }) %> 
+            ]
+        }];
+        var chartUsersOptions = {
+            xaxis: {
+                mode: "time",
+                timeformat: "%d.%m"
+            },
+            yaxis: {
+                min: 0
+            },
+            series: {
+                splines: {
+                    show: true,
+                    tension: 0.4,
+                    lineWidth: 2,
+                    fill: true
+                },
+                points: {
+                    show: true
+                }
+            },
+            legend: {
+                show: false
+            },
+            grid: {
+                borderWidth: 0
+            }
+        };
+
+        $.plot($("#flotProfile"), data, chartUsersOptions);
+
+    });
+</script>
+
+</body>
+
+</html>

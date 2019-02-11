@@ -1,0 +1,43 @@
+<% /**
+    * Вывод данных у таблицы с задачами
+    * @param tasks [object] - список задач
+    */ %>
+<% tasks.forEach(function(task) { %>
+    <tr>
+        <td>
+            <% if (task.status == 'run') { %>
+                <span class="label label-accent">
+            <% } else { %>
+                <span class="label label-default">
+            <% } %>
+                <% switch (task.status) {
+                    case 'finish' : %>
+                        Выполнена
+                        <% break;
+
+                    case 'run' : %>
+                        Выполняется
+                        <% break;
+
+                    case 'wait' : %>
+                        Ожидание
+                        <% break;
+                    } %>
+            </span>
+        </td>
+        <td>
+            <a href="#"><%= task.name %></a>
+            <div class="small"><%= task.url %></div>
+        </td>
+        <td>
+            <%= task.like_need %>
+        </td>
+        <td>
+            <% progress = Math.round(task.like_now / task.like_need * 100); %>
+            <div class="progress m-b-none full progress-small">
+                <div style="width: <%= progress %>%" class="progress-bar progress-bar-warning"></div>
+            </div>
+            <small><%= progress + "% завершено" %></small>
+        </td>
+    </tr>
+<% }); %>
