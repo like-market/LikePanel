@@ -25,7 +25,8 @@ queue.process('like', async function(job, done){
 	accounts = [];
 
 	// Получаем аккаунты, которые уже поставили лайки
-	already_set = await vkapi.getLikeList('post', data.owner_id, data.item_id);
+	already_set = await vkapi.getLikeList(data.type, data.owner_id, data.item_id);
+	already_set = already_set.response.items;
 
 	for (let account of all_accounts) {
 		// Если аккаунт не поставил лайк, добавляем его в массив аккаунтов

@@ -10,12 +10,14 @@ toastr.options = {
     "progressBar": true
 };
 
-function edit(id) {
+function edit(group_id) {
     console.log('edit')
     $('#add-panel-body').fadeOut(250);
     $('#edit-panel-body').fadeIn(250);
 
     // $('#edit-panel').toggleClass('ld-loading');
+    $('#new_name').val($('#group_name_' + group_id).html());
+    $('#new_url').val()
 }
 
 // Включаем/выключаем постхантер

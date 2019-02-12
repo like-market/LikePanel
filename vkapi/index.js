@@ -116,35 +116,44 @@ exports.addLike = async function(type, owner_id, item_id, account) {
 /**
  * Получить список пользователей, кто поставил лайк записи
  */
-exports.getLikeList = function(type, owner_id, item_id) {
-    return axios.get('https://api.vk.com/method/likes.getList', {
-        params: {
-            type: type,
-            owner_id: owner_id,
-            item_id: item_id,
-            access_token: utils.vk.random_access_token,
-            filter: 'likes', // Возвращаем только лайки
-            count: 1000, 
-            v: 5.56
-        }
-    }).then(function (response) {
-        return response.data.response.items
-    }).catch(function (error) {
-        return error.response.data
-    });    
+exports.getLikeList = async function(type, owner_id, item_id, count = 1000) {
+    const params = { type, owner_id, item_id, count, filter: 'likes', v: 5.56, access_token: utils.vk.random_access_token}
+
+    const response = await axios.get('https://api.vk.com/method/likes.getList', {params})
+
+    return response.data;
 }
 
 /**
  * Добавляем комментарий
- * @param type - тип комментария (пока доступен только 'post')
- * @param owner_id - идентификатор пользователя или сообщества, на чьей стене находится запись
- * @param post_id  - идентификатор записи на стене
+ * @param type - тип комментария
+ * @param owner_id - идентификатор пользователя или сообщества
+ * @param item_id  - идентификатор
  * @param message  - текст комментария
  * @param account  - данные об аккаунте
  */
-exports.createComment = async function(type, owner_id, post_id, message, account, captcha_sid = null, captcha_key = null) {
-    // TODO: комментарий ставится в зависимости от типа
-    var params = { owner_id, post_id, message, access_token: account.access_token, v: 5.56 }
+exports.createComment = async function(type, owner_id, item_id, message, account, captcha_sid = null, captcha_key = null) {
+    var params = { owner_id, message, access_token: account.access_token, v: 5.56 }
+
+    let method;
+    switch (type) {
+        case 'photo':
+            method = 'photos.createComment';
+            params.photo_id = item_id;
+            break;
+        case 'post':
+            method = 'wall.createComment';
+            params.post_id = item_id;
+            break;
+        case 'video':
+            method = 'video.createComment';
+            params.video_id = item_id
+            break;
+        case 'market':
+            method = 'market.createComment';
+            params.item_id = item_id
+            break;
+    }    
 
     // Получаем прокси
     if (account.proxy_id) {
@@ -167,7 +176,7 @@ exports.createComment = async function(type, owner_id, post_id, message, account
         params.captcha_key = captcha_key // текст капчи
     }
 
-    const response = await axios.get('https://api.vk.com/method/wall.createComment', {params});
+    const response = await axios.get('https://api.vk.com/method/' + method, {params});
 
     // Если нужно ввести капчу
     if (response.data.error && response.data.error.error_code == 14) {
@@ -178,7 +187,7 @@ exports.createComment = async function(type, owner_id, post_id, message, account
         var [error, captcha_key] = await utils.anticaptcha.getCaptcha(captcha_img)
         logger.debug('Получена капча ' + captcha_key)
         if (!error) {
-            const response = await exports.createComment(type, owner_id, post_id, message, account.access_token, captcha_sid, captcha_key);
+            const response = await exports.createComment(type, owner_id, item_id, message, account.access_token, captcha_sid, captcha_key);
             return response;
         }else {
             logger.error("Ошибка от капчи")
@@ -186,6 +195,34 @@ exports.createComment = async function(type, owner_id, post_id, message, account
     }
 
     return response.data
+}
+
+exports.getCommentList = async function(type, owner_id, item_id, count = 100) {
+    const params = { owner_id, count, v: 5.56, access_token: utils.vk.random_access_token}
+
+    let method;
+    switch (type) {
+        case 'photo':
+            method = 'photos.getComments';
+            params.photo_id = item_id;
+            break;
+        case 'post':
+            method = 'wall.getComments';
+            params.post_id = item_id;
+            break;
+        case 'video':
+            method = 'video.getComments';
+            params.video_id = item_id
+            break;
+        case 'market':
+            method = 'market.getComments';
+            params.item_id = item_id
+            break;
+    }
+
+    const response = await axios.get('https://api.vk.com/method/' + method, {params})
+
+    return response.data;
 }
 
 /**

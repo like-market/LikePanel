@@ -151,11 +151,11 @@
                         <div class="panel-body" id="edit-panel-body" style="display: none;">
                             <div class="form-group">
                                 <p>Название</p>
-                                <input type="text" class="form-control" id="name" placeholder="Будет отображаться в списке">
+                                <input type="text" class="form-control" id="new_name" placeholder="Будет отображаться в списке">
                             </div>
                             <div class="form-group">
                                 <p>Ссылка на группу</p>
-                                <input type="text" class="form-control" id="url" placeholder="" disabled>
+                                <input type="text" class="form-control" id="new_url" placeholder="" disabled>
                             </div>
                             <div class="form-group">
                                 <p>Количество лайков (выбирается случайно)</p>
@@ -209,6 +209,13 @@
     <!-- End main content-->
 </div>
 <!-- End wrapper-->
+
+<script type="text/javascript">
+    window.groups = [];
+    <% groups.forEach(function(group) { %>
+        window.groups[<%= group.id %>] = <%- JSON.stringify(group) %>
+    <% }) %>
+</script>
 
 <!-- Vendor scripts -->
 <script src="vendor\pacejs\pace.min.js"></script>

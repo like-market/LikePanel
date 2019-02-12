@@ -41,7 +41,6 @@ $('#createLikes').click(function() {
     }
 
     var cost = ($('#like_count').val() * likePrice).toFixed(2);
-    console.log(cost, balance)
     if (cost > balance) {
         toastr.error('У вас не хватает средств')
         return;
@@ -49,49 +48,45 @@ $('#createLikes').click(function() {
 
     var url = $('#url_like').val()
 
-    //const regex = /(https?:\/\/)?vk.com\/(.*)\?w=wall([0-9-]*)_([0-9]*)(%2Fall)?(\?.*)?/gm;
-    const regex = /(https?:\/\/)?vk.com\/(.*)(\?w=)?wall([0-9-]*_[0-9]*)(%2Fall)?(\?.*)?/gm;
+    const regex = /(https?:\/\/)?vk.com\/.*/i;
     match = regex.exec(url)
 
     if (match == null) {
-        toastr.error('Неверный URL записи на стене')
+        toastr.error('Неверный URL')
         $('#url_like').css('border', '1px solid red')
         return;
     }
-    // post_id = match[4]
-    // console.log(post_id)
 
     $.ajax({
         type: 'POST',
         url: '/addtask/add_likes',
-        data: JSON.stringify({
+        data: {
             name: $('#task_name_like').val(),
             url: url,
             count: $('#like_count').val()
-        }),
-        contentType: 'application/json',
+        },
         success: function(res) {
             switch(res) {
-                case 'Post not found':
-                    toastr.error('Запись не найдена')
-                    break;
-                case 'Success':
-                    toastr.success('Задание успешно добавлено')
-                    setTimeout(function() {
-                        //window.location.href = "/panel";
-                    }, 2000)
-                    break;
-                case 'Not enough money':
-                    toastr.error('У вас не хватает средств')
-                    break;
                 case 'Error url':
-                    toastr.error('Неверный URL записи на стене')
+                    toastr.error('Неверный URL')
                     break;
                 case 'Invalid amount likes':
                     toastr.error('Неверное количество лайков')
                     break;
+                case 'Not enough money':
+                    toastr.error('У вас не хватает средств')
+                    break;
+                case 'Access restriction':
+                    toastr.error('Запись не найдена или не хватает прав')
+                    break;
+                case 'Success':
+                    toastr.success('Задание успешно добавлено')
+                    $('#task_name_like').val('') //
+                    $('#like_count').val('')     // Обновляем поля
+                    $('#url_like').val('')       //
+                    break;
                 default:
-                    toastr.error("ERROR: " + res);
+                    toastr.error(res);
             }
         }
     });
@@ -120,27 +115,47 @@ $('#createComments').click(function() {
 
     var url = $('#url_comment').val()
 
-    const regex = /(https?:\/\/)?vk.com\/(.*)(\?w=)?wall([0-9-]*_[0-9]*)(%2Fall)?(\?.*)?/gm;
+    const regex = /(https?:\/\/)?vk.com\/.*/i;
     match = regex.exec(url)
 
     if (match == null) {
-        toastr.error('Неверный URL записи на стене')
-        $('#url_comment').css('border', '1px solid red')
+        toastr.error('Неверный URL')
+        $('#url_like').css('border', '1px solid red')
         return;
     }
     
     $.ajax({
         type: 'POST',
         url: '/addtask/add_comments',
-        data: JSON.stringify({
+        data: {
             name: $('#task_name_comment').val(),
             url: url,
             count: $('#comment_count').val(),
-            type: $('#comments').val()
-        }),
-        contentType: 'application/json',
+            comment_ids: $('#comments').val()
+        },
         success: function(res) {
-            console.log(res)
+            switch(res) {
+                case 'Error url':
+                    toastr.error('Неверный URL')
+                    break;
+                case 'Invalid amount likes':
+                    toastr.error('Неверное количество лайков')
+                    break;
+                case 'Not enough money':
+                    toastr.error('У вас не хватает средств')
+                    break;
+                case 'Access restriction':
+                    toastr.error('Запись не найдена или не хватает прав')
+                    break;
+                case 'Success':
+                    toastr.success('Задание успешно добавлено')
+                    $('#task_name_comment').val('') //
+                    $('#comment_count').val('')     // Обновляем поля
+                    $('#url_comment').val('')       //
+                    break;
+                default:
+                    toastr.error(res);
+            }
         }
     });
 })

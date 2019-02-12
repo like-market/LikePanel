@@ -13,16 +13,16 @@
     * @param moment [module] - модуль для работы со временем
     */ %>
 <% groups.forEach(function(group) { %>
-    <tr>
+    <tr id="group_<%= group.id %>">
         <td>
             <% if (group.status == 'enable') { %>
-                <span id="status_<%= group.id %>" class="label label-success">Включено</span>
+                <span id="group_status_<%= group.id %>" class="label label-success">Включено</span>
             <% }else { %>
-                <span id="status_<%= group.id %>" class="label label-danger">Отключено</span>
+                <span id="group_status_<%= group.id %>" class="label label-danger">Отключено</span>
             <% } %>
         </td>
         <td>
-            <a href="#"><%= group.name %></a>
+            <a href="#" id="group_name_<%= group.id %>"><%= group.name %></a>
             <div class="small"><i class="fa fa-clock-o"></i>
                 Добавлена <%= moment(group.create).format("D MMMM YYYY") %>
             </div>
