@@ -14,9 +14,14 @@ exports.random_access_token = null;
  * Функция нужна для получения любого валидного токена из бд
  * Токен нужен в процессе работы скрипта - чтобы проверять записи, например
  */
-exports.getRandomToken = async function(cb) {
+exports.getRandomToken = async function() {
     while (exports.random_access_token == null) {
         var account = await db.vk.getRandomAccount()
+        // Если аккаунт не найден
+        if (account == null) {
+        	logger.error('Нет активных аккаунтов в бд')
+        	process.exit(1)
+        }
 
         // Проверяем access_token на валидность
         var isValid = await isTokenValid(account.access_token);
@@ -28,7 +33,6 @@ exports.getRandomToken = async function(cb) {
             logger.info('Random access token: ' + exports.random_access_token.substring(0, 15) + "...")
         }
     }
-    cb();
 }
 
 
@@ -114,7 +118,7 @@ exports.addAccounts = async function(accounts) {
 /**
  * Обновляем все аккаунты, где статус = need_token
  */
-exports.updateAccounts = async function() {
+exports.updateAccounts = async function(cb = null) {
 	var accounts = await db.vk.getAllAccounts();
 	for (i = 0; i < accounts.length; i++) {
 		if (accounts[i].status == 'need_token' || accounts[i].status == 'error') {
@@ -123,5 +127,6 @@ exports.updateAccounts = async function() {
 			await utils.sleep(500)
 		}
 	}
-	// logger.info('Все токены обновлены')
+	logger.info('Все токены обновлены')
+	if (cb != null) cb();
 }

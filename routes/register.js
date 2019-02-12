@@ -35,7 +35,8 @@ router.post("/", async function(req, res) {
     if (err) return console.error(err);
     res.send("Success");
 
-    ip = req.connection.remoteAddress.split(":").pop();
+    // ip = req.connection.remoteAddress.split(":").pop();
+    ip = req.headers["x-real-ip"].split(":").pop(); // Nginx IP
     db.activity.register(user.id, ip);
   });
 });

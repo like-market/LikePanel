@@ -5,9 +5,6 @@ const utils = require('./utils')
 
 const fs = require('fs');
 
-const http = require('http');
-const https = require('https');
-
 var express = require('express');
 var router = express.Router()
 
@@ -17,7 +14,6 @@ var session = require('express-session')
 
 var passport = require('passport')
 var Strategy = require('passport-local').Strategy;
-
 
 
 passport.use(new Strategy(
@@ -64,42 +60,18 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
-
 app.use(require('./routes/routes.js'))
 
 
-
-// Сертификаты
-const privateKey = fs.readFileSync('/etc/letsencrypt/live/like-market.ru-0001/privkey.pem', 'utf8');
-const certificate = fs.readFileSync('/etc/letsencrypt/live/like-market.ru-0001/cert.pem', 'utf8');
-const ca = fs.readFileSync('/etc/letsencrypt/live/like-market.ru-0001/chain.pem', 'utf8');
-
-const credentials = {
-    key: privateKey,
-    cert: certificate,
-    ca: ca
-};
-
-const httpServer = http.createServer(function (req, res) {
-    res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
-    res.end();
-})
-const httpsServer = https.createServer(credentials, app);
-
-httpServer.listen(80, () => {
-    logger.info('HTTP Server running on port 80');
-});
-
-httpsServer.listen(443, () => {
-    logger.info('HTTPS Server running on port 443');
+app.listen(8080, () => {
+    logger.info('HTTP Server running on port 8080');
 });
 
 // Получаем рандомный валидный токен
-utils.vk.getRandomToken(async function() {
-    // Обновляем аккаунты в бд,
-    await utils.vk.updateAccounts()
+utils.vk.updateAccounts(async function() {
+    await utils.vk.getRandomToken();
     await utils.posthunter.updateAll();
 
     setInterval(utils.vk.updateAccounts, 1000 * 60 * 5)
     setInterval(utils.posthunter.updateAll,  1000 * 30)
-})
+});

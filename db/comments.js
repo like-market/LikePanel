@@ -40,7 +40,7 @@ exports.getComments = function(ids) {
 			// Склеиваем все комментарии
         	var result = [];
         	for (comment of comments) {
-        		result = result.concat(comment.text.split('|'))
+        		result = result.concat(comment.text.split('|||'))
         	}
         	resolve(result);
 		});

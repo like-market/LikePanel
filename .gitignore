@@ -3,3 +3,12 @@ node_modules/
 package-lock.json
 package.json
 log/
+.bash_history
+.bash_logout
+.bashrc
+.cache/
+.npm/
+.profile
+.ssh/
+dump.sql
+

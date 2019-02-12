@@ -23,7 +23,8 @@ router.post("/", function(req, res, next) {
     req.logIn(user, function(err) {
       if (err) return next(err);
       res.send("Success");
-      ip = req.connection.remoteAddress.split(":").pop();
+      // ip = req.connection.remoteAddress.split(":").pop();
+      ip = req.headers["x-real-ip"].split(":").pop(); // Nginx IP
       db.activity.auth(user.id, ip);
     });
   })(req, res, next);

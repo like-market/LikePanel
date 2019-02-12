@@ -34,7 +34,8 @@ exports.getByOwner = function(owner_id) {
         sql += " ORDER BY `status`";
 
         db.query(sql, function(err, rows) {
-            if (err || rows.length == 0) reject(err)
+            if (err) reject(err);
+            if (rows.length) return resolve([]);
 
             var data = JSON.parse(JSON.stringify(rows))
             return resolve(data)

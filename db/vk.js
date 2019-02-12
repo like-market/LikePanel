@@ -59,7 +59,7 @@ exports.addAccount = function(user_id, login, password, access_token = null) {
  */
 exports.getActiveAccounts = function() {
 	return new Promise(function(resolve, reject){
-		var sql = "SELECT `user_id`, `access_token` FROM `account_vk`";
+		var sql = "SELECT `user_id`, `access_token`, `proxy_id` FROM `account_vk`";
 		sql += " WHERE `access_token` IS NOT NULL AND `status` = 'active' ORDER BY RAND()"
 
 		db.query(sql, function(err, rows) {
@@ -127,6 +127,7 @@ exports.getRandomAccount = function() {
 
 		db.query(sql, function(err, rows) {
 			if (err) return reject(err)
+			if (!rows.length) return resolve(null);
 
 			var access_token = JSON.parse(JSON.stringify(rows[0]))
 			resolve(access_token)

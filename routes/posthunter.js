@@ -14,7 +14,7 @@ router.get('/', async function(req, res) {
 	if (!req.isAuthenticated()) return res.redirect('/login');
 
 	comments = await db.comments.getUserComments(req.user.id, true);
-	groups = await db.posthunter.getByOwner(req.user.id); // Получаем все группы
+	groups   = await db.posthunter.getByOwner(req.user.id); // Получаем все группы
 
 	res.render('posthunter', {user: req.user, comments, groups, moment});
 });

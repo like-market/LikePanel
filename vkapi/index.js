@@ -1,7 +1,7 @@
 const logger = require('../logger.js')
 const utils = require('../utils')
-const axios = require('axios')
 const db    = require('../db')
+const axios = require('axios-https-proxy-fix')
 
 /**
  * Авторизация пользователя
@@ -96,20 +96,26 @@ exports.getPhotoData = function() {
 /**
  * Добавить лайк
  */
-exports.addLike = function(type, owner_id, item_id, access_token) {
-    return axios.get('https://api.vk.com/method/likes.add', {
-        params: {
-            type: type,
-            owner_id: owner_id,
-            item_id: item_id,
-            access_token: access_token,
-            v: 5.56
+exports.addLike = async function(type, owner_id, item_id, account) {
+    let params = { type, owner_id, item_id, access_token: account.access_token, v: 5.56 }
+
+    // Получаем прокси
+    if (account.proxy_id) {
+        let proxy = db.proxy.get(account.proxy_id);
+        if (proxy != null) {
+            params['proxy'] = {
+                host: proxy.ip,
+                port: proxy.port,
+                auth: {
+                    username: proxy.login,
+                    password: proxy.password
+                }
+            }
         }
-    }).then(function (response) {
-        return response.data
-    }).catch(function (error) {
-        return error.response.data
-    });
+    }
+
+    const response = await axios.get('https://api.vk.com/method/likes.add', {params});
+    return response.data
 }
 
 /**
@@ -139,11 +145,26 @@ exports.getLikeList = function(type, owner_id, item_id) {
  * @param owner_id - идентификатор пользователя или сообщества, на чьей стене находится запись
  * @param post_id  - идентификатор записи на стене
  * @param message  - текст комментария
- * @param access_token - токен юзера
+ * @param account  - данные об аккаунте
  */
-exports.createComment = async function(type, owner_id, post_id, message, access_token, captcha_sid = null, captcha_key = null) {
+exports.createComment = async function(type, owner_id, post_id, message, account, captcha_sid = null, captcha_key = null) {
     // TODO: комментарий ставится в зависимости от типа
-    var params = { owner_id, post_id, message, access_token, v: 5.56 }
+    var params = { owner_id, post_id, message, access_token: account.access_token, v: 5.56 }
+
+    // Получаем прокси
+    if (account.proxy_id) {
+        let proxy = db.proxy.get(account.proxy_id);
+        if (proxy != null) {
+            params['proxy'] = {
+                host: proxy.ip,
+                port: proxy.port,
+                auth: {
+                    username: proxy.login,
+                    password: proxy.password
+                }
+            }
+        }
+    }
 
     // Если нужно ввести капчу (т.е. есть данные капчи), то добавляем их
     if (captcha_sid && captcha_key) {
@@ -162,7 +183,7 @@ exports.createComment = async function(type, owner_id, post_id, message, access_
         var [error, captcha_key] = await utils.anticaptcha.getCaptcha(captcha_img)
         logger.debug('Получена капча ' + captcha_key)
         if (!error) {
-            const response = await exports.createComment(type, owner_id, post_id, message, access_token, captcha_sid, captcha_key);
+            const response = await exports.createComment(type, owner_id, post_id, message, account.access_token, captcha_sid, captcha_key);
             return response;
         }else {
             logger.error("Ошибка от капчи")
@@ -192,8 +213,3 @@ exports.getTypeByName = async function(screen_name) {
 //
 //    console.log(response.data);
 //}
-
-
-//setTimeout(function() {
-//    exports.getLikeList(5555555555293029)
-//},1000)

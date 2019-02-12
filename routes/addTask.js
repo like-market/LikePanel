@@ -80,10 +80,8 @@ router.post('/add_likes', async function(req, res) {
  */
 router.post('/add_comments', async function(req, res) {
 	if (!req.isAuthenticated()) return res.redirect('/login');
-	console.log(req.body);
 
 	const data = utils.urlparser.parse(req.body.url)
-    console.log(data);
     if (data == null) {
     	res.send("Error url");
     	return

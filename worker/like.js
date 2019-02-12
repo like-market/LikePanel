@@ -41,7 +41,7 @@ queue.process('like', async function(job, done){
 	// Для всех аккаунтов
 	for (let account of accounts) {
 		// Пытаемся поставить лайк
-		const response = await vkapi.addLike(data.type, data.owner_id, data.item_id, account.access_token);
+		const response = await vkapi.addLike(data.type, data.owner_id, data.item_id, account);
 
 		if (response.error && response.error.error_code == 17) {
 			logger.warn('Требуется валидация пользователя')
