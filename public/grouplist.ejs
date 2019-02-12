@@ -39,8 +39,8 @@
                 <% }else { %>
                     <button id="button_<%= group.id %>" onclick="updateStatus(<%= group.id %>, 'enable')" class="btn btn-success btn-xs"><i class="fa fa-pencil"></i> Включить </button>
                 <% } %>
-                <button oncklick="stat(<%= group.id %>)" class="btn btn-default btn-xs"><i class="fa fa-folder"></i> Статистика </button>
-                <button oncklick="edit(<%= group.id %>)" class="btn btn-default btn-xs"><i class="fa fa-folder"></i> Изменить </button>
+                <button onclick="stat(<%= group.id %>)" class="btn btn-default btn-xs"><i class="fa fa-folder"></i> Статистика </button>
+                <button onclick="edit(<%= group.id %>)" class="btn btn-default btn-xs"><i class="fa fa-folder"></i> Изменить </button>
             </div>
         </td>
     </tr>

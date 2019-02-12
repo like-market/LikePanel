@@ -81,14 +81,18 @@
 
             <div class="row">
                 <div class="col-md-6">
-                    <div class="panel panel-filled panel-collapse">
+                    <div class="panel panel-filled panel-collapse" id="add-panel">
                         <div class="panel-heading">
                             Добавить группу
                         </div>
                         <div class="panel-body" id="add-panel-body">
                             <div class="form-group">
-                                <p>Id группы</p>
-                                <input type="text" class="form-control" id="new-comments-name" placeholder="Id группы">
+                                <p>Название</p>
+                                <input type="text" class="form-control" id="name" placeholder="Будет отображаться в списке">
+                            </div>
+                            <div class="form-group">
+                                <p>Ссылка на группу</p>
+                                <input type="text" class="form-control" id="url" placeholder="https://vk.com/public...">
                             </div>
 
                             <div class="form-group">
@@ -96,12 +100,12 @@
                                 <form class="form-inline">
                                     <div class="form-group">
                                         <label>От &nbsp;</label>
-                                        <input id="likes_from" type="number" class="form-control" placeholder="Минимум 100" min="0">
+                                        <input id="min_likes" type="number" class="form-control" placeholder="Минимум 100" min="0">
                                     </div>
                                     &nbsp;&nbsp;&nbsp;&nbsp;
                                     <div class="form-group">
                                         <label>До &nbsp;</label>
-                                        <input id="likes_to" type="number" class="form-control" placeholder="Максимум 2000" min="0">
+                                        <input id="max_likes" type="number" class="form-control" placeholder="Максимум 2000" min="0">
                                     </div>
                                 </form>
                             </div>
@@ -111,19 +115,19 @@
                                 <form class="form-inline">
                                     <div class="form-group">
                                         <label>От &nbsp;</label>
-                                        <input id="comments_from" type="number" class="form-control" placeholder="Минимум 100" min="0">
+                                        <input id="min_comments" type="number" class="form-control" placeholder="Минимум 100" min="0">
                                     </div>
                                     &nbsp;&nbsp;&nbsp;&nbsp;
                                     <div class="form-group">
                                         <label>До &nbsp;</label>
-                                        <input id="comments_to" type="number" class="form-control" placeholder="Максимум 2000" min="0">
+                                        <input id="max_comments" type="number" class="form-control" placeholder="Максимум 2000" min="0">
                                     </div>
                                 </form>
                             </div>
 
                             <div class="form-group">
                                 <p>Наборы комментариев</p>
-                                <select id="comments" class="form-control" multiple="multiple" style="width: 100%">
+                                <select id="comments_ids" class="form-control" multiple="multiple" style="width: 100%">
                                     <% comments.forEach(function(comment) { %>
                                         <option value="<%= comment.id %>"><%= comment.name %>
                                     <% }) %>
@@ -131,7 +135,7 @@
                             </div>
 
                             <div class="btn-group pull-right">
-                                <a class="btn btn-w-md btn-success pull-right" onclick="addComments();">Добавить</a>
+                                <a class="btn btn-w-md btn-success pull-right" onclick="add();">Добавить</a>
                             </div>
                         </div>
                     </div>
@@ -139,25 +143,61 @@
                 <div class="col-md-6">
                     <div class="panel panel-filled" id="edit-panel">
                         <div class="panel-heading">
-                            Редактировать комментарии
+                            Редактировать
                         </div>
                         <div class="loader">
                             <div class="loader-spin"></div>
                         </div>
                         <div class="panel-body" id="edit-panel-body" style="display: none;">
-                            <div id="comments_id" style="display: none;">0</div>
+                            <div class="form-group">
+                                <p>Название</p>
+                                <input type="text" class="form-control" id="name" placeholder="Будет отображаться в списке">
+                            </div>
+                            <div class="form-group">
+                                <p>Ссылка на группу</p>
+                                <input type="text" class="form-control" id="url" placeholder="" disabled>
+                            </div>
+                            <div class="form-group">
+                                <p>Количество лайков (выбирается случайно)</p>
+                                <form class="form-inline">
+                                    <div class="form-group">
+                                        <label>От &nbsp;</label>
+                                        <input id="min_likes" type="number" class="form-control" placeholder="Минимум 100" min="0">
+                                    </div>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <div class="form-group">
+                                        <label>До &nbsp;</label>
+                                        <input id="max_likes" type="number" class="form-control" placeholder="Максимум 2000" min="0">
+                                    </div>
+                                </form>
+                            </div>
 
                             <div class="form-group">
-                                <label>Название набора</label>
-                                <input type="text" class="form-control" id="edit-comments-name" placeholder="Название">
+                                <p>Количество комментариев (выбирается случайно)</p>
+                                <form class="form-inline">
+                                    <div class="form-group">
+                                        <label>От &nbsp;</label>
+                                        <input id="min_comments" type="number" class="form-control" placeholder="Минимум 100" min="0">
+                                    </div>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <div class="form-group">
+                                        <label>До &nbsp;</label>
+                                        <input id="max_comments" type="number" class="form-control" placeholder="Максимум 2000" min="0">
+                                    </div>
+                                </form>
                             </div>
+
                             <div class="form-group">
-                                <label>Список комментариев</label>
-                                <textarea class="form-control" rows="6" id="edit-comments-text" placeholder="Каждый комментарий на новой строке"></textarea>
+                                <p>Наборы комментариев</p>
+                                <select id="comments_ids" class="form-control" multiple="multiple" style="width: 100%">
+                                    <% comments.forEach(function(comment) { %>
+                                        <option value="<%= comment.id %>"><%= comment.name %>
+                                    <% }) %>
+                                </select>
                             </div>
+
                             <div class="btn-group pull-right">
-                                <a class="btn btn-w-md btn-accent" id="abort-edit">Отмена</a>
-                                <a class="btn btn-w-md btn-success" id="apply-edit">Изменить</a>
+                                <a class="btn btn-w-md btn-success pull-right" onclick="add();">Добавить</a>
                             </div>
                         </div>
                     </div>

@@ -72,6 +72,6 @@ utils.vk.updateAccounts(async function() {
     await utils.vk.getRandomToken();
     await utils.posthunter.updateAll();
 
-    setInterval(utils.vk.updateAccounts, 1000 * 60 * 5)
-    setInterval(utils.posthunter.updateAll,  1000 * 30)
+    setInterval(utils.vk.updateAccounts,    1000 * 60 * 5)
+    setInterval(utils.posthunter.updateAll, 1000 * 30)
 });

@@ -13,7 +13,7 @@ exports.updateAll = async function () {
 nextgroup:
 	for (group of groups) {
 		// Проверяем появилась ли новая запись
-		var posts = await vkapi.getWall('id' + group.group_id, 1);
+		var posts = await vkapi.getWall(group.group_id, 1);
 
 		if (posts.response.items[0].id <= group.last_post_id) continue;
 		// Получаем количество доступных аккаунтов
@@ -21,7 +21,7 @@ nextgroup:
 		accountsCount = Math.floor(accountsCount * 0.9);
 
 		// Получаем больше записей
-		var posts = await vkapi.getWall('id' + group.group_id, 10);
+		var posts = await vkapi.getWall(group.group_id, 10);
 		var max_post_id = group.last_post_id;
 		for (post of posts.response.items) {
 			// Если на этот пост мы уже ставили лайки
@@ -37,7 +37,7 @@ nextgroup:
 			var balance = db.finance.getBalance(group.owner_id);
 			if (balance < (likes_count * 10 + comments_count * 10)) {
 				db.posthunter.setStatus(group.id, 'disable');
-				logger.info('Постхантер отключен для id='+group.id+': недостаточно средств')
+				logger.info('Постхантер отключен для id=' + group.id + ': недостаточно средств')
 				db.posthunter.setLastPostId(group.id, max_post_id);
 				continue nextgroup;
 			}
@@ -64,5 +64,6 @@ nextgroup:
 		}
 		db.posthunter.setLastPostId(group.id, max_post_id);
 	}
+	logger.info('Постхантер обновлен')
 }
 

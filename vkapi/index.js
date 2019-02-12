@@ -71,11 +71,11 @@ exports.getWallData = function(post_id) {
 /**
  * Функция получает записи со стены сообщества
  */
-exports.getWall = async function(group_id, count = 10) {
+exports.getWall = async function(owner_id, count = 10) {
     // Стандартные параметры запроса
     var params = {
         access_token: utils.vk.random_access_token,
-        domain: group_id,
+        owner_id,
         count,
         v: 5.56
     }
@@ -84,13 +84,8 @@ exports.getWall = async function(group_id, count = 10) {
         const response = await axios.get('https://api.vk.com/method/wall.get', {params});
         return response.data;
     }catch (error) {
-
         return error.response.data;
     }
-}
-
-exports.getPhotoData = function() {
-    
 }
 
 /**
@@ -197,19 +192,8 @@ exports.createComment = async function(type, owner_id, post_id, message, account
  * Получаем тип объекта по короткому имени
  */
 exports.getTypeByName = async function(screen_name) {
-    var params = { screen_name, v: 5.56 }
+    var params = { screen_name, access_token: utils.vk.random_access_token, v: 5.56 }
     const response = await axios.get('https://api.vk.com/method/utils.resolveScreenName', {params});
 
-    return response.data;
+    return response.data.response;
 }
-
-/**
- * Получить информацию о группе
- */
-//exports.getLikeList = async function(group_id) {
-//    const params = {group_id, access_token: utils.vk.random_access_token, v: 5.56}
-//
-//    const response = await axios.get('https://api.vk.com/method/groups.getById', {params});
-//
-//    console.log(response.data);
-//}
