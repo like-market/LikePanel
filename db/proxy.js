@@ -57,3 +57,16 @@ exports.get = function(id) {
         })
     })
 }
+
+exports.getRandom = function() {
+	return new Promise(function(resolve, reject){
+		var sql = "SELECT * FROM `proxy` ORDER BY RAND() LIMIT 1";
+
+		db.query(sql, function(err, rows) {
+			if (err) return reject(err)
+
+			var proxy = JSON.parse(JSON.stringify(rows[0]))
+			resolve(proxy)
+        })
+	})
+}

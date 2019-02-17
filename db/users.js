@@ -1,72 +1,74 @@
 var db = require('./index.js').db;
 
-exports.findById = function(id) {
+/**
+ * Получить пользователя по id
+ */
+exports.findById = function(user_id) {
     return new Promise(function(resolve, reject){
-        var sql = "SELECT * FROM `users` WHERE `id`=" + id;
+        var sql = `SELECT * FROM users WHERE id= ${user_id}`
+
         db.query(sql, function(err, rows) {
             if (err) return reject(err)
 
-            if (rows.length != 0) {
-                var data = JSON.parse(JSON.stringify(rows[0]))
-                return resolve(data)
-            }else {
-                return resolve(null)
-            }
+            if (rows.length == 0) return resolve(null);
+
+            // resolve( rows.parseSqlResult()[0] );
+            resolve( JSON.parse(JSON.stringify(rows))[0] )
         })
     });
 }
 
+/**
+ * Получить пользователя по логину
+ * @param username - логин
+ */
 exports.findByUsername = function(username) {
     return new Promise(function(resolve, reject){
-        var sql = "SELECT * FROM `users` WHERE `username`='" + username+ "'";
-        db.query(sql, function(err, rows) {
-            if (err) return reject(err)
-
-            if (rows.length != 0) {
-                var data = JSON.parse(JSON.stringify(rows[0]))
-                return resolve(data)
-            }else {
-                return resolve(null)
-            }
-        })
-    })
-}
-
-exports.getBasicStatistic = function(id) {
-    return new Promise(function(resolve, reject){
-        var sql = "SELECT COUNT(*) AS data FROM `tasks` WHERE `user_id`=" + id;
-        sql += " UNION SELECT COALESCE(SUM(`data`), -1) FROM `recent_activity` WHERE `type`='refill' AND `user_id`=" + id;
-        sql += " UNION SELECT COALESCE(SUM(`like_need`), -2) FROM `tasks` WHERE `user_id`=" + id;
+        var sql = `SELECT * FROM users WHERE username = '${username}'`
 
         db.query(sql, function(err, rows) {
             if (err) return reject(err)
 
-            var data = JSON.parse(JSON.stringify(rows))
+            if (rows.length == 0) return resolve(null);
 
-            var statistic = {};
-            statistic.tasks = data[0].data;
-            // Говнокод - чтобы делать один запрос, а не три
-            statistic.money = data[1].data != -1 ? data[1].data : 0;
-
-            // TODO: Если кол-во лайков равно кол-ву тасков
-            if (data[2] == undefined) data[2] = data[1]
-            statistic.likes = data[2].data != -2 ? data[2].data : 0;
-            statistic.comments = 0;
-
-            return resolve(statistic)
+            // resolve( rows.parseSqlResult()[0] );
+            resolve( JSON.parse(JSON.stringify(rows))[0] )
         })
-
     })
 }
 
-exports.register = function(username, password, email) {
+/**
+ * Добавляем нового пользователя
+ * @param username - логин
+ * @param password - пароль
+ * @param email - почта
+ */
+exports.addUser = function(username, password, email = "") {
     return new Promise(function(resolve, reject){
-        var sql = "INSERT INTO `users`(username, password, email) VALUES";
-        sql += "('" + username + "','" + password + "','" + email + "')";
+        var sql = `INSERT INTO users(username, password, email) VALUES('${username}', '${password}', '${email}')`
         
         db.query(sql, function(err, rows) {
             if (err) return reject(err)
+
             resolve(true)
+        })
+    })
+}
+
+/**
+ * Обновляем пароль и почту у пользователя
+ * @param username - логин
+ * @param password - пароль
+ * @param email - почта
+ */
+exports.updateData = function(username, password, email) {
+    return new Promise(function(resolve, reject){
+        var sql = `UPDATE users SET password='${password}', email='${email}' WHERE username='${username}'`
+
+        db.query(sql, function(err, rows) {
+            if (err) return reject(err)
+
+            resolve()
         })
     })
 }

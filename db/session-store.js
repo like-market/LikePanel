@@ -6,7 +6,7 @@ var options = {
     port: 3306,
     user: 'likepanel',
     password: 'r35ImTyr52Ks666',
-    database: 'likepanel',
+    database: 'devlikepanel',
     schema: {
         tableName: 'sessions',
         columnNames: {

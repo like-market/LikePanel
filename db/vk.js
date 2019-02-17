@@ -38,10 +38,10 @@ exports.removeAccount = function(user_id) {
 /**
  * Добавляем аккаунт в бд
  */
-exports.addAccount = function(user_id, login, password, access_token = null) {
+exports.addAccount = function(user_id, login, password, access_token = null, proxy_id) {
 	process.nextTick(function() {
-		var sql = "INSERT INTO `account_vk`(user_id, login, password, access_token, status) VALUES('"
-		sql += user_id + "', '" + login + "', '" + password + "', ";
+		var sql = "INSERT INTO `account_vk`(user_id, login, password, proxy_id, access_token, status) VALUES('"
+		sql += user_id + "', '" + login + "', '" + password + "', " + proxy_id + ", ";
 		if (access_token != null) {
 			sql += "'" + access_token + "', 'active')";
 		} else {
