@@ -106,12 +106,12 @@ exports.updateUserToken = function(user_id) {
 
 
 /**
- * Добавляем новые аккаунты
+ * Добавляем новый аккаунт
  */
 exports.addAccounts = async function(accounts) {
 	for (account of accounts) {
 		console.log('Добавили задачу на ' + account.login)
-		worker.queue.create('vk_auth', account).removeOnComplete(true).save()
+		worker.queue.create('auth', account).removeOnComplete(true).save()
 	}
 }
 

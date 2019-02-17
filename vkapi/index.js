@@ -3,6 +3,11 @@ const utils = require('../utils')
 const db    = require('../db')
 const axios = require('axios-https-proxy-fix')
 
+
+exports.wall = require('./wall.js');
+// exports.likes = require('./likes.js');
+exports.comments = require('./comments.js');
+
 /**
  * Авторизация пользователя
  * Алгоритм:
@@ -11,7 +16,7 @@ const axios = require('axios-https-proxy-fix')
  *        2.1 Скачиваем base64 капчу
  *        2.2 Формируем запрос к anticaptcha 
  */
-exports.authorize = async function(login, password, captcha_sid = null, captcha_key = null) {
+exports.authorize = async function(login, password, proxy = null, captcha_sid = null, captcha_key = null) {
     // Стандартные параметры запроса
     var params = {
         client_id:     2274003,                // Данные от приложения андроид
@@ -22,6 +27,19 @@ exports.authorize = async function(login, password, captcha_sid = null, captcha_
         scope:         'notify,friends,photos,audio,video,pages,status,notes,messages,wall,ads,offline,docs,groups,notifications,stats,email,market',
         v: 5.56
     }
+
+    // Добавляем прокси
+    if (proxy != null) {
+        params.proxy = {
+            host: proxy.ip,
+            port: proxy.port,
+            auth: {
+                username: proxy.login,
+                password: proxy.password
+            }
+        }
+    }
+
     // Если нужно ввести капчу (т.е. есть данные капчи), то добавляем их
     if (captcha_sid && captcha_key) {
         params.captcha_sid = captcha_sid
@@ -41,7 +59,7 @@ exports.authorize = async function(login, password, captcha_sid = null, captcha_
             var [error, captcha_key] = await utils.anticaptcha.getCaptcha(captcha_img)
             logger.debug('Получена капча ' + captcha_key + ' для ' + login)
             if (!error) {
-                const response = await exports.authorize(login, password, captcha_sid, captcha_key);
+                const response = await exports.authorize(login, password, proxy, captcha_sid, captcha_key);
                 return response;
             }
         }
