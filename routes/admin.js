@@ -11,26 +11,25 @@ router.get('/', function(req, res){
 	res.render('admin', {user: req.user});
 })
 
+/**
+ * Изменяем баланс
+ */
 router.post('/change_balance', async function(req, res) {
 	if (!req.isAuthenticated()) return res.redirect('/login');
 	if (!req.user.admin) return res.redirect('/panel');
 
-	var username = req.body.username
-	var count = req.body.count
-	var type = req.body.type
-
-	var user = await db.users.findByUsername(username)
+	const user = await db.users.findByUsername(req.body.username)
 	if (!user) return res.send('User not found')
 
-	if (type == 'add') {
-		utils.user.addBalance(user.id, count)
-	}
-	if (type == 'sub') {
-		utils.user.subtractBalance(user.id, count)
-	}
+	if (type == 'add') utils.user.changeBalance(user, 'add', req.body.count, 'Изменение через админку')
+	if (type == 'sub') utils.user.changeBalance(user, 'spend', req.body.count, 'Изменение через админку')
+
 	res.send('Success')
 })
 
+/**
+ * Добавляем новые аккаунты вк
+ */
 router.post('/add_account', function(req, res) {
 	if (!req.isAuthenticated()) return res.redirect('/login');
 	if (!req.user.admin) return res.redirect('/panel');

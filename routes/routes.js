@@ -2,10 +2,10 @@ var express = require('express')
 var router = express.Router()
 
 
-router.use('/vendor', express.static('public/vendor'))
-router.use('/styles', express.static('public/styles'))
-router.use('/images', express.static('public/images'))
-router.use('/scripts', express.static('public/scripts'))
+// router.use('/vendor', express.static('public/vendor'))
+// router.use('/styles', express.static('public/styles'))
+// router.use('/images', express.static('public/images'))
+// router.use('/scripts', express.static('public/scripts'))
 
 
 router.get('/logout', function(req, res){ 	
@@ -25,6 +25,7 @@ router.use('/forgotPassword', require('./forgotPassword.js'));
 
 router.use('/news', require('./news.js'));
 router.use('/tasks', require('./tasks.js'));
+router.use('/payment', require('./payment.js'));
 router.use('/support', require('./support.js'));
 router.use('/profile', require('./profile.js'));
 router.use('/comments', require('./comments.js'));
