@@ -61,62 +61,39 @@
 
             <div class="row">
                 <div class="col-md-12">
-
-                    <div class="panel panel-filled">
-                        <div class="panel-body">
-                            <div class="row">
-                                <div class="col-lg-6">
-                                    <div class="input-group m-b-xs m-t-xs">
-                                        <input class="form-control" type="text" placeholder="Поиск по названию или URL" style="width: 100%">
-                                        <div class="input-group-btn">
-                                            <button class="btn btn-default"><i class="fa fa-search"></i></button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-3">
-                                    <select class="form-control m-b-xs m-t-xs" name="account" style="width: 100%">
-                                        <option selected="">Выберите статус
-                                        <option>Активна
-                                        <option>Завершена
-                                    </select>
-                                </div>
-                                <div class="col-lg-3">
-                                    <select class="form-control m-t-xs" name="account" style="width: 100%">
-                                        <option selected="">Сортировка по:
-                                        <option>Статусу
-                                    </select>
+                    <% if (tasks != null) { %>
+                        <div id="tasks_panel" class="panel">
+                            <div class="loader">
+                                <div class="loader-bar"></div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="table-responsive">
+                                    <%- include('taskslist', {tasks: tasks}); %>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <% if (tasks != null) { %>
-                        <div class="panel">
-                            <div class="panel-body">
-                                <div class="table-responsive">
-                                <table class="table table-vertical-align-middle">
-                                    <thead>
-                                    <tr>
-                                        <th>
-                                            Статус
-                                        </th>
-                                        <th>
-                                            Название и URL
-                                        </th>
-                                        <th>
-                                            Заказано лайков
-                                        </th>
-                                        <th>
-                                            Прогресс
-                                        </th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <%- include('taskslist', {tasks: tasks}); %>
-                                    </tbody>
-                                </table>
-                                </div>
+                        <div class="row">
+                            <div class="pull-left">
+                                <span>Показаны задачи с <a id="from">1</a> по <a id="to"><%= tasks_count > 10 ? 10 : tasks_count %></a> из <a><%= tasks_count %></a></span>
                             </div>
+
+                            <div class="pull-right">
+                                <ul id="pagination" class="pagination pagination-sm" style="margin: 2px 10px">
+                                    <li><a onclick="changePage('prev')">Назад</a></li>
+                                    <li><a onclick="changePage('next')">Вперед</a></li>
+                                </ul>
+                            </div>
+
+                            <form class="form-inline pull-right">
+                                <span>Задач на странице&nbsp;</span>
+                                <select id="count" class="form-control">
+                                    <option>10</option>
+                                    <option>25</option>
+                                    <option>50</option>
+                                    <option>100</option>
+                                </select>
+                            </form>
                         </div>
                     <% }else { %>
                         <h3>У вас еще нет задач</h3>
@@ -124,16 +101,6 @@
                     <% } %>
                 </div>
             </div>
-            <!-- <div class="pull-right">
-                <ul class="pagination pagination-sm">
-                <li class="disabled"><a href="#">Previous</a></li>
-                    <li class="active"><a href="#">1</a></li>
-                    <li><a href="#">2</a></li>
-                    <li><a href="#">3</a></li>
-                    <li><a href="#">Next</a></li>
-                </ul>
-            </div> -->
-
         </div>
     </section>
     <!-- End main content-->
@@ -148,7 +115,14 @@
 
 <!-- App scripts -->
 <script src="scripts\luna.js"></script>
+<script src="scripts\tasks.js"></script>
 
+<script type="text/javascript">
+let page = 1;   // Номер текущей страницы
+let count = 10; // Количество тасков на странице
+const tasks_count = <%= tasks_count %>; // Всего тасков
+const max_page = Math.ceil(tasks_count / count); // Максимальная страница
+</script>
 
 </body>
 

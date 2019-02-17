@@ -19,6 +19,8 @@ var vkapi = require('../vkapi')
  */
 queue.process('comment', 1, async function(job, done){
 	logger.info("Начала выполнятся задача на накрутку комментов")
+	db.tasks.setStatus(data.task_id, 'run')
+	
 	const data = job.data
 
     // Получаем все аккаунты
@@ -62,7 +64,7 @@ queue.process('comment', 1, async function(job, done){
 		// Если лайк успешно поставлен
 		if (response.response) {
 			now++; // Увеличиваем количество поставленных комментов
-			db.tasks.inrementLikes(data.task_id);
+			db.tasks.inrement(data.task_id);
 			logger.debug('Добавлен комментарий')
 		}else {
 			logger.warn('Странный результат')
@@ -72,7 +74,7 @@ queue.process('comment', 1, async function(job, done){
 	}
 
 
-	db.tasks.setFinish(data.task_id)
+	db.tasks.setStatus(data.task_id, 'finish')
 	logger.info('Задача ' + data.task_id + ' выполнена')
 	done();
 });

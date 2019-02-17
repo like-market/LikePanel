@@ -17,6 +17,9 @@ var vkapi = require('../vkapi')
  */
 queue.process('like', async function(job, done){
 	const data = job.data
+	
+	logger.info("Начала выполнятся задача на накрутку лайков")
+	db.tasks.setStatus(data.task_id, 'run')
 
     // Получаем все аккаунты
 	all_accounts = await db.vk.getActiveAccounts();
@@ -72,7 +75,7 @@ queue.process('like', async function(job, done){
 		// Если лайк успешно поставлен
 		if (response.response) {
 			like_now++; // Увеличиваем кол-во лайков
-			db.tasks.inrementLikes(data.task_id);
+			db.tasks.inrement(data.task_id);
 			logger.debug('Поставлен лайк')
 		}else {
 			logger.warn('Странный результат')
@@ -80,13 +83,13 @@ queue.process('like', async function(job, done){
 		}
 
 		if (like_now == data.like_need) {
-			db.tasks.setFinish(data.task_id)
+			db.tasks.setStatus(data.task_id, 'finish')
 			logger.info('Задача ' + data.task_id + ' выполнена')
 			return done();
 		}
 	}
 
 	logger.error('Не получается завершить задачу ' + data.task_id)
-	db.tasks.setWait(data.task_id)
+	db.tasks.setStatus(data.task_id, 'error')
 	done()
 });

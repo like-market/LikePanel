@@ -1,43 +1,55 @@
-<% /**
-    * Вывод данных у таблицы с задачами
-    * @param tasks [object] - список задач
-    */ %>
-<% tasks.forEach(function(task) { %>
-    <tr>
-        <td>
-            <% if (task.status == 'run') { %>
-                <span class="label label-accent">
-            <% } else { %>
-                <span class="label label-default">
-            <% } %>
-                <% switch (task.status) {
-                    case 'finish' : %>
-                        Выполнена
-                        <% break;
-
-                    case 'run' : %>
-                        Выполняется
-                        <% break;
-
-                    case 'wait' : %>
-                        Ожидание
-                        <% break;
-                    } %>
-            </span>
-        </td>
-        <td>
-            <a href="#"><%= task.name %></a>
-            <div class="small"><%= task.url %></div>
-        </td>
-        <td>
-            <%= task.like_need %>
-        </td>
-        <td>
-            <% progress = Math.round(task.like_now / task.like_need * 100); %>
-            <div class="progress m-b-none full progress-small">
-                <div style="width: <%= progress %>%" class="progress-bar progress-bar-warning"></div>
-            </div>
-            <small><%= progress + "% завершено" %></small>
-        </td>
-    </tr>
-<% }); %>
+<table class="table table-vertical-align-middle table-striped table-hover">
+    <thead>
+        <tr>
+            <th>Статус</th>
+            <th>Название и URL</th>
+            <th>Заказано</th>
+            <th>Прогресс</th>
+        </tr>
+    </thead>
+    <tbody id="tasks-data">
+    <% /**
+        * Вывод данных у таблицы с задачами
+        * @param tasks [object] - список задач
+        */ %>
+    <% tasks.forEach(function(task) { %>
+        <tr>
+            <td>
+            <% switch (task.status) {
+                   case 'finish' : %>
+                       <span class="label label-success">Выполнена</span>
+                   <% break;
+                   case 'run' : %>
+                       <span class="label label-info">Выполняется</span>
+                   <% break;
+                   case 'wait' : %>
+                       <span class="label label-accent">Ожидание</span>
+                   <% break;
+                   case 'error' : %>
+                       <span class="label label-danger">Ошибка</span>
+                   <% break;
+               } %>
+            </td>
+            <td>
+                <%= task.name %>
+                <div class="small"><a href="<%= task.url %>" target="_blank"><%= task.url %></a></div>
+            </td>
+            <td>
+                <% if (task.type == 'like') { %>
+                    <i class="fa pe-7s-like"></i>&nbsp;&nbsp;
+                <% }else { %>
+                    <i class="fa fa-commenting-o"></i>&nbsp;&nbsp;
+                <% } %>
+                <%= task.need_add %>
+            </td>
+            <td>
+                <% progress = Math.round(task.now_add / task.need_add * 100); %>
+                <div class="progress m-b-none full progress-small">
+                    <div style="width: <%= progress %>%" class="progress-bar progress-bar-warning"></div>
+                </div>
+                <small><%= progress + "% завершено" %></small>
+            </td>
+        </tr>
+    <% }); %>
+    </tbody>
+</table>

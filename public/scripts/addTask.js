@@ -34,28 +34,30 @@ $('#url_like, #url_comment').change(function() {
 
 // При клике на кнопку 'накрутить лайки'
 $('#createLikes').click(function() {
+    let error = 0;
+
     if ($('#like_count').val() == '') {
         toastr.error('Введите количество лайков')
         $('#like_count').css('border', '1px solid red')
-        return;
+        error++;
     }
 
     var cost = ($('#like_count').val() * likePrice).toFixed(2);
     if (cost > balance) {
         toastr.error('У вас не хватает средств')
-        return;
+        error++;
     }
 
     var url = $('#url_like').val()
 
     const regex = /(https?:\/\/)?vk.com\/.*/i;
-    match = regex.exec(url)
-
-    if (match == null) {
+    if (regex.exec(url) == null) {
         toastr.error('Неверный URL')
         $('#url_like').css('border', '1px solid red')
-        return;
+        error++
     }
+    
+    if (error) return;
 
     $.ajax({
         type: 'POST',
@@ -95,34 +97,34 @@ $('#createLikes').click(function() {
 
 // При клике на кнопку 'накрутить комменты'
 $('#createComments').click(function() {
+    let error = 0;
+
     if ($('#comment_count').val() == '') {
         toastr.error('Введите количество комментариев')
         $('#comment_count').css('border', '1px solid red')
-        return;
+        error++;
     }
     if ($('#comments').val() == null) {
         toastr.error('Выберите хотя бы один набор')
         $('#comments').css('border', '1px solid red')
-        return;
+        error++;
     }
 
     var cost = ($('#comment_count').val() * commentPrice).toFixed(2);
-    console.log(cost, balance)
     if (cost > balance) {
         toastr.error('У вас не хватает средств')
-        return;
+        error++;
     }
 
     var url = $('#url_comment').val()
 
     const regex = /(https?:\/\/)?vk.com\/.*/i;
-    match = regex.exec(url)
-
-    if (match == null) {
+    if (regex.exec(url) == null) {
         toastr.error('Неверный URL')
         $('#url_like').css('border', '1px solid red')
-        return;
+        error++;
     }
+    if (error) return;
     
     $.ajax({
         type: 'POST',

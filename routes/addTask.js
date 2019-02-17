@@ -69,7 +69,7 @@ router.post('/add_likes', async function(req, res) {
 		else return res.send('Error')
 	}
 
-	utils.task.addLikes(req.user.id, req.body.name, data.owner_id, data.type, data.item_id, like_need);
+	utils.task.addLikes(req.user, req.body.name, data.owner_id, data.type, data.item_id, like_need);
 
 	res.send('Success')
 })
@@ -109,7 +109,7 @@ router.post('/add_comments', async function(req, res) {
 	}
 
 	utils.task.addComments(
-		req.user.id,         // Id пользователя, создающего задачу
+		req.user,            // Объект пользователя, создающего задачу
 		data.type,           // Тип задачи
 		req.body.name,       // Название задачи
 		data.owner_id,       // Id юзера или сообщества, где находится запись
