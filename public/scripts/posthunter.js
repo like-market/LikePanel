@@ -35,15 +35,15 @@ function updateStatus(id, status) {
                 		$('#button_' + id).html('<i class="fa fa-pencil"></i> Отключить ')
                 		$('#button_' + id).attr('onclick', "updateStatus(" + id + ", 'disable')");
 
-                		$('#status_' + id).toggleClass('label-danger label-success')
-                		$('#status_' + id).html('Включено')
+                		$('#group_status_' + id).toggleClass('label-danger label-success')
+                		$('#group_status_' + id).html('Включено')
                     }else {
                 		$('#button_' + id).toggleClass('btn-danger btn-success')
                 		$('#button_' + id).html('<i class="fa fa-pencil"></i> Включить ')
                 		$('#button_' + id).attr('onclick', "updateStatus(" + id + ", 'enable')");
 
-                		$('#status_' + id).toggleClass('label-success label-danger')
-                		$('#status_' + id).html('Отключено')
+                		$('#group_status_' + id).toggleClass('label-success label-danger')
+                		$('#group_status_' + id).html('Отключено')
                     }
                     toastr.success('Статус обновлен')
                     break;
@@ -63,6 +63,7 @@ function add() {
         toastr.error('Неверное количество лайков')
         return
     }
+
     // Если неверное количество комментариев
     if ($('#min_comments').val() > $('#max_comments').val()) {
         toastr.error('Неверное количество комментариев')
