@@ -57,7 +57,7 @@ exports.getBalanceHistory = function(user, days) {
  */
 exports.getTotalRefill = function(user_id) {
     return new Promise(function(resolve, reject){
-        var sql = `SELECT SUM(ammount) as SUM FROM balance WHERE user_id=${user_id} AND type='add'`
+        var sql = `SELECT SUM(amount) as SUM FROM balance WHERE user_id=${user_id} AND type='add'`
 
         db.query(sql, function(err, rows) {
             if (err) return reject(err)
@@ -77,20 +77,23 @@ exports.getTotalRefill = function(user_id) {
  * Изменяем баланс
  * @param user_id - ID пользователя
  * @param type - тип операции [add, spend]
- * @param ammount - колличество (в копейках)
+ * @param amount - колличество (в копейках)
  * @param description - описание
  */
-exports.changeBalance = function(user, type, ammount, description) {
+exports.changeBalance = function(user, type, amount, description) {
 	return new Promise(function(resolve, reject){
 		// Добавляем транзакцию
-		sql = "INSERT into balance(user_id, type, ammount, description, balance) "
-		sql += `VALUES(${user.id}, '${type}', ${ammount}, '${description}', ${ammount + user.balance});`
+		sql = "INSERT into balance(user_id, type, amount, description, balance) "
+		sql += `VALUES(${user.id}, '${type}', ${amount}, '${description}', ${amount + user.balance});`
 
 		db.query(sql, function(err, rows) {
 			if (err) reject(err)
 
+			if (type == 'add') sign = '+';
+			else sign = '-';
+			
 			// Изменяем баланс
-			sql = `UPDATE users SET balance = balance - ${ammount} WHERE id = ${user.id}`			
+			sql = `UPDATE users SET balance = balance ${sign} ${amount} WHERE id = ${user.id}`			
 			
 			db.query(sql, function(err, rows) {
 				if (err) reject(err)
@@ -99,4 +102,54 @@ exports.changeBalance = function(user, type, ammount, description) {
 			})
 		})
 	})
+}
+
+/**
+ * Создаем счет для оплаты
+ * @param owner_id  - владелец счета
+ * @param amount   - сумма для пополнения (в рублях)
+ */
+exports.createBill = function(owner_id, amount) {
+    return new Promise(function(resolve, reject){
+        let sql = `INSERT INTO payment(user_id, amount) VALUES(${owner_id}, ${amount})`;
+
+        db.query(sql, function(err, rows) {
+            if (err) return reject(err)
+
+            // resolve(rows.insertId)
+            resolve( JSON.parse(JSON.stringify(rows)).insertId )
+        })
+    })
+}
+
+/**
+ * Получаем информацию об оплате
+ * @param pay_id - идентификатор платежа
+ */
+exports.getBill = function(pay_id) {
+	return new Promise(async function(resolve, reject){
+		sql = `SELECT * FROM payment WHERE id=${pay_id}`
+
+		db.query(sql, function(err, rows) {
+			if (err || rows.length == 0) return reject(err)
+
+			resolve( JSON.parse(JSON.stringify(rows))[0] );
+		})
+	})
+}
+
+/**
+ * Устанавливаем статус платежа
+ * @param pay_id - идентификатор платежа
+ */
+exports.setBillStatus = function(pay_id, status) {
+    return new Promise(function(resolve, reject){
+        var sql = `UPDATE payment SET status = '${status}' WHERE id = ${pay_id}`
+
+        db.query(sql, function(err, rows) {
+            if (err) return reject(err)
+
+            resolve()
+        })
+    })
 }

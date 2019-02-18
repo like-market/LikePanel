@@ -1,6 +1,7 @@
 exports.vk   = require('./vk.js');
 exports.task = require('./task.js');
 exports.user = require('./user.js');
+exports.payment  = require('./payment.js');
 exports.urlparser   = require('./urlparser.js');
 exports.posthunter  = require('./posthunter.js');
 exports.anticaptcha = require('./anticaptcha.js')

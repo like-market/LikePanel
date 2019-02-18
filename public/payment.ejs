@@ -66,16 +66,16 @@
                         
                         <div class="panel-body">
                             <h4>Пополнить баланс</h4>
-
+                            <span>Вы можете пополнить баланс от <a>100₽</a> до <a>10'0000₽</a>   
                             <p class="small">Если вы хотите пополнить баланс другим способом, напишите <a class="c-white" href="https://tgdo.me/edward_stark" target="_blank" style="color: #f6a821;">менеджеру</a></p>
 
                             <div class="form-inline">
                                 <label>Сумма &nbsp;</label>
-                                <input id="ammount" type="number" class="form-control" placeholder="Минимум 100₽" min="100">
+                                <input id="amount" type="number" class="form-control" placeholder="Минимум 100₽" min="100">
                             </div>
                         </div>
                         <div class="panel-footer text-center">
-                            <a href="#" class="btn btn-w-md btn-accent">Пополнить</a>
+                            <a id="pay" class="btn btn-w-md btn-accent">Пополнить</a>
                         </div>
                     </div>
 
@@ -113,9 +113,9 @@
                                             <td><%= trx.id %></td>
                                             <td>
                                                 <% if (trx.type == 'add') { %>
-                                                    +<%= (trx.ammount / 100).toFixed(2) %>₽
+                                                    +<%= (trx.amount / 100).toFixed(2) %>₽
                                                 <% }else if (trx.type == 'spend') { %>
-                                                    -<%= (trx.ammount / 100).toFixed(2) %>₽
+                                                    -<%= (trx.amount / 100).toFixed(2) %>₽
                                                 <% } %>
                                             </td>
                                             <td>
