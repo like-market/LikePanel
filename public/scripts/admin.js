@@ -1,57 +1,3 @@
-/**
- * Графики
- */
-/*$(document).ready(function () {
-    var tasks = [{
-        data: [ 
-                [1540376659000, 1.30],
-                [1540374640000, 1.10],
-                [1540374626000, 0.90],
-                [1540374613000, 0.70],
-                [1540374583000, 0.50],
-                [1540349362000, 0.30],
-            ]
-        }]
-
-    var balance = [{
-        data: [ 
-                [1540376659000, 1.30],
-                [1540374640000, 1.10],
-                [1540374626000, 0.90],
-                [1540374613000, 0.70],
-                [1540374583000, 0.50],
-                [1540349362000, 0.30],
-            ]
-        }]
-
-    var chartUsersOptions = {
-        xaxis: {
-            mode: "time",
-            timeformat: "%d"
-        },
-        series: {
-            splines: {
-                show: true,
-                tension: 0.4,
-                lineWidth: 2,
-                fill: true
-            },
-            points: {
-                show: true
-            }
-        },
-        legend: {
-            show: false
-        },
-        grid: {
-            borderWidth: 0
-        }
-    };
-
-    $.plot($("#tasks-create"), tasks, chartUsersOptions);
-    $.plot($("#refill-balance"), balance, chartUsersOptions);
-});*/
-
 toastr.options = {
     "debug": false,
     "newestOnTop": false,
@@ -108,18 +54,14 @@ $('#change-balance').click(function() {
         toastr.error('Введите количество денег')
         return;
     }
+    count = parseFloat(count) * 100;
 
     var type = $('#operation-type').val()
 
      $.ajax({
         type: 'POST',
         url: '/admin/change_balance',
-        data: JSON.stringify({
-            username: username,
-            count: count,
-            type: type
-        }),
-        contentType: 'application/json',
+        data: { username, count, type },
         success: function(res) {
             switch(res) {
                 case 'Success':

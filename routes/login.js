@@ -25,7 +25,7 @@ router.post("/", function(req, res, next) {
       res.send("Success");
       // ip = req.connection.remoteAddress.split(":").pop();
       ip = req.headers["x-real-ip"].split(":").pop(); // Nginx IP
-      db.activity.auth(user.id, ip);
+      db.activity.addActivity(user.id, 'auth', ip);
     });
   })(req, res, next);
 });

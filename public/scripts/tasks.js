@@ -73,6 +73,7 @@ function updateTasks() {
  */
 $('#count').change(function() {
 	count = $('#count').val();  // Количество тасков на странице
+	max_page = Math.ceil(tasks_count / count);
 	page = 1;                   // Текущая страница - первая
 	updateTasks();      // Обновляем список задач
 	updatePagination(); // Обновляем пагинацию

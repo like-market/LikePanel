@@ -84,7 +84,7 @@ exports.changeBalance = function(user, type, amount, description) {
 	return new Promise(function(resolve, reject){
 		// Добавляем транзакцию
 		sql = "INSERT into balance(user_id, type, amount, description, balance) "
-		sql += `VALUES(${user.id}, '${type}', ${amount}, '${description}', ${amount + user.balance});`
+		sql += `VALUES(${user.id}, '${type}', ${amount}, '${description}', ${parseInt(amount) + parseInt(user.balance)});`
 
 		db.query(sql, function(err, rows) {
 			if (err) reject(err)
@@ -94,7 +94,7 @@ exports.changeBalance = function(user, type, amount, description) {
 			
 			// Изменяем баланс
 			sql = `UPDATE users SET balance = balance ${sign} ${amount} WHERE id = ${user.id}`			
-			
+
 			db.query(sql, function(err, rows) {
 				if (err) reject(err)
 				

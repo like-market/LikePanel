@@ -21,9 +21,8 @@ router.post('/change_balance', async function(req, res) {
 	const user = await db.users.findByUsername(req.body.username)
 	if (!user) return res.send('User not found')
 
-	if (type == 'add') utils.user.changeBalance(user, 'add', req.body.count, 'Изменение через админку')
-	if (type == 'sub') utils.user.changeBalance(user, 'spend', req.body.count, 'Изменение через админку')
-
+	utils.user.changeBalance(user, req.body.type, req.body.count, 'Изменение через админку')
+	
 	res.send('Success')
 })
 

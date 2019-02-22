@@ -1,6 +1,22 @@
 const db = require('./index.js').db;
 const promise = require('promise');
 
+
+exports.findById = function(task_id) {
+    return new Promise(function(resolve, reject){
+        var sql = `SELECT * FROM tasks WHERE id= ${task_id}`
+
+        db.query(sql, function(err, rows) {
+            if (err) return reject(err)
+
+            if (rows.length == 0) return resolve(null);
+
+            // resolve( rows.parseSqlResult()[0] );
+            resolve( JSON.parse(JSON.stringify(rows))[0] )
+        })
+    });
+}
+
 /**
  * Получаем список задач у пользователя
  * @param user_id - id пользователя

@@ -113,16 +113,16 @@
 <script src="vendor\jquery\dist\jquery.min.js"></script>
 <script src="vendor\bootstrap\js\bootstrap.min.js"></script>
 
+<script type="text/javascript">
+const tasks_count = <%= tasks_count %>; // Всего тасков
+let page = 1;   // Номер текущей страницы
+let count = 10; // Количество тасков на странице
+let max_page = Math.ceil(tasks_count / count); // Максимальная страница
+</script>
+
 <!-- App scripts -->
 <script src="scripts\luna.js"></script>
 <script src="scripts\tasks.js"></script>
-
-<script type="text/javascript">
-let page = 1;   // Номер текущей страницы
-let count = 10; // Количество тасков на странице
-const tasks_count = <%= tasks_count %>; // Всего тасков
-const max_page = Math.ceil(tasks_count / count); // Максимальная страница
-</script>
 
 </body>
 

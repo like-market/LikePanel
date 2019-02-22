@@ -19,7 +19,7 @@ var Strategy = require('passport-local').Strategy;
 passport.use(new Strategy(
     async function(username, password, cb) {
         user = await db.users.findByUsername(username);
-        if (!user) { 
+        if (!user) {
             return cb(null, false);
         }
         if (user.password != password) {
@@ -32,18 +32,19 @@ passport.serializeUser(function(user, cb) {
     cb(null, user.id);
 });
 
-passport.deserializeUser(async function(id, cb) {
-    user = await db.users.findById(id)
+passport.deserializeUser(async function(user_id, cb) {
+    user = await db.users.findById(user_id)
     cb(null, user);
 });
 
 var app = express();
+app.disable('etag'); // disable cache
 
 app.use(cookieParser());
 app.use(bodyParser.json());       // To support JSON-encoded bodies
 app.use(bodyParser.urlencoded({   // To support URL-encoded bodies
     extended: true
-})); 
+}));
 
 app.set('view engine', 'ejs');
 app.set('views', require("path").join(__dirname, '/public'));
@@ -63,8 +64,8 @@ app.use(passport.session());
 app.use(require('./routes/routes.js'))
 
 
-app.listen(8080, () => {
-    logger.info('HTTP Server running on port 8080');
+app.listen(8888, () => {
+    logger.info('HTTP Server running on port 8888');
 });
 
 // Получаем рандомный валидный токен
