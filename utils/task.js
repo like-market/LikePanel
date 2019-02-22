@@ -1,6 +1,7 @@
-var logger = require('../logger.js')
-var db = require('../db');
-var worker = require('../worker');
+const logger = require('../logger.js')
+const utils = require('../utils')
+const db = require('../db');
+const worker = require('../worker');
 
 
 /**
@@ -54,3 +55,34 @@ exports.addLikes = async function(user, name, owner_id, type, item_id, like_need
         user_id: user.id, type, owner_id, item_id, like_need, task_id
     }).removeOnComplete(true).save();
 }
+
+/**
+ * Отменяем задачу, возаращаем деньги
+ * @param task_id - номер задачи
+ */
+exports.cancelTask = async function(task_id) {
+    // TODO
+}
+
+/**
+ * Вызывается в случае возникновения ошибки при выполнении задачи
+ * Возвращаем деньги за невыполненную задачу
+ * @param task_id - инедтификатор задачи
+ */
+exports.onError = async function(task_id) {
+    logger.warn(`Останавливаем задачу ${task_id}`)
+    db.tasks.setStatus(task_id, 'error')
+
+    // Ждем 5 секунд, чтобы выполнились все асинхронные функции
+    await utils.sleep(5);
+
+    const task = await db.tasks.findById(task_id);
+    const user = await db.users.findById(task.owner_id)
+
+    // Количество денег для возврата
+    const amount = (task.need_add - task.now_add) * 10; 
+    utils.user.changeBalance(user, 'add', amount, `Возврат по задаче ${task_id}`);
+    logger.warn(`Возвращаем пользователю ${user.username} ${(amount / 100).toFixed(2)}₽`)
+}
+
+// TODO: Функция, которая убирает задачи, находящиеся в ожидании при старте

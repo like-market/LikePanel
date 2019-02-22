@@ -50,7 +50,6 @@ exports.checkBill = async function(pay_id, amount, sign) {
 	}
 
 	const verify = md5(`${merchant_id}:${amount}:${pay_id}:${secret_key}`);
-	console.log(verify, sign);
 	if (sign != verify) {
 		logger.warn(`Подписи не совпадают  pay_id: ${pay_id}  amount: ${amount}`)
 		return;

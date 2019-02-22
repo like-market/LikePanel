@@ -26,16 +26,16 @@ queue.process('auth', 1, async function(job, done) {
 	const proxy = await db.proxy.getRandom();
 
 	// Проверяем аккаунт в бд
-	var row = await db.vk.getAccount(login)
-	if (row && row.length != 0) {
+	const account = await db.vk.getAccount(login)
+	if (account && account.length != 0) {
 		// Изменились ли какие-нибудь данные (пароль)
-		if (row.password == password) {
+		if (account.password == password || account.status == 'active') {
 			logger.warn('Попытка добавления существующего аккаунта ' + login)
 			return done()
 		}
 	}
 
-	var response = await vkapi.authorize(login, password, proxy);
+	const response = await vkapi.authorize(login, password, proxy);
 
 	// Если неправильный логин или пароль
 	if (response.error_type && response.error_type == 'username_or_password_is_incorrect') {
