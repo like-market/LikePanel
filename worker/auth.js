@@ -19,7 +19,7 @@ const vkapi = require('../vkapi')
  * @parallel 5
  * @params {login, password}
  */
-queue.process('auth', 1, async function(job, done) {
+queue.process('auth', 3, async function(job, done) {
 	const login    = job.data.login
 	const password = job.data.password
 
@@ -54,12 +54,12 @@ queue.process('auth', 1, async function(job, done) {
 	// Если нет токена - значит произошла какая-то ошибка
 	if (!response.access_token) {
 		logger.error('Неотслеживаемая ошибка ' + login)
-		console.log(response)
+		console.log(response.data)
 		return done()
 	}
 
 	// На этом этапе авторизация прошла успешно
-	if (row && row.length != 0) {
+	if (account && account.length != 0) {
 		await db.vk.removeAccount(response.user_id) // Удаляем старую инфу о клиенте
 		db.vk.addAccount(response.user_id, login, password, response.access_token, proxy.id)
 		logger.info('Обновили данные о пользователе ' + response.user_id)
