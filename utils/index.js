@@ -1,6 +1,7 @@
 exports.vk   = require('./vk.js');
 exports.task = require('./task.js');
 exports.user = require('./user.js');
+exports.payment  = require('./payment.js');
 exports.urlparser   = require('./urlparser.js');
 exports.posthunter  = require('./posthunter.js');
 exports.anticaptcha = require('./anticaptcha.js')
@@ -18,3 +19,13 @@ exports.randInt = function(min, max) {
 Array.prototype.random = function () {
 	return this[Math.floor((Math.random() * this.length))];
 }
+
+Array.prototype.popRandom = function() {
+	return this.splice(Math.floor(Math.random() * this.length), 1)[0];
+}
+
+/*
+Object.prototype.parseSqlResult = function () {
+    return JSON.parse(JSON.stringify(this))
+}
+*/

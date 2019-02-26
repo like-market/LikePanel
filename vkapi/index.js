@@ -3,6 +3,11 @@ const utils = require('../utils')
 const db    = require('../db')
 const axios = require('axios-https-proxy-fix')
 
+
+exports.wall = require('./wall.js');
+// exports.likes = require('./likes.js');
+exports.comments = require('./comments.js');
+
 /**
  * Авторизация пользователя
  * Алгоритм:
@@ -11,7 +16,7 @@ const axios = require('axios-https-proxy-fix')
  *        2.1 Скачиваем base64 капчу
  *        2.2 Формируем запрос к anticaptcha 
  */
-exports.authorize = async function(login, password, captcha_sid = null, captcha_key = null) {
+exports.authorize = async function(login, password, account_proxy = null, captcha_sid = null, captcha_key = null) {
     // Стандартные параметры запроса
     var params = {
         client_id:     2274003,                // Данные от приложения андроид
@@ -22,6 +27,20 @@ exports.authorize = async function(login, password, captcha_sid = null, captcha_
         scope:         'notify,friends,photos,audio,video,pages,status,notes,messages,wall,ads,offline,docs,groups,notifications,stats,email,market',
         v: 5.56
     }
+
+    // Добавляем прокси
+    let proxy = {}
+    if (account_proxy) {
+        proxy = {
+            host: account_proxy.ip,
+            port: account_proxy.port,
+            auth: {
+                username: account_proxy.login,
+                password: account_proxy.password
+            }
+        }
+    }
+
     // Если нужно ввести капчу (т.е. есть данные капчи), то добавляем их
     if (captcha_sid && captcha_key) {
         params.captcha_sid = captcha_sid
@@ -29,7 +48,8 @@ exports.authorize = async function(login, password, captcha_sid = null, captcha_
     }
 
     try {
-        const response = await axios.get('https://oauth.vk.com/token', {params});
+        const response = await axios.get('https://oauth.vk.com/token', {params, proxy});
+
         return response.data;
     }catch (error) {
         // Если нужно ввести капчу
@@ -41,7 +61,7 @@ exports.authorize = async function(login, password, captcha_sid = null, captcha_
             var [error, captcha_key] = await utils.anticaptcha.getCaptcha(captcha_img)
             logger.debug('Получена капча ' + captcha_key + ' для ' + login)
             if (!error) {
-                const response = await exports.authorize(login, password, captcha_sid, captcha_key);
+                const response = await exports.authorize(login, password, account_proxy, captcha_sid, captcha_key);
                 return response;
             }
         }
@@ -95,21 +115,22 @@ exports.addLike = async function(type, owner_id, item_id, account) {
     let params = { type, owner_id, item_id, access_token: account.access_token, v: 5.56 }
 
     // Получаем прокси
+    let proxy = {}
     if (account.proxy_id) {
-        let proxy = db.proxy.get(account.proxy_id);
-        if (proxy != null) {
-            params['proxy'] = {
-                host: proxy.ip,
-                port: proxy.port,
+        let account_proxy = await db.proxy.get(account.proxy_id);
+        if (account_proxy) {
+            proxy = {
+                host: account_proxy.ip,
+                port: account_proxy.port,
                 auth: {
-                    username: proxy.login,
-                    password: proxy.password
+                    username: account_proxy.login,
+                    password: account_proxy.password
                 }
             }
         }
     }
 
-    const response = await axios.get('https://api.vk.com/method/likes.add', {params});
+    const response = await axios.get('https://api.vk.com/method/likes.add', {params, proxy});
     return response.data
 }
 
@@ -133,7 +154,7 @@ exports.getLikeList = async function(type, owner_id, item_id, count = 1000) {
  * @param account  - данные об аккаунте
  */
 exports.createComment = async function(type, owner_id, item_id, message, account, captcha_sid = null, captcha_key = null) {
-    var params = { owner_id, message, access_token: account.access_token, v: 5.56 }
+    let params = { owner_id, message, access_token: account.access_token, v: 5.56 }
 
     let method;
     switch (type) {
@@ -156,15 +177,16 @@ exports.createComment = async function(type, owner_id, item_id, message, account
     }    
 
     // Получаем прокси
+    let proxy = {}
     if (account.proxy_id) {
-        let proxy = db.proxy.get(account.proxy_id);
-        if (proxy != null) {
-            params['proxy'] = {
-                host: proxy.ip,
-                port: proxy.port,
+        let account_proxy = await db.proxy.get(account.proxy_id);
+        if (account_proxy) {
+            proxy = {
+                host: account_proxy.ip,
+                port: account_proxy.port,
                 auth: {
-                    username: proxy.login,
-                    password: proxy.password
+                    username: account_proxy.login,
+                    password: account_proxy.password
                 }
             }
         }
@@ -176,18 +198,18 @@ exports.createComment = async function(type, owner_id, item_id, message, account
         params.captcha_key = captcha_key // текст капчи
     }
 
-    const response = await axios.get('https://api.vk.com/method/' + method, {params});
+    const response = await axios.get('https://api.vk.com/method/' + method, {params, proxy});
 
     // Если нужно ввести капчу
     if (response.data.error && response.data.error.error_code == 14) {
-        logger.debug('Нужно ввести капчу')
-        var captcha_img = response.data.error.captcha_img
-        var captcha_sid = response.data.error.captcha_sid
+        logger.debug(`Нужно ввести капчу для акк ${account.user_id}`)
+        let captcha_img = response.data.error.captcha_img
+        let captcha_sid = response.data.error.captcha_sid
 
-        var [error, captcha_key] = await utils.anticaptcha.getCaptcha(captcha_img)
-        logger.debug('Получена капча ' + captcha_key)
+        let [error, captcha_key] = await utils.anticaptcha.getCaptcha(captcha_img)
+        logger.debug(`Получена капча ${captcha_key} для акк ${account.user_id}`)
         if (!error) {
-            const response = await exports.createComment(type, owner_id, item_id, message, account.access_token, captcha_sid, captcha_key);
+            const response = await exports.createComment(type, owner_id, item_id, message, account, captcha_sid, captcha_key);
             return response;
         }else {
             logger.error("Ошибка от капчи")

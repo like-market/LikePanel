@@ -1,17 +1,11 @@
 const db = require('../db');
 
-exports.addBalance = function(user_id, count) {
-	// Увеличиваем баланс пользователя
-	db.finance.addBalance(user_id, count);
-
-	// Добавляем 'пополнение' в recent_activity
-	db.activity.addMoney(user_id, count)
-}
-
-exports.subtractBalance = function(user_id, count) {
-	// Уменьшаем баланс пользователя
-	db.finance.spend(user_id, count);
-
-	// Добавляем 'уменьшение' в recent_activity
-	db.activity.spendMoney(user_id, count)
+/**
+ * Изменяем баланс
+ * @param user - объект пользователя
+ * @param type   - тип операции [add, spend]
+ * @param amount - колличество копеек
+ */
+exports.changeBalance = function(user, type, amount, description = '') {
+	db.finance.changeBalance(user, type, amount, description);
 }

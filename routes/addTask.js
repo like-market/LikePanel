@@ -20,7 +20,7 @@ router.get('/', async function(req, res) {
 
 	// Если ограничение по кол-ву аккаунтов
 	if (req.user.balance * likePrice < accountsCount) {
-		maxLikeCount = req.user.balance * likePrice; 
+		maxLikeCount = Math.floor(req.user.balance * likePrice); 
 	}else {
 		maxLikeCount = accountsCount;
 	}
@@ -94,7 +94,7 @@ router.post('/add_comments', async function(req, res) {
     const comment_need = req.body.count
 
 	// Проверка на количество
-	if (parseInt(comment_need) != comment_need || comment_need == "" || comment_need <= 0 || comment_need > 500) {
+	if (parseInt(comment_need) != comment_need || comment_need == "" || comment_need <= 0 || comment_need > 1000) {
 		return res.send('Invalid amount')
 	}
 	if (comment_need > req.user.balance * 10) {

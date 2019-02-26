@@ -9,11 +9,13 @@ const axios  = require('axios')
  */
 exports.getCaptcha = async function(url) {
 	// Получаем картинку
-	var response = await axios(url, {responseType: 'arraybuffer'});
-	var base64 = Buffer.from(response.data, 'binary').toString('base64')
+	let response = await axios(url, {responseType: 'arraybuffer'});
+	let base64 = Buffer.from(response.data, 'binary').toString('base64')
 
 	// Параметры для создания задачи
-	var params = {
+	let params = {
+		// Other: d833689e84681713035fd6c8572ef315
+		// My: f8e099d2af14077c13ebcb7568d5c423
 	    "clientKey":"f8e099d2af14077c13ebcb7568d5c423",
 	    "task": {
 	        "type": "ImageToTextTask",
@@ -26,22 +28,28 @@ exports.getCaptcha = async function(url) {
 	        "maxLength": 0
 	    }
 	}
-	// Создаем задачу	
-	const task = await axios.post('https://api.anti-captcha.com/createTask', params);
-	taskId = task.data.taskId
+	// Создаем задачу
+	let taskId = -1;
+
+	try {
+		const task = await axios.post('https://api.anti-captcha.com/createTask', params);
+		taskId = task.data.taskId
+	} catch(error) {
+		console.log(error);
+	}
 
 	// Ждем 5 секунд
 	await utils.sleep(5000)
-	
+
 	// Параметры для проверки статуса задачи
-	var params = {
+	params = {
 	    "clientKey":"f8e099d2af14077c13ebcb7568d5c423",
 	    "taskId": taskId
 	}
 
 	// Пока не получим ответ - будем спрашивать результат каждую секунду
 	while (true) {
-		var response = await axios.post('https://api.anti-captcha.com/getTaskResult', params);
+		let response = await axios.post('https://api.anti-captcha.com/getTaskResult', params);
 
 		// Если есть какая-то ошибка
 		if (response.data.errorId != 0) {
@@ -50,7 +58,7 @@ exports.getCaptcha = async function(url) {
 		// Если капча разгадана
 		if (response.data.status == 'ready') {
 			// Добавляем капчу в бд
-			var sql = "INSERT INTO `captcha`(`base64`, `result`)"
+			let sql = "INSERT INTO `captcha`(`base64`, `result`)"
 			sql += " VALUES('" + base64 + "', '" + response.data.solution.text + "')";
 			db.query(sql);
 

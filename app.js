@@ -1,77 +1,43 @@
-var logger = require('./logger.js')
-var db = require('./db');
-
-const utils = require('./utils')
-
-const fs = require('fs');
-
-var express = require('express');
-var router = express.Router()
-
-var bodyParser = require('body-parser')
-var cookieParser = require('cookie-parser')
-var session = require('express-session')
-
-var passport = require('passport')
-var Strategy = require('passport-local').Strategy;
+const logger  = require('./logger.js');
+const utils   = require('./utils');
+const cluster = require('cluster');
 
 
-passport.use(new Strategy(
-    async function(username, password, cb) {
-        user = await db.users.findByUsername(username);
-        if (!user) { 
-            return cb(null, false);
-        }
-        if (user.password != password) {
-            return cb(null, false);
-        }
-        return cb(null, user);
-    }
-));
-passport.serializeUser(function(user, cb) {
-    cb(null, user.id);
-});
+if (cluster.isMaster) {
+    logger.info('Запущен web-обработчик')
 
-passport.deserializeUser(async function(id, cb) {
-    user = await db.users.findById(id)
-    cb(null, user);
-});
+    const express = require('express');
+    const app = express()
 
-var app = express();
+    app.use(require('./routes/routes.js'))
 
-app.use(cookieParser());
-app.use(bodyParser.json());       // To support JSON-encoded bodies
-app.use(bodyParser.urlencoded({   // To support URL-encoded bodies
-    extended: true
-})); 
+    app.set('view engine', 'ejs');
+    app.set('views', require("path").join(__dirname, '/public'));
 
-app.set('view engine', 'ejs');
-app.set('views', require("path").join(__dirname, '/public'));
+    app.listen(8888, async () => {
+        await utils.vk.getRandomToken();
+        // Каждые 5 минут обновляем рандомный токен
+        // setInterval(() => { utils.vk.getRandomToken(true) }, 1000 * 60 * 5)
 
-app.use(session({
-    secret: 'KJjsdz',
-    store: db.sessionStore,
-    resave: false,
-    saveUninitialized: false,
-    cookie: { maxAge: 1000 * 60 * 60 * 24 * 5 } // 5 дней
-}))
+        logger.info('HTTP Server running on port 8888');
+    });
 
-app.use(passport.initialize());
-app.use(passport.session());
+    // Создаем форк
+    cluster.fork();
+
+}else {
+    logger.info('Запущен backend')
+
+    // Получаем рандомный валидный токен
+    utils.vk.updateAccounts(async function() {
+        await utils.vk.getRandomToken();
+        await utils.posthunter.updateAll();
+
+        setInterval(utils.vk.updateAccounts,    1000 * 60 * 5) // Каждые 5 минут обновляем аккаунты
+        setInterval(utils.posthunter.updateAll, 1000 * 30)     // Каждые 30 секунд обновляем постхантер 
+        // Каждые 5 минуту обновляем рандомный токен
+        // setInterval(()=>{ utils.vk.getRandomToken(true) }, 1000 * 60 * 5)
+    });
+}
 
 
-app.use(require('./routes/routes.js'))
-
-
-app.listen(8080, () => {
-    logger.info('HTTP Server running on port 8080');
-});
-
-// Получаем рандомный валидный токен
-utils.vk.updateAccounts(async function() {
-    await utils.vk.getRandomToken();
-    await utils.posthunter.updateAll();
-
-    setInterval(utils.vk.updateAccounts,    1000 * 60 * 5)
-    setInterval(utils.posthunter.updateAll, 1000 * 30)
-});

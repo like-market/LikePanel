@@ -14,7 +14,10 @@ exports.random_access_token = null;
  * Функция нужна для получения любого валидного токена из бд
  * Токен нужен в процессе работы скрипта - чтобы проверять записи, например
  */
-exports.getRandomToken = async function() {
+exports.getRandomToken = async function(update = false) {
+	// Если нужно обновить токен
+    if (update) exports.random_access_token = null
+    
     while (exports.random_access_token == null) {
         var account = await db.vk.getRandomAccount()
         // Если аккаунт не найден
@@ -63,8 +66,9 @@ isTokenValid = function(access_token) {
 exports.updateUserToken = function(user_id) {
 	return new Promise(async function(resolve, reject) {
 		var account = await db.vk.getAccount(user_id)
+		var proxy = await db.proxy.get(account.proxy_id)
 
-		var data = await vkapi.authorize(account.login, account.password)
+		var data = await vkapi.authorize(account.login, account.password, proxy);
 
 		// Если авторизация прошла успешно
 		if (data.access_token) {
@@ -106,12 +110,12 @@ exports.updateUserToken = function(user_id) {
 
 
 /**
- * Добавляем новые аккаунты
+ * Добавляем новый аккаунт
  */
 exports.addAccounts = async function(accounts) {
 	for (account of accounts) {
 		console.log('Добавили задачу на ' + account.login)
-		worker.queue.create('vk_auth', account).removeOnComplete(true).save()
+		worker.queue.create('auth', account).removeOnComplete(true).save()
 	}
 }
 

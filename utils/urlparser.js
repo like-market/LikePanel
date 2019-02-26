@@ -35,3 +35,13 @@ exports.parseURL = function(url) {
 
 	return null;
 }
+
+exports.createURL = function(type, owner_id, item_id) {
+	switch (type) {
+		case 'post':  return `https://vk.com/wall${owner_id}_${item_id}`
+		case 'photo': return `https://vk.com/photo${owner_id}_${item_id}`
+		case 'video': return `https://vk.com/video${owner_id}_${item_id}`
+		case 'market': return `https://vk.com/market${owner_id}_${item_id}`
+		default: return 'error';
+	}
+}

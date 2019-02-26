@@ -16,7 +16,7 @@ $('#like_count').change(function() {
     var new_cost = ($(this).val() * likePrice).toFixed(2)
     var text = "Стоимость <mark>" + new_cost + "₽</mark>"
 
-    $('#total_like_cost').html(text)
+    $('#total_cost').html(text)
 })
 
 // При изменении кол-ва лайков

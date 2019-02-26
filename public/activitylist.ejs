@@ -1,0 +1,30 @@
+<% /**
+    * Вывод списка активности пользователя
+    * @param activities [object] - список действий
+    * @param moment [module] - модуль для работы со временем
+    */ %>
+<% activities.forEach(function(activity) { %>
+    <div class="vertical-timeline-block">
+        <div class="vertical-timeline-icon">
+            <i class="fa fa-user"></i>
+        </div>
+        <div class="vertical-timeline-content" style="background-color: rgba(68, 70, 79, 1)">
+            <div class="p-sm">
+                <span class="vertical-date pull-right">
+                    <small><%= moment(activity.date).fromNow() %></small>
+                </span>
+
+                <% switch (activity.type) {
+                    case 'register' : %>
+                        <h2>Регистрация на сайте</h2>
+                        <p>Произведена регистрация аккаунта с IP: <a><%= activity.ip %></a></p>
+                        <% break;
+                    case 'auth' : %>
+                        <h2>Вход</h2>
+                        <p>Произведен вход в аккаунт с IP: <a><%= activity.ip %></a></p>
+                        <% break;
+                } %>
+            </div>
+        </div>
+    </div>
+<% }) %>

@@ -35,16 +35,18 @@ router.post('/add', async function(req, res) {
 
 	// Проверка лайков
 	if (parseInt(data.min_likes) != data.min_likes || parseInt(data.max_likes) != data.max_likes ||
-		data.min_likes < 50 || data.min_likes > 2000 || data.max_likes < 50 || data.max_likes > 2000 ||
+		data.min_likes < 10 || data.min_likes > 1000 || data.max_likes < 10 || data.max_likes > 1000 ||
 		data.min_likes > data.max_likes)
 	{
 		return res.send('Error likes');
 	}
 
 	// Проверка комментариев
+	if (!data.min_comments) data.min_comments = 0;
+	if (!data.max_comments) data.max_comments = 0;
 	if (((parseInt(data.min_comments) != data.min_comments || parseInt(data.max_comments) != data.max_comments) &&
 		data.min_comments != "" && data.max_comments != "") ||
-		data.min_comments < 50 || data.min_comments > 500 || data.max_comments < 50 || data.max_comments > 500 ||
+		data.min_comments < 0 || data.min_comments > 500 || data.max_comments < 0 || data.max_comments > 500 ||
 		data.min_comments > data.max_comments)
 	{
 		return res.send('Error comments');
@@ -64,12 +66,17 @@ router.post('/add', async function(req, res) {
 
 	// Проверка на то, что группа еще не была добавлена
 	const exists = await db.posthunter.getByGroupId(group_data.object_id);
-	if (exists) {
+	console.log(exists);
+	if (exists.length) {
 		return res.send('Already added')
 	}
 
+	let last_post_id;
 	const wall = await vkapi.getWall(group_data.object_id, 1);
-	const last_post_id = wall.response.items[0].id;
+	
+	if (wall.response.items.length == 0) last_post_id = 0
+	else last_post_id = wall.response.items[0].id;
+	
 	if (parseInt(last_post_id) != last_post_id) last_post_id = 0;
 
 	db.posthunter.add(

@@ -15,7 +15,11 @@ nextgroup:
 		// Проверяем появилась ли новая запись
 		var posts = await vkapi.getWall(group.group_id, 1);
 
-		if (posts.response.items[0].id <= group.last_post_id) continue;
+		let new_post_id;
+		if (posts.response.items.length == 0) new_post_id = 0;
+		else new_post_id = posts.response.items[0].id;
+
+		if (new_post_id <= group.last_post_id) continue;
 		// Получаем количество доступных аккаунтов
 		accountsCount = await db.vk.getActiveAccountsCount();
 		accountsCount = Math.floor(accountsCount * 0.9);
@@ -42,15 +46,18 @@ nextgroup:
 				continue nextgroup;
 			}
 
-			await utils.task.addComments(
-				group.owner_id,
-				'post',
-				'Постхантер ' + group.group_id,
-				group.group_id,
-				post.id,
-				group.comments_ids.split(','),
-				comments_count
-			);
+
+			if (comments_count != 0) {
+				await utils.task.addComments(
+					group.owner_id,
+					'post',
+					'Постхантер ' + group.group_id,
+					group.group_id,
+					post.id,
+					group.comments_ids.split(','),
+					comments_count
+				);
+			}
 			await utils.task.addLikes(
 				group.owner_id,
 				'Постхантер ' + group.group_id,

@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="vendor\fontawesome\css\font-awesome.css">
     <link rel="stylesheet" href="vendor\animate.css\animate.css">
     <link rel="stylesheet" href="vendor\bootstrap\css\bootstrap.css">
+    <link rel="stylesheet" href="vendor\toastr\toastr.min.css">
 
     <!-- App styles -->
     <link rel="stylesheet" href="styles\pe-icons\pe-icon-7-stroke.css">
@@ -39,110 +40,97 @@
     <!-- Main content-->
     <section class="content">
         <div class="container-fluid">
+            
 
-            <div class="row m-t-sm">
-
-                <div class="col-md-12">
-                    <div class="panel panel-filled">
-
-                        <div class="panel-body">
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="media">
-                                        <h2 class="m-t-xs m-b-none">
-                                            Пользователь: <%= user.username %>
-                                        </h2>
-                                        <small>
-                                            Здесь содержится основная информация о вашем аккаунте
-                                        </small>
-                                    </div>
-                                </div>
-                            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="view-header">
+                        <div class="header-icon">
+                            <i class="pe page-header-icon pe-7s-users"></i>
+                        </div>
+                        <div class="header-title">
+                            <h3>Пользователь: <%= user.username %></h3>
+                            <small>
+                                Основная информация о вашем аккаунте и смена даных
+                            </small>
                         </div>
                     </div>
+                    <hr>
                 </div>
             </div>
 
-
             <div class="row">
-
                 <div class="col-md-6">
-
-                    <div class="panel">
-                        <div class="panel-body">
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">
                             <h4> Последняя активность</h4>
+                        </div>
+                        <div class="panel-body">
 
                             <div class="v-timeline vertical-container">
                                 
-                                <%- include('recentActivity', {activities: activities}); %>
+                                <%- include('activitylist', {activities: activities, moment}); %>
 
                             </div>
                         </div>
                     </div>
-
-
                 </div>
                 <div class="col-md-6">
-                    <div class="panel">
-
-                        <div class="panel-body">
-                            <h4>Состояние счета</h4>
-
-                            <p class="small">График показывает состояние вашего счета за последние 15 дней
-                            </p>
-
-                            <div class="flot-chart  m-t-md m-b-xl" style="height: 200px">
-                                <div class="flot-chart-content" id="flotProfile"></div>
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">
+                            <h4> Ваши данные </h4>
+                        </div>
+                        <div class="panel-body" style="padding: 30px 15px 15px 15px">
+                            <form class="form-horizontal">
+                                <div class="form-group">
+                                    <label for="login" class="col-sm-2 control-label">Логин</label>
+                                    <div class="col-sm-8">
+                                        <input type="password" class="form-control" id="login" placeholder="<%= user.username %>" disabled>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputEmail3" class="col-sm-2 control-label">Почта</label>
+                                    <div class="col-sm-8">
+                                        <input type="email" class="form-control" id="mail" placeholder="<%= (user.email.length ? user.email : 'Добавить почту') %>">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="password" class="col-sm-2 control-label">Пароль</label>
+                                    <div class="col-sm-8">
+                                        <input type="password" class="form-control" id="password" placeholder="Новый пароль">
+                                    </div>
+                                </div>
+                                <p class="text-center">Для изменения данных введите старый пароль</p>
+                                <div class="form-group">
+                                    <label for="repeat" class="col-sm-2 control-label">Пароль</label>
+                                    <div class="col-sm-8">
+                                        <input type="password" class="form-control" id="repeat" placeholder="Введите старый пароль">
+                                    </div>
+                                </div>                                
+                            </form>
+                        </div>
+                        <div class="panel-footer">
+                            <div class="text-center">
+                                <a class="btn btn-w-md btn-accent" onclick="applyChange();">Изменить</a>
                             </div>
+                        </div>
+                    </div>
 
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Операция</th>
-                                        <th>Описание</th>
-                                        <th>Количество</th>
-                                        <th>Дата</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <% transactions.reverse().forEach(function(transaction) {
-                                        // если нет типа транзакции - выходим из перебора транзакции
-                                        if (transaction.type == null) return; %>
-                                        <tr>
-                                            <td><%= transaction.id %></td>
-                                            <td>
-                                                <% if (transaction.type == 'refill') { %>
-                                                    Пополнение
-                                                <% }else if (transaction.type == 'spend') { %>
-                                                    Списание
-                                                <% } %>
-                                            </td>
-                                            <td>
-                                                <% if (transaction.type == 'spend') { %>
-                                                    Задача <a>#<%= transaction.data2 %></a>
-                                                <% } %>
-                                            </td>
-                                            <td>
-                                                <% if (transaction.type == 'refill') { %>
-                                                    +<%= (transaction.data / 100).toFixed(2) %>₽
-                                                <% }else if (transaction.type == 'spend') { %>
-                                                    -<%= (transaction.data / 100).toFixed(2) %>₽
-                                                <% } %>
-                                            </td>
-                                            <td>
-                                                <%= moment(transaction.create).format("D MMMM YYYY") %>
-                                            </td>
-                                        </tr>
-                                    <% }) %>
-                                </tbody>
-                            </table>
-
+                    <div class="panel panel-filled">
+                        <div class="panel-heading">
+                            <h4> Выйти из аккаунта </h4>
+                        </div>
+                        <div class="panel-body">
+                            <!-- <p>Тут можно придумать стремный текст</p> -->
+                            <div class="text-center">
+                                <a class="btn btn-w-md btn-accent" href="/logout">Выйти</a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+
 
             <div class="row">
 
@@ -154,27 +142,27 @@
                             <div class="row">
                                 <div class="col-md-3 col-xs-6 text-center">
                                     <h2 class="no-margins">
-                                        <%= statistic.tasks %>
+                                        <%= task_count %>
                                     </h2>
                                     <span class="c-white">Задач</span> создано
                                 </div>
                                 <div class="col-md-3 col-xs-6 text-center">
                                     <h2 class="no-margins">
-                                        <%= (statistic.money / 100).toFixed(2) %>
+                                        <%= (money_add / 100).toFixed(2) %>
                                     </h2>
                                     <span class="c-white">Рублей</span> пополнено
                                 </div>
                                 <div class="col-md-3 col-xs-6 text-center">
                                     <h2 class="no-margins">
-                                        <%= statistic.likes %>
+                                        <%= like_count %>
                                     </h2>
-                                    <span class="c-white">Лайков</span> заказано
+                                    <span class="c-white">Лайков</span> накручено
                                 </div>
                                 <div class="col-md-3 col-xs-6 text-center">
                                     <h2 class="no-margins">
-                                        <%= statistic.comments %>
+                                        <%= comment_count %>
                                     </h2>
-                                    <span class="c-white">Комментариев</span> заказано
+                                    <span class="c-white">Комментариев</span> накручено
                                 </div>
                             </div>
 
@@ -198,51 +186,12 @@
 <script src="vendor\flot\jquery.flot.resize.min.js"></script>
 <script src="vendor\flot\jquery.flot.spline.js"></script>
 <script src="vendor\flot\jquery.flot.time.js"></script>
+<script src="vendor\toastr\toastr.min.js"></script>
 
 
 <!-- App scripts -->
 <script src="scripts\luna.js"></script>
-
-<script>
-    $(document).ready(function () {
-        var data = [{
-            data: [ 
-            <% transactions.forEach(function(transaction) { %>
-                <%= '[' + moment(transaction.create).valueOf() + ', ' + (transaction.balance / 100).toFixed(2) + '],' %>
-            <% }) %> 
-            ]
-        }];
-        var chartUsersOptions = {
-            xaxis: {
-                mode: "time",
-                timeformat: "%d.%m"
-            },
-            yaxis: {
-                min: 0
-            },
-            series: {
-                splines: {
-                    show: true,
-                    tension: 0.4,
-                    lineWidth: 2,
-                    fill: true
-                },
-                points: {
-                    show: true
-                }
-            },
-            legend: {
-                show: false
-            },
-            grid: {
-                borderWidth: 0
-            }
-        };
-
-        $.plot($("#flotProfile"), data, chartUsersOptions);
-
-    });
-</script>
+<script src="scripts\profile.js"></script>
 
 </body>
 

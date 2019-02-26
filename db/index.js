@@ -5,7 +5,7 @@ const db = mysql.createPool({
     connectionLimit: 5,
     host: "localhost",
     user: "likepanel",
-    database: "likepanel",
+    database: "devlikepanel",
     password: "r35ImTyr52Ks666",
     charset: 'utf8'
     //timezone: "+7"
