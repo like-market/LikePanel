@@ -1,11 +1,55 @@
-var express = require('express')
-var router = express.Router()
+const express = require('express')
+const router = express.Router()
+
+const db = require('../db');
+
+const bodyParser = require('body-parser')
+const cookieParser = require('cookie-parser')
+const session = require('express-session')
+
+const passport = require('passport')
+const Strategy = require('passport-local').Strategy;
 
 
-// router.use('/vendor', express.static('public/vendor'))
-// router.use('/styles', express.static('public/styles'))
-// router.use('/images', express.static('public/images'))
-// router.use('/scripts', express.static('public/scripts'))
+passport.use(new Strategy(
+    async function(username, password, cb) {
+        user = await db.users.findByUsername(username);
+        if (!user) {
+            return cb(null, false);
+        }
+        if (user.password != password) {
+            return cb(null, false);
+        }
+        return cb(null, user);
+    }
+));
+passport.serializeUser(function(user, cb) {
+    cb(null, user.id);
+});
+
+passport.deserializeUser(async function(user_id, cb) {
+    user = await db.users.findById(user_id)
+    cb(null, user);
+});
+
+
+router.use(cookieParser());
+router.use(bodyParser.json());       // To support JSON-encoded bodies
+router.use(bodyParser.urlencoded({   // To support URL-encoded bodies
+    extended: true
+}));
+
+
+router.use(session({
+    secret: 'KJjsdz',
+    store: db.sessionStore,
+    resave: false,
+    saveUninitialized: false,
+    cookie: { maxAge: 1000 * 60 * 60 * 24 * 5 } // 5 дней
+}))
+
+router.use(passport.initialize());
+router.use(passport.session());
 
 
 router.get('/logout', function(req, res){ 	

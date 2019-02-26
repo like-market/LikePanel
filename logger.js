@@ -1,6 +1,7 @@
 const { createLogger, format, transports } = require('winston');
 const fs = require('fs');
 const path = require('path');
+const colors = require('colors');
 
 const env = process.env.NODE_ENV || 'development';
 const logDir = 'log';
@@ -22,6 +23,10 @@ const filename = path.join(logDir, 'results.log');
  * 5: silly   (простое сообщение)
  */
 
+const prefix_color = require('cluster').isMaster ? '[WEB] '.red : '[BACK]'.cyan
+const prefix       = require('cluster').isMaster ? '[WEB] ' : '[BACK]'
+
+
 const logger = createLogger({
     // Уровень сообщений, который нужно логировать
 
@@ -35,7 +40,7 @@ const logger = createLogger({
                     format: 'HH:mm:ss'
                 }),
                 format.printf(function(data){
-                    return `${data.timestamp} ${data.level}: ${data.message}${data.json ? '\n' + JSON.stringify(data.json, null, 2) : ''}`
+                    return `${prefix_color} ${data.timestamp.blue} ${data.level}: ${data.message}${data.json ? '\n' + JSON.stringify(data.json, null, 2) : ''}`
                 })
             )
         }),
@@ -47,7 +52,7 @@ const logger = createLogger({
                     format: 'YYYY-MM-DD HH:mm:ss'
                 }),
                 format.printf(function(data) {
-                    return `${data.timestamp} ${data.level}: ${data.message}${data.json ? '\n' + JSON.stringify(data.json, null, 2) : ''}`
+                    return `${prefix} ${data.timestamp} ${data.level}: ${data.message}${data.json ? '\n' + JSON.stringify(data.json, null, 2) : ''}`
                 })
             ),
             filename: filename,
