@@ -8,6 +8,11 @@ exports.wall = require('./wall.js');
 // exports.likes = require('./likes.js');
 exports.comments = require('./comments.js');
 
+
+let proxies;
+// После загрузки модуля utils.proxy
+setTimeout(function() { proxies = utils.proxy.proxies; }, 1000);
+
 /**
  * Авторизация пользователя
  * Алгоритм:
@@ -115,20 +120,7 @@ exports.addLike = async function(type, owner_id, item_id, account) {
     let params = { type, owner_id, item_id, access_token: account.access_token, v: 5.56 }
 
     // Получаем прокси
-    let proxy = {}
-    if (account.proxy_id) {
-        let account_proxy = await db.proxy.get(account.proxy_id);
-        if (account_proxy) {
-            proxy = {
-                host: account_proxy.ip,
-                port: account_proxy.port,
-                auth: {
-                    username: account_proxy.login,
-                    password: account_proxy.password
-                }
-            }
-        }
-    }
+    let proxy = (account.proxy_id != null) ? proxies[account.proxy_id] : null;
 
     const response = await axios.get('https://api.vk.com/method/likes.add', {params, proxy});
     return response.data
@@ -177,20 +169,7 @@ exports.createComment = async function(type, owner_id, item_id, message, account
     }    
 
     // Получаем прокси
-    let proxy = {}
-    if (account.proxy_id) {
-        let account_proxy = await db.proxy.get(account.proxy_id);
-        if (account_proxy) {
-            proxy = {
-                host: account_proxy.ip,
-                port: account_proxy.port,
-                auth: {
-                    username: account_proxy.login,
-                    password: account_proxy.password
-                }
-            }
-        }
-    }
+    let proxy = (account.proxy_id != null) ? proxies[account.proxy_id] : null;
 
     // Если нужно ввести капчу (т.е. есть данные капчи), то добавляем их
     if (captcha_sid && captcha_key) {

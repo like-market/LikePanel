@@ -117,6 +117,11 @@ exports.onError = async function(task_id) {
  * Вызывается при успешном выполнении таска
  */
 exports.onSuccess = async function(task_id) {
+    logger.info(`Ждем все асинхронные функции в задаче ${task_id}, чтобы завершить задачу`)
+    while (tasks[task_id].async_count) {
+        await utils.sleep(500);
+    }
+    
     db.tasks.setStatus(task_id, 'finish')
     logger.info('Задача ' + task_id + ' выполнена')
 

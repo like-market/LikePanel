@@ -41,9 +41,9 @@ const createRequest = async function(task_id, account) {
 
 	// Если лайк успешно поставлен
 	if (response.response) {
-		db.tasks.inrement(task_id);
-		logger.debug('Лайк поставлен', {json: response.response})
-
+		// db.tasks.inrement(task_id);
+		logger.debug(`Лайк поставлен: ${response.response.likes}`)
+		
 		tasks[task_id].async_count--;
 		return;
 	}
@@ -63,10 +63,9 @@ const createRequest = async function(task_id, account) {
 			db.vk.setAccountStatus(account.user_id, 'need_token')
 			break;
 
-		// case 6:
-		//    logger.warn('Слишком много запросов в секунду')
-		//    await utils.sleep(1000)
-		//    break;
+		case 6:
+		    logger.warn('Слишком много запросов в секунду')
+		    break;
 
 		// Fatal Error - прекращаем выполнение накрутки
 		case 30:
@@ -101,7 +100,6 @@ const createRequest = async function(task_id, account) {
 			logger.warn('Неизвестная ошибка', {json: response})
 			tasks[task_id].error_count++;
 	}
-
 	tasks[task_id].async_count--;
 }
 
@@ -134,7 +132,12 @@ queue.process('like', 2, async function(job, done){
 
 	// Получаем аккаунты, которые уже поставили лайки
 	let already_set = await vkapi.getLikeList(tasks[task_id].type, tasks[task_id].owner_id, tasks[task_id].item_id);
-	already_set = already_set.response.items;
+	if (!already_set) {
+		logger.error('getLikeList вернуло null')
+		already_set = []	
+	}else {
+		already_set = already_set.response.items;
+	}
 
     for (let account of all_accounts) {
     	// Если аккаунт не поставил лайк, добавляем его в массив аккаунтов
@@ -151,7 +154,7 @@ queue.process('like', 2, async function(job, done){
 	// И добавляет новые, если есть свободные места
 	const addRequests = async function() {
 		// Синхронный режим (когда осталось накрутить мало лайков)
-		if (tasks[task_id].like_need - tasks[task_id].now_add < 30) {
+		if (tasks[task_id].like_need - tasks[task_id].now_add < 50) {
 			if (timerID != -1) {
 				clearInterval(timerID)
 				timerID = -1;
@@ -167,22 +170,30 @@ queue.process('like', 2, async function(job, done){
 				}
 
 				// Создаем синхронный запрос
-				await createRequest(task_id, account);			
+				await createRequest(task_id, account);
+
+				db.tasks.updateCount(task_id, tasks[task_id].now_add);
 
 				// Проверка на то, что все лайки поставлены
-				if (tasks[task_id].like_need == tasks[task_id].now_add) {
+				if (tasks[task_id].now_add >= tasks[task_id].like_need) {
 					utils.task.onSuccess(task_id);
 					return done();
 				}
-			}
+			}		
+			utils.task.onSuccess(task_id);
+			return done();
 		// Асинхронный режим
 		}else {
+			db.tasks.updateCount(task_id, tasks[task_id].now_add);
+
 			// Создаем асинхронные запросы
-			while (tasks[task_id].async_count < 25) {
+			while (tasks[task_id].async_count < 50) {
 				// Выбираем случайный аккаунт и удаляем из массива аккаунтов
 				const account = accounts.popRandom()
+
 				// Если нет аккаунтов
 				if (!account) {
+					logger.error('Закончились аккаунты')
 					clearInterval(timerID)
 					utils.task.onError(task_id);
 					return done();
@@ -191,7 +202,7 @@ queue.process('like', 2, async function(job, done){
 				createRequest(task_id, account);
 			}
 			// Если в асинхронных функция произошла фатальная ошибки
-			if (tasks[task_id].fatal_error || tasks[task_id].error_count > 20) {
+			if (tasks[task_id].fatal_error || tasks[task_id].error_count > 50) {
 				clearInterval(timerID)
 				utils.task.onError(task_id);
 				done();
@@ -199,5 +210,5 @@ queue.process('like', 2, async function(job, done){
 		}
 	}
 	// Запускаем функцию каждую секунду
-	timerID = setInterval(addRequests, 1000);
+	timerID = setInterval(addRequests, 500);
 });

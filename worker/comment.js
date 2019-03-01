@@ -41,8 +41,8 @@ const createRequest = async function(task_id, message, account) {
 
 	// Если коммент успешно добавлен
 	if (response.response) {
-		db.tasks.inrement(task_id);
-		logger.debug('Добавлен комментарий')
+		// db.tasks.inrement(task_id);
+		logger.debug(`Добавлен комментарий: ${response.response.comment_id}`)
 
 		tasks[task_id].async_count--;
 		return;
@@ -63,10 +63,9 @@ const createRequest = async function(task_id, message, account) {
 			db.vk.setAccountStatus(account.user_id, 'need_token')
 			break;
 
-		// case 6:
-		//    logger.warn('Слишком много запросов в секунду')
-		//    await utils.sleep(1000)
-		//    break;
+		case 6:
+		    logger.warn('Слишком много запросов в секунду')
+		    break;
 
 		// Fatal Error - прекращаем выполнение накрутки
 		case 213:
@@ -143,7 +142,7 @@ queue.process('comment', 2, async function(job, done){
 	// И добавляет новые, если есть свободные места
 	const addRequests = async function() {
 		// Синхронный режим (когда осталось накрутить мало комментов)
-		if (tasks[task_id].comment_need - tasks[task_id].now_add < 30) {
+		if (tasks[task_id].comment_need - tasks[task_id].now_add < 50) {
 			if (timerID != -1) {
 				clearInterval(timerID)
 				timerID = -1;
@@ -155,7 +154,9 @@ queue.process('comment', 2, async function(job, done){
 
 				// Создаем синхронный запрос
 				await createRequest(task_id, message, account);
-			
+
+				db.tasks.updateCount(task_id, tasks[task_id].now_add);
+
 				// Если в асинхронных функция произошла фатальная ошибки
 				if (tasks[task_id].fatal_error || tasks[task_id].error_count > 50) {
 					utils.task.onError(task_id);
@@ -168,10 +169,15 @@ queue.process('comment', 2, async function(job, done){
 					return done();
 				}
 			}
+			// Как мы сюда попали - это уже отдельная история...
+			utils.task.onSuccess(task_id);
+			return done();
 		// Асинхронный режим
 		}else {
+			db.tasks.updateCount(task_id, tasks[task_id].now_add);
+
 			// Создаем асинхронные запросы
-			while (tasks[task_id].async_count < 25) {
+			while (tasks[task_id].async_count < 50) {
 				// Выбираем случайные значения из массивов
 				const message = comments.random()
 				const account = accounts.random()
@@ -187,5 +193,5 @@ queue.process('comment', 2, async function(job, done){
 		}
 	}
 	// Запускаем функцию каждую секунду
-	timerID = setInterval(addRequests, 1000);
+	timerID = setInterval(addRequests, 500);
 });

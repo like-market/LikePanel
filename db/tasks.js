@@ -126,6 +126,18 @@ exports.inrement = function(task_id) {
     })    
 }
 
+exports.updateCount = function(task_id, count) {
+    return new Promise(function(resolve, reject) {
+        var sql = `UPDATE tasks SET now_add = ${count} WHERE id = ${task_id}`
+ 
+        db.query(sql, function(err, rows) {
+            if (err) return reject(err)
+
+            resolve()
+        })
+    })     
+}
+
 /**
  * Установить статус задаче
  * @param task_id - id задачи

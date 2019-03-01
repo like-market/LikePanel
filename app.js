@@ -16,6 +16,7 @@ if (cluster.isMaster) {
 
     app.listen(8888, async () => {
         await utils.vk.getRandomToken();
+        await utils.proxy.updateProxyList();
         // Каждые 5 минут обновляем рандомный токен
         // setInterval(() => { utils.vk.getRandomToken(true) }, 1000 * 60 * 5)
 
@@ -32,6 +33,7 @@ if (cluster.isMaster) {
     utils.vk.updateAccounts(async function() {
         await utils.vk.getRandomToken();
         await utils.posthunter.updateAll();
+        await utils.proxy.updateProxyList();
 
         setInterval(utils.vk.updateAccounts,    1000 * 60 * 5) // Каждые 5 минут обновляем аккаунты
         setInterval(utils.posthunter.updateAll, 1000 * 30)     // Каждые 30 секунд обновляем постхантер 
