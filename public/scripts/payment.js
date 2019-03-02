@@ -21,7 +21,7 @@ $('#pay').click(function() {
 	if (amount < 100 || amount > 10000) {
 		toastr.error('Можно пополнить от 100 до 10\'000 руб')
 		$("#amount").css("border", "1.5px solid red");
-		// return
+		return
 	}
 
 	$("button").prop("disabled", false);
@@ -37,6 +37,9 @@ $('#pay').click(function() {
 	});
 })
 
+/**
+ * Проверяем, если был пополнен баланс, то выводим toastr
+ */
 $(document).ready(function(){
 	let params = new URLSearchParams(document.location.search.substring(1));
 	let amount = parseInt(params.get("amount"), 10);
@@ -46,3 +49,92 @@ $(document).ready(function(){
     	toastr.info(`Вы оплатили счет №${pay_id}<br/>Баланс пополнен на ${amount}₽`, { timeOut: 5000 });
     }
 })
+
+/**
+ * Обновляем пагинацию
+ */
+function updatePagination() {
+	// Вычисляем сколько всего страниц
+	console.log(`Count: ${count} Page: ${page} Tasks: ${transactions_count}`)
+
+	let to = (page) * (count);
+	if (to > transactions_count) to = transactions_count;
+
+	let from = (page - 1) * count + 1;
+
+	$('#from').text(from);
+	$('#to').text(to)
+
+	console.log(`From: ${from} To: ${to}`)
+}
+
+/**
+ * Обновляем список задач
+ * @param count - количество задач на странице
+ * @param page  - номер страницы
+ */
+function updateTransactions() {
+	$('#transactions_panel').toggleClass('ld-loading');
+	$.ajax({
+	    type: 'POST',
+	    url: '/payment/get_transactions',
+	    data: {
+	        count: count,
+	        offset: (page - 1) * count
+	    },
+	    success: function(res) {
+	    	console.log(res)
+			let rows; // Для всех строк
+			JSON.parse(res).forEach(function(trx) {
+		        let row = `<tr><td>${trx.id}</td><td>`;
+                if (trx.type == 'add') {
+                	row += `+${(trx.amount / 1000).toFixed(2)}₽`
+                }else if (trx.type == 'spend') {
+                    row += `-${(trx.amount / 1000).toFixed(2)}₽`
+                }
+                row += `</td><td>${trx.description}</td><td>${trx.date}</td></tr>`
+
+                rows += row;
+		    });
+		    $('#transactions-data').html(rows);
+		    $('#transactions_panel').toggleClass('ld-loading');
+	    },
+	    error: function(XMLHttpRequest, textStatus, errorThrown) { 
+	        alert(`Status: ${textStatus} \n Error: ${errorThrown}`);
+	        console.log(errorThrown)
+	    }
+	})
+}
+
+function setCountOnPage(new_count) {
+	count = new_count;
+	
+	max_page = Math.ceil(transactions_count / count);
+	page = 1;               // Текущая страница - первая
+	updateTransactions();   // Обновляем список задач
+	updatePagination();     // Обновляем пагинацию
+
+	$('#10, #25, #50, #100').removeClass('active');
+	$(`#${count}`).toggleClass('active');
+}
+
+/**
+ * Изменяем страницу
+ * @param page - next/prev
+ */
+function changePage(type) {
+	if (type == 'next') {
+		let new_page = page + 1;
+		console.log(new_page, max_page)
+		if (new_page > max_page) return;
+		page++;
+		updateTransactions();
+		updatePagination();
+	}else {
+		let new_page = page - 1;
+		if (new_page < 1) return;
+		page--;
+		updateTransactions();
+		updatePagination();
+	}
+}
