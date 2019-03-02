@@ -29,11 +29,11 @@
 <div class="wrapper">
 
     <!-- Header-->
-     <%- include('header', {user:user}); %>
+     <%- include('header', { user }); %>
     <!-- End header-->
 
     <!-- Navigation-->
-    <%- include('navigation', {isAdmin: user.admin, page: 'admin'}); %>
+    <%- include('navigation', {user, page: 'admin'}); %>
     <!-- End navigation-->
 
 
@@ -58,86 +58,10 @@
             </div>
 
             <div class="row">
-                <div class="col-lg-3 col-xs-6">
-                    <div class="panel panel-filled">
-                        <div class="panel-body">
-                            <h2 class="m-b-none">
-                                NaN
-                            </h2>
-                            <div class="small">Всего пользователей</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-xs-6">
-                    <div class="panel panel-filled">
-                        <div class="panel-body">
-                            <h2 class="m-b-none">
-                                NaN₽
-                            </h2>
-                            <div class="small">Всего пополнено</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-xs-6">
-                    <div class="panel panel-filled">
-
-                        <div class="panel-body">
-                            <h2 class="m-b-none">
-                                NaN
-                            </h2>
-                            <div class="small">Задач создано</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-xs-6">
-                    <div class="panel panel-filled">
-
-                        <div class="panel-body">
-                            <h2 class="m-b-none">
-                                NaN
-                            </h2>
-                            <div class="small">todo</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- <div class="row">
-                <div class="col-md-6">
-                    <div class="panel panel-filled">
-                        <div class="panel-body">
-                            <h4> Задач создано</h4>
-                            <div class="text-center slight"></div>
-
-                            <div class="flot-chart" style="height: 160px;margin-top: 5px">
-                                <div class="flot-chart-content" id="tasks-create"></div>
-                            </div>
-
-                            <div class="small text-center">Все созданные задачи за последний месяц.</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="panel panel-filled">
-                        <div class="panel-body">
-                            <h4> Пополнение баланса</h4>
-                            <div class="text-center slight"></div>
-
-                            <div class="flot-chart" style="height: 160px;margin-top: 5px">
-                                <div class="flot-chart-content" id="refill-balance"></div>
-                            </div>
-
-                            <div class="small text-center">Пополнение баланса за последний месяц.</div>
-                        </div>
-                    </div>
-                </div>
-            </div> -->
-            <div class="row">
                 <div class="col-lg-12">
                     <div class="panel panel-filled">
                         <div class="panel-body">
-
                             <h4> Проверка комментариев</h4>
-
 
                             <div class="row">
                                 <div class="col-lg-6">

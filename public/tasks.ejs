@@ -28,11 +28,11 @@
 <div class="wrapper">
 
     <!-- Header-->
-    <%- include('header', {user:user}); %>
+    <%- include('header', { user }); %>
     <!-- End header-->
 
     <!-- Navigation-->
-    <%- include('navigation', {isAdmin: user.admin, page: 'tasks'}); %>
+    <%- include('navigation', {user, page: 'tasks'}); %>
     <!-- End navigation-->
 
 

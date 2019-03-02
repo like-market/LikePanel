@@ -33,11 +33,11 @@
 <div class="wrapper">
 
     <!-- Header-->
-    <%- include('header', {user:user}); %>
+    <%- include('header', { user }); %>
     <!-- End header-->
 
     <!-- Navigation-->
-    <%- include('navigation', {isAdmin: user.admin, page: 'posthunter'}); %>
+    <%- include('navigation', {user, page: 'posthunter'}); %>
     <!-- End navigation-->
 
 

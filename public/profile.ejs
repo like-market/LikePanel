@@ -29,11 +29,11 @@
 <div class="wrapper">
 
     <!-- Header-->
-     <%- include('header', {user:user}); %>
+     <%- include('header', { user }); %>
     <!-- End header-->
 
     <!-- Navigation-->
-    <%- include('navigation', {isAdmin: user.admin, page: 'profile'}); %>
+    <%- include('navigation', {user, page: 'profile'}); %>
     <!-- End navigation-->
 
 

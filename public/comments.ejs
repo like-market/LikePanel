@@ -32,11 +32,11 @@
 <div class="wrapper">
 
     <!-- Header-->
-     <%- include('header', {user:user}); %>
+     <%- include('header', { user }); %>
     <!-- End header-->
 
     <!-- Navigation-->
-    <%- include('navigation', {isAdmin: user.admin, page: 'comments'}); %>
+    <%- include('navigation', {user, page: 'comments'}); %>
     <!-- End navigation-->
 
     <!-- Main content-->

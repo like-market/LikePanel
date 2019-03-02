@@ -1,6 +1,6 @@
 <% /**
     * Панелька слева
-    * @param isAdmin [bool] - привилегия пользователя 
+    * @param user [object] - объект пользователя
     * @param page [string] - название страницы
     */ %>
 <aside class="navigation">
@@ -24,15 +24,21 @@
             <li <% if (page == 'payment') { %> class="active" <% } %>>
                 <a href="payment">Финансы</a>
             </li>
-            <li <% if (page == 'news') { %> class="active" <% } %>>
+            <!-- <li <% if (page == 'news') { %> class="active" <% } %>>
                 <a href="news">Новости</a>
-            </li>
+            </li> -->
             <li <% if (page == 'support') { %> class="active" <% } %>>
                 <a href="support">Помощь и условия</a>
             </li>
-            <% if (isAdmin) { %>
+            <% if (user.admin) { %>
+                <li class="nav-category">
+                    Управление
+                </li>
                 <li <% if (page == 'admin') { %> class="active" <% } %>>
                     <a href="admin">Админка</a>
+                </li>
+                <li <% if (page == 'statistics') { %> class="active" <% } %>>
+                    <a href="statistics">Статистика</a>
                 </li>
             <% } %>
 
@@ -45,6 +51,11 @@
                 </div>
                 <div class="m-t-xs">
                     Менеджер<br/><a class="c-white" href="https://tgdo.me/olkaf" target="_blank">@olkaf</a>
+                </div>
+                <div class="m-t-xl">
+                    Баланс: <a><%= (user.balance / 1000).toFixed(2) %>₽</a><br/>
+                    1к&nbsp;&nbsp<i style="font-size: 12px" class="fa pe-7s-like"></i>&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;<a><%= user.like_price %>₽</a><br/>
+                    1к&nbsp;&nbsp<i style="font-size: 12px" class="fa fa-commenting-o"></i>&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;<a><%= user.comment_price %>₽</a><br/>
                 </div>
             </li>
         </ul>
