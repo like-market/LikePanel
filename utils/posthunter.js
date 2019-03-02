@@ -31,27 +31,27 @@ nextgroup:
 			// Если на этот пост мы уже ставили лайки
 			if (post.id <= group.last_post_id) continue;
 
-			var likes_count = utils.randInt(group.min_likes, group.max_likes);
+			let likes_count = utils.randInt(group.min_likes, group.max_likes);
 			if (likes_count > accountsCount) likes_count = accountsCount;
 
-			var comments_count = utils.randInt(group.min_comments, group.max_comments);
-			if (comments_count > accountsCount * 4) comments_count = accountsCount * 4;
+			let comments_count = utils.randInt(group.min_comments, group.max_comments);
 
-			// Проверка на наличие баланса
-			var balance = db.finance.getBalance(group.owner_id);
-			if (balance < (likes_count * 10 + comments_count * 10)) {
+			// Проверка баланса
+			const user = await db.users.findById(group.owner_id);
+			const price = likes_count * user.like_price + comments_count * user.comment_price;
+			
+			if (user.balance < price) {
 				db.posthunter.setStatus(group.id, 'disable');
 				logger.info('Постхантер отключен для id=' + group.id + ': недостаточно средств')
 				db.posthunter.setLastPostId(group.id, max_post_id);
 				continue nextgroup;
 			}
 
-
 			if (comments_count != 0) {
 				await utils.task.addComments(
-					group.owner_id,
+					user,
 					'post',
-					'Постхантер ' + group.group_id,
+					`Постхантер "${group.name}" ${comments_count} комментов`,
 					group.group_id,
 					post.id,
 					group.comments_ids.split(','),
@@ -59,8 +59,8 @@ nextgroup:
 				);
 			}
 			await utils.task.addLikes(
-				group.owner_id,
-				'Постхантер ' + group.group_id,
+				user,
+				`Постхантер "${group.name}" ${likes_count} лайков`,
 				group.group_id,
 				'post',
 				post.id,
