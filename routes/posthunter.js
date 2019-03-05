@@ -34,13 +34,18 @@ router.post('/add', async function(req, res) {
 	if (!req.isAuthenticated()) return res.redirect('/login');
 	data = req.body;
 
+	data.name = data.name.replace(/['"]/gi, '')
+	if (data.name.length > 60) {
+		return res.send('Ошибка в названии')
+	}
+
 	// Проверка лайков
 	if (parseInt(data.min_likes) != data.min_likes || parseInt(data.max_likes) != data.max_likes ||
 		data.min_likes < 50 || data.max_likes > 5000 ||
 		data.max_likes < 50 || data.max_likes > 5000 ||
 		data.min_likes > data.max_likes)
 	{
-		return res.send('Error likes');
+		return res.send('Ошибка с лайками');
 	}
 
 	// Проверка комментариев
@@ -52,7 +57,7 @@ router.post('/add', async function(req, res) {
 		data.max_comments < 0 || data.max_comments > 3500  ||
 		data.min_comments > data.max_comments)
 	{
-		return res.send('Error comments');
+		return res.send('Ошибка с комментарими');
 	}
 
 	// Проверка url группы

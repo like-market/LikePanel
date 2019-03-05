@@ -74,7 +74,7 @@ function updatePagination() {
  * @param page  - номер страницы
  */
 function updateTransactions() {
-	$('#transactions_panel').toggleClass('ld-loading');
+	$('#info_panel').toggleClass('ld-loading');
 	$.ajax({
 	    type: 'POST',
 	    url: '/payment/get_transactions',

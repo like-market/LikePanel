@@ -46,6 +46,12 @@ router.get('/', async function(req, res) {
 router.post('/add_likes', async function(req, res) {
 	if (!req.isAuthenticated()) return res.redirect('/login');
 
+	// Проверка названия [длина] + замена запрещенных символов
+	req.body.name = req.body.name.replace(/['"]/gi, '')
+	if (req.body.name.length > 75) {
+		res.send('Ошибка в названии')
+	}
+
 	// Проверка URL
     const data = utils.urlparser.parseURL(req.body.url)
     if (data == null) {
@@ -69,8 +75,11 @@ router.post('/add_likes', async function(req, res) {
 	// Проверка на наличие объекта (пытаемся получить список поставленных лайков)
 	let likes = await vkapi.getLikeList(data.type, data.owner_id, data.item_id, 1);
 	if (likes.error) {
-		if (likes.error.error_code == 5) return res.send('Access restriction')
-		else return res.send('Error')
+		if (likes.error.error_code == 5) {
+			return res.send('Запись не найдена или не хватает прав для комментирования')
+		} else {
+			return res.send('Ошибка при получении информации о записе')
+		}
 	}
 	
 	utils.task.addLikes(req.user, req.body.name, data.owner_id, data.type, data.item_id, like_need);
@@ -89,6 +98,13 @@ router.post('/add_likes', async function(req, res) {
 router.post('/add_comments', async function(req, res) {
 	if (!req.isAuthenticated()) return res.redirect('/login');
 
+	// Проверка названия [длина] + замена запрещенных символов
+	req.body.name = req.body.name.replace(/['"]/gi, '')
+	if (req.body.name.length > 75) {
+		res.send('Ошибка в названии')
+	}
+
+	// Проверка url
 	const data = utils.urlparser.parseURL(req.body.url)
     if (data == null) {
     	res.send("Error url");

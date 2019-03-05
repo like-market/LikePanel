@@ -10,6 +10,10 @@ toastr.options = {
     "progressBar": true
 };
 
+$("#min_likes, #max_likes, #min_comments, #max_comments").change(function() {
+    $(this).css("border", "");
+});
+
 function edit(group_id) {
     console.log('edit')
     $('#add-panel-body').fadeOut(250);
@@ -56,26 +60,43 @@ function updateStatus(id, status) {
 
 // Добавить новую группу
 function add() {
+    let error = 0;
+
     // Если неверное количество лайков
     if ($('#min_likes').val() > $('#max_likes').val() ||
         $('#min_likes').val() == "" || $('#max_likes').val() == "")
     {
-        toastr.error('Неверное количество лайков')
-        return
+        toastr.error('Неверное количество лайков');
+        $("#min_likes").css("border", "1.5px solid red");
+        $("#max_likes").css("border", "1.5px solid red");
+        error++;
     }
 
     // Если неверное количество комментариев
     if ($('#min_comments').val() > $('#max_comments').val()) {
         toastr.error('Неверное количество комментариев')
-        return
+        $("#min_comments").css("border", "1.5px solid red");
+        $("#max_comments").css("border", "1.5px solid red");
+        error++;
     }
 
+    let name = $('#name').val();
+    if (name.length > 60) {
+        $("#name").css("border", "1.5px solid red");
+        toastr.error('Название может содержать до 60 символов');
+        error++;
+    }
+
+    // Проверка ссылки на группу
     const regex = /(https?:\/\/)?(www\.)?vk\.com\/(.[a-zA-Z0-9]+)(\?.+)?/gm;
     let math = regex.exec($('#url').val())
     if (math == null) {
+        $("#url").css("border", "1.5px solid red");
         toastr.error('Неверный URL')
-        return
+        error++
     }
+
+    if (error) return;
 
     $.ajax({
         type: 'POST',
@@ -91,12 +112,6 @@ function add() {
         },
         success: function(res) {
             switch (res) {
-                case 'Error likes':
-                    toastr.error('Ошибка с лайками');
-                    break;
-                case 'Error comments':
-                    toastr.error('Ошибка с комментарими');
-                    break;
                 case 'Error group':
                     toastr.error('Группа не найдена');
                     break;
@@ -108,6 +123,8 @@ function add() {
                     setTimeout(function() {
                         window.location.href = "/posthunter";
                     }, 500);
+                default:
+                    toastr.error(res);
             }
         }
     })

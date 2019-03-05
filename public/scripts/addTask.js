@@ -39,7 +39,7 @@ $('#comment_count').change(function() {
     $('#total_comment_cost').html(`Стоимость <mark>${new_cost}₽</mark>`)
 })
 
-$('#url_like, #url_comment').change(function() {
+$('#url_like, #url_comment, #task_name_like, #task_name_comment').change(function() {
     $(this).css('border', '')
 })
 
@@ -76,7 +76,15 @@ $('#createLikes').click(function() {
         $('#url_like').css('border', '1px solid red')
         error++
     }
-    
+
+    // Проверка названия
+    let name = $('#task_name_like').val()
+    if (name.length > 75) {
+        toastr.error('Название может быть не длиннее 75 символов')
+        $('#task_name_like').css('border', '1px solid red')
+        error++;
+    }
+
     if (error) return;
     canUseLikeButton = false;
     
@@ -84,8 +92,8 @@ $('#createLikes').click(function() {
         type: 'POST',
         url: '/addtask/add_likes',
         data: {
-            name: $('#task_name_like').val(),
-            url: url,
+            name,
+            url,
             count: $('#like_count').val()
         },
         success: function(res) {
@@ -156,6 +164,14 @@ $('#createComments').click(function() {
         error++;
     }
 
+    // Проверка названия
+    let name = $('#task_name_comment').val()
+    if (name.length > 75) {
+        toastr.error('Название может быть не длиннее 75 символов')
+        $('#task_name_like').css('border', '1px solid red')
+        error++;
+    }
+
     if (error) return;
     canUseCommentButton = false;
     
@@ -163,8 +179,8 @@ $('#createComments').click(function() {
         type: 'POST',
         url: '/addtask/add_comments',
         data: {
-            name: $('#task_name_comment').val(),
-            url: url,
+            name,
+            url,
             count: $('#comment_count').val(),
             comment_ids: $('#comments').val()
         },
@@ -177,15 +193,14 @@ $('#createComments').click(function() {
                 case 'Invalid amount comments':
                     toastr.error(`Неверное количество комментариев<br/>Можно заказать от ${minCommentCount} до ${maxCommentCount}`)
                     break;
-                case 'Access restriction':
-                    toastr.error('Запись не найдена или не хватает прав для комментирования')
-                    break;
                 case 'Success':
                     toastr.success('Задание успешно добавлено')
                     $('#task_name_comment').val('') //
                     $('#comment_count').val('')     // Обновляем поля
                     $('#url_comment').val('')       //
                     break;
+                default:
+                    toastr.error(res);
             }
             canUseCommentButton = true;
         }

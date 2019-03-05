@@ -12,19 +12,29 @@ $('#new-comments-name, #new-comments-text').change(function() {
 })
 
 function addComments() {
-    var name = $('#new-comments-name').val();
-    if ($('#new-comments-name').val() == '') {
-        toastr.error('Введите название')
+    let error = 0;
+
+    let name = $('#new-comments-name').val();
+    if (name.val() == '' || name.length > 50) {
+        toastr.error('Название должно содержать от 1 до 50 символов');
         $('#new-comments-name').css('border', '1px solid red')
-        return;
+        error++;
     }
 
-    var text = $('#new-comments-text').val(); 
-    if (text.split('\n').length < 5) {
-        toastr.error('Добавьте минимум 5 комментариев')
+    let text = $('#new-comments-text').val(); 
+    if (text.split('\n').length < 50) {
+        toastr.error('Нужно минимум 50 комментариев')
         $('#new-comments-text').css('border', '1px solid red')
-        return;
+        error++;
     }
+
+    if (text.length > 50000) {
+        toastr.error('Максимальная длина всех комментариев 50\'000 символов');
+        $('#new-comments-text').css('border', '1px solid red')
+        error++;
+    }
+
+    if (error) return;
 
     $.ajax({
         type: "POST",
@@ -38,15 +48,11 @@ function addComments() {
             switch(res) {
                 case 'Success':
                     toastr.success('Комментарии добавлены')
-                    /*setTimeout(function() {
-                        window.location.href = "/panel";
-                    }, 2000)*/
                     $('#new-comments-name').val('')
                     $('#new-comments-text').val('')
                     break;
                 default:
-                    toastr.error('Untraceable error')
-                    console.error(res);
+                    toastr.error(res)
             }
         }
     });
@@ -106,21 +112,32 @@ $('#abort-edit').click(function(e) {
 
 // Подтверждаем редактирование комментариев
 $('#apply-edit').click(function(e) {
-    var name = $('#edit-comments-name').val();
-    if (name == '') {
-        toastr.error('Введите название')
+    let error = 0;
+
+    let name = $('#edit-comments-name').val();
+    if (name == '' || name.length > 50) {
+        toastr.error('Название должно содержать от 1 до 50 символов')
         $('#edit-comments-name').css('border', '1px solid red')
-        return;
+        error++;
     }
 
-    var text = $('#edit-comments-text').val(); 
-    if (text.split('\n').length < 5) {
-        toastr.error('Добавьте минимум 5 комментариев')
-        $('#new-comments-text').css('border', '1px solid red')
-        return;
+    let text = $('#edit-comments-text').val(); 
+    if (text.split('\n').length < 50) {
+        toastr.error('Нужно минимум 50 комментариев')
+        $('#edit-comments-text').css('border', '1px solid red')
+        error++
     }
+
+    if (text.length > 50000) {
+        toastr.error('Максимальная длина всех комментариев 50\'000 символов');
+        $('#edit-comments-text').css('border', '1px solid red')
+        error++;
+    }
+
+    if (error) return;
 
     var comment_id = $('#comments_id').val()
+
     $.ajax({
         type: "POST",
         url: '/comments/edit',
