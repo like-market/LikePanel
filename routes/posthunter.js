@@ -16,8 +16,12 @@ router.get('/', async function(req, res) {
 
 	comments = await db.comments.getUserComments(req.user.id, true);
 	groups   = await db.posthunter.getByOwner(req.user.id); // Получаем все группы
+	for (group of groups) {
+		group.url = utils.urlparser.createPageURL(group.group_id);
+		group.create = moment(group.create).format("D MMMM YYYY")
+	}
 
-	res.render('posthunter', {user: req.user, comments, groups, moment});
+	res.render('posthunter', {user: req.user, comments, groups});
 });
 
 /**
@@ -43,7 +47,7 @@ router.post('/add', async function(req, res) {
 	if (parseInt(data.min_likes) != data.min_likes || parseInt(data.max_likes) != data.max_likes ||
 		data.min_likes < 50 || data.max_likes > 5000 ||
 		data.max_likes < 50 || data.max_likes > 5000 ||
-		data.min_likes > data.max_likes)
+		parseInt(data.min_likes) > parseInt(data.max_likes))
 	{
 		return res.send('Ошибка с лайками');
 	}
@@ -55,7 +59,7 @@ router.post('/add', async function(req, res) {
 	if (parseInt(data.min_comments) != data.min_comments || parseInt(data.max_comments) != data.max_comments ||
 		data.min_comments < 0 || data.min_comments > 3500 ||
 		data.max_comments < 0 || data.max_comments > 3500  ||
-		data.min_comments > data.max_comments)
+		parseInt(data.min_comments) > parseInt(data.max_comments))
 	{
 		return res.send('Ошибка с комментарими');
 	}
@@ -101,10 +105,35 @@ router.post('/add', async function(req, res) {
 })
 
 /**
+ * Удаляем группу
+ * @body group_id - ID группы
+ */
+router.post('/delete', async function(req, res) {
+	if (!req.isAuthenticated()) return res.redirect('/login');
+
+	// Проверка на то, что group_id - число
+	if (parseInt(req.body.group_id) != req.body.group_id) return res.send('Неверный параметр group_id');
+
+	// Проверка прав
+	const group = await db.posthunter.getById(req.body.group_id);
+	if (group.owner_id != req.user.id) {
+		return res.send('Forbidden');
+	}
+
+	// Удаляем постхантер
+	db.posthunter.delete(req.body.group_id);
+
+	res.send('Ok');
+})
+
+/**
  * Обновляем статус
  */
 router.post('/update_status', async function(req, res) {
 	if (!req.isAuthenticated()) return res.redirect('/login');
+
+	// Проверка на то, что id - число
+	if (parseInt(req.body.id) != req.body.id) return res.send('Неверный параметр id');
 
 	group = await db.posthunter.getById(req.body.id);
 	
