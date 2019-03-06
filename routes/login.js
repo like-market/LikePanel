@@ -16,6 +16,8 @@ router.post("/", function(req, res, next) {
     
     // Формат для логина и пароля
     const format = /^[a-zA-Z0-9а-яА-Я]+$/;
+    // Формат для почты
+    const mail = /^[a-zA-Z0-9!$&*-=^|~#%+\/?_{}]+@[a-zA-Z0-9]+\.[a-zA-Z0-9]+$/
     
     // Проверка пароля [длина, проверка запрещенных символов, совпадение паролей]
     let password = req.body.password;
@@ -25,8 +27,21 @@ router.post("/", function(req, res, next) {
 
     // Проверка логина [длина, наличие запрещенных символов]
     let username = req.body.username.toLowerCase();
-    if (username.length < 5 || username.length > 20 || !format.test(username)) {
-        return res.send("Ошибка с логином");
+
+    // Если вход по логину
+    if (format.test(username)) {
+        // Проверка длины логина
+        if (username.length < 5 || username.length > 20) {
+            return res.send('Логин может содержать от 5 до 20 символов')
+        }
+    // Если входим по почте
+    } else if (mail.test(username)) {
+        if (username.length > 50) {
+            return res.send("Почта может содержать до 50 символов");
+        }
+    // Если написан ни логин, ни почта
+    } else {
+        return res.send("Неправильный логин или почта")
     }
 
     passport.authenticate("local", function(err, user, info) {

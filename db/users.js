@@ -38,6 +38,25 @@ exports.findByUsername = function(username) {
 }
 
 /**
+ * Получить пользователя по почте
+ * @param email - почта
+ */
+exports.findByMail = function(email) {
+    return new Promise(function(resolve, reject){
+        var sql = `SELECT * FROM users WHERE email = '${email}'`
+
+        db.query(sql, function(err, rows) {
+            if (err) return reject(err)
+
+            if (rows.length == 0) return resolve(null);
+
+            // resolve( rows.parseSqlResult()[0] );
+            resolve( JSON.parse(JSON.stringify(rows))[0] )
+        })
+    })
+}
+
+/**
  * Получить список всех пользователей
  */
 exports.getAllUsers = function() {

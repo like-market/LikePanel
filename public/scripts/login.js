@@ -14,11 +14,31 @@ $("#loginForm").submit(function(e) {
     e.preventDefault(); // Отменяем отправку формы
     var error = 0;
 
+    // Формат логина и пароля
+    const format = /^[a-zA-Z0-9а-яА-Я]+$/;
+    // формат почты
+    const mail = /^[a-zA-Z0-9!$&*-=^|~#%+\/?_{}]+@[a-zA-Z0-9]+\.[a-zA-Z0-9]+$/
+
     var username = $("#username").val();
-    if (username.length < 5 || username.length > 20) {
-        error++;
+    // Если входим по логину
+    if (format.test(username)) {
+        // Проверка длины логина
+        if (username.length < 5 || username.length > 20) {
+            error++;
+            $("#username").css("border", "1.5px solid red");
+            toastr.error("Логин может содержать от 5 до 20 символов");
+        }
+    // Если входим по почте
+    } else if (mail.test(username)) {
+        if (username.length > 50) {
+            error++;
+            $("#username").css("border", "1.5px solid red");
+            toastr.error("Почта может содержать до 50 символов");
+        }
+    // Если написан ни логин, ни почта
+    } else {
         $("#username").css("border", "1.5px solid red");
-        toastr.error("Логин может содержать от 5 до 20 символов");
+        toastr.error("Неправильный логин или почта");
     }
 
     var password = $("#password").val();
@@ -30,12 +50,6 @@ $("#loginForm").submit(function(e) {
 
     if (error > 0) return;
 
-    const format = /^[a-zA-Z0-9а-яА-Я]+$/;
-    if (!format.test(username)) {
-        error++;
-        $("#username").css("border", "1.5px solid red");
-        toastr.error("Логин может содержать только буквы и цифры");
-    }
 
     if (!format.test(password)) {
         error++;
@@ -60,7 +74,12 @@ $("#loginForm").submit(function(e) {
                     break;
                 case "Unauthorized":
                     $("button").prop("disabled", false);
-                    toastr.error("Логин или пароль введены неверно");
+                    // Разные сообщения об ошибке авторизации
+                    if (format.test(username)) {
+                        toastr.error("Логин или пароль введены неверно");
+                    }else {
+                        toastr.error("Почта или пароль введены неверно");
+                    }
                     break;
                 default:
                     $("button").prop("disabled", false);
