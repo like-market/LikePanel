@@ -6,7 +6,7 @@ toastr.options = {
     progressBar: true
 };
 
-$("#username, #password, #repeatpassword").change(function() {
+$("#username, #password, #repeatpassword, #email").change(function() {
     $(this).css("border", "");
 });
 
@@ -14,28 +14,53 @@ $("#loginForm").submit(function(e) {
     e.preventDefault(); // Отменяем отправку формы
     var error = 0;
 
-    var username = $("#username").val();
+    let username = $("#username").val();
     if (username.length < 5 || username.length > 20) {
         error++;
         $("#username").css("border", "1.5px solid red");
-        toastr.error("Логин должен быть от 5 до 20 символов");
+        toastr.error("Логин может содержать от 5 до 20 символов");
     }
 
-    // var email = $('#email').val()
+    let email = $('#email').val();
+    let format = /^[a-zA-Z0-9!$&*-=^|~#%+\/?_{}]+@[a-zA-Z0-9]+\.[a-zA-Z0-9]+$/
+    if (!format.test(email)) {
+        error++;
+        $("#email").css("border", "1.5px solid red");
+        toastr.error("Почтовый адрес не валидный");
+    }
 
-    var password = $("#password").val();
+    if (email.length > 50) {
+        error++;
+        $("#email").css("border", "1.5px solid red");
+        toastr.error("Слишком длинная почта");
+    }
+
+    let password = $("#password").val();
     if (password.length < 5 || password.length > 30) {
         error++;
         $("#password").css("border", "1.5px solid red");
-        toastr.error("Пароль должен быть от 5 до 30 символов");
+        toastr.error("Пароль может содержать от 6 до 30 символов");
+    }
+
+    if (error > 0) return;
+    format = /^[a-zA-Z0-9а-яА-Я]+$/;
+    if (!format.test(username)) {
+        error++;
+        $("#username").css("border", "1.5px solid red");
+        toastr.error("Логин может содержать только буквы и цифры");
+    }
+
+    if (!format.test(password)) {
+        error++;
+        $("#password").css("border", "1.5px solid red");
+        toastr.error("Пароль может содержать только буквы и цифры");
     }
 
     var repeatpassword = $("#repeatpassword").val();
     if (repeatpassword != password) {
         error++;
         $("#repeatpassword").css("border", "1.5px solid red");
-        // Не выводим это сообщение, если первый пароль некорректен
-        if (error != 2) toastr.error("Пароли не совпадают");
+        toastr.error("Пароли не совпадают");
     }
 
     if (error > 0) return;
@@ -51,7 +76,7 @@ $("#loginForm").submit(function(e) {
                     toastr.success("Авторизация прошла успешно");
                     setTimeout(function() {
                         window.location.href = "/tasks";
-                    }, 2000);
+                    }, 500);
                     break;
                 case "User already exist":
                     toastr.error("Логин уже зарегистрирован");
@@ -60,8 +85,7 @@ $("#loginForm").submit(function(e) {
                     break;
                 default:
                     $("button").prop("disabled", false);
-                    console.error("Untraceable error");
-                    console.error(res);
+                    toastr.error(res)
             }
         },
         error: function(jqXHR, textStatus, errorThrown) {

@@ -26,9 +26,26 @@ exports.findById = function(task_id) {
 exports.getUserTasks = function(user_id, count = 10, offset = 0) {
 	return new Promise(function(resolve, reject){
         var sql = `SELECT * FROM tasks WHERE owner_id = ${user_id} ORDER BY \`create\` DESC LIMIT ${count} OFFSET ${offset}`;
-        
+
         db.query(sql, function(err, rows) {
         	if (err) return reject(err)
+            if (rows.length == 0) return resolve([])
+
+            // resolve( rows.parseSqlResult() )
+            resolve( JSON.parse(JSON.stringify(rows)) )
+        })
+    });
+}
+
+/**
+ * Получаем список последних задач [для админки]
+ */
+exports.getRecentTasks = function() {
+    return new Promise(function(resolve, reject) {
+        let sql = "SELECT tasks.*, users.username FROM tasks RIGHT JOIN users ON users.id= tasks.owner_id WHERE tasks.owner_id <> 23 AND tasks.owner_id <> 22 ORDER BY \`create\` DESC LIMIT 10";
+
+        db.query(sql, function(err, rows) {
+            if (err) return reject(err)
             if (rows.length == 0) return resolve([])
 
             // resolve( rows.parseSqlResult() )
@@ -48,7 +65,7 @@ exports.getUserTaskCount = function(owner_id, type = 'all') {
         if (type == 'all') {
             var sql = `SELECT COUNT(*) as COUNT FROM tasks WHERE owner_id=${owner_id}`
         }else {
-            var sql = `SELECT COUNT(*) as COUNT FROM tasks WHERE owner_id=${owner_id} AND type=${type}`
+            var sql = `SELECT COUNT(*) as COUNT FROM tasks WHERE owner_id=${owner_id} AND type='${type}'`
         }
 
         db.query(sql, function(err, rows) {
@@ -124,6 +141,18 @@ exports.inrement = function(task_id) {
             resolve()
         })
     })    
+}
+
+exports.updateCount = function(task_id, count) {
+    return new Promise(function(resolve, reject) {
+        var sql = `UPDATE tasks SET now_add = ${count} WHERE id = ${task_id}`
+ 
+        db.query(sql, function(err, rows) {
+            if (err) return reject(err)
+
+            resolve()
+        })
+    })     
 }
 
 /**

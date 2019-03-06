@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="shortcut icon" type="image/png" href="/images/favicon.png"/>
+    <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900' rel='stylesheet' type='text/css'>
+
+    <!-- Page title -->
+    <title>LikeMarket | Накрутка лайков</title>
+
+    <!-- Vendor styles -->
+    <link rel="stylesheet" href="vendor\fontawesome\css\font-awesome.css">
+    <link rel="stylesheet" href="vendor\animate.css\animate.css">
+    <link rel="stylesheet" href="vendor\bootstrap\css\bootstrap.css">
+    <link rel="stylesheet" href="vendor\toastr\toastr.min.css">
+
+    <!-- App styles -->
+    <link rel="stylesheet" href="styles\pe-icons\pe-icon-7-stroke.css">
+    <link rel="stylesheet" href="styles\pe-icons\helper.css">
+    <link rel="stylesheet" href="styles\stroke-icons\style.css">
+    <link rel="stylesheet" href="styles\style.css">
+</head>
+<body>
+
+<!-- Wrapper-->
+<div class="wrapper">
+
+    <!-- Header-->
+     <%- include('header', { user }); %>
+    <!-- End header-->
+
+    <!-- Navigation-->
+    <%- include('navigation', {user, page: 'statistics'}); %>
+    <!-- End navigation-->
+
+
+    <!-- Main content-->
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="view-header">
+                        <div class="header-icon">
+                            <i class="pe page-header-icon pe-7s-info"></i>
+                        </div>
+                        <div class="header-title">
+                            <h3 class="m-b-xs">Статистика</h3>
+                            <small>
+                                Статистика использования сайта
+                            </small>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-filled">
+                        <div class="panel-body">
+                            <h4>Последние задачи</h4>
+
+                            <table class="table table-vertical-align-middle table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Статус</th>
+                                        <th>Клиент</th>
+                                        <th>URL</th>
+                                        <th>Поставлено</th>
+                                        <th>Дата</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                <% /**
+                                    * Вывод данных у таблицы с задачами
+                                    * @param tasks [object] - список задач
+                                    */ %>
+                                <% tasks.forEach(function(task) { %>
+                                    <tr>
+                                        <td>
+                                        <% switch (task.status) {
+                                               case 'finish' : %>
+                                                   <span class="label label-success">Выполнена</span>
+                                               <% break;
+                                               case 'run' : %>
+                                                   <span class="label label-info">Выполняется</span>
+                                               <% break;
+                                               case 'wait' : %>
+                                                   <span class="label label-accent">Ожидание</span>
+                                               <% break;
+                                               case 'error' : %>
+                                                   <span class="label label-danger">Ошибка</span>
+                                               <% break;
+                                           } %>
+                                        </td>
+                                        <td>
+                                            <%= task.username %>
+                                        </td>
+                                        <td>
+                                            <div class="small"><a href="<%= task.url %>" target="_blank">Ссылка</a></div>
+                                        </td>
+                                        <td>
+                                            <% if (task.type == 'like') { %>
+                                                <i class="fa pe-7s-like"></i> 
+                                            <% }else { %>
+                                                <i class="fa fa-commenting-o"></i> 
+                                            <% } %>
+                                            <%= task.now_add %>&nbsp;/&nbsp;<%= task.need_add %>
+                                        </td>
+                                        <td>
+                                            <%= task.create %>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="panel panel-filled">
+                        <div class="panel-body">
+                            <h4>Последние пополнения</h4>
+
+                            <table class="table table-vertical-align-middle table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Статус</th>
+                                        <th>Клиент</th>
+                                        <th>Количество</th>
+                                        <th>Дата</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                <% /**
+                                    * Вывод данных у таблицы с задачами
+                                    * @param payments [object] - список транзакций
+                                    */ %>
+                                <% payments.forEach(function(payment) { %>
+                                    <tr>
+                                        <td>
+                                        <% switch (payment.status) {
+                                               case 'paid' : %>
+                                                   <span class="label label-success">Оплачен</span>
+                                               <% break;
+                                               case 'not paid' : %>
+                                                   <span class="label label-accent">Ожидание</span>
+                                               <% break;
+                                               case 'fail' : %>
+                                                   <span class="label label-danger">Ошибка</span>
+                                               <% break;
+                                           } %>
+                                        </td>
+                                        <td>
+                                            <%= payment.username %>
+                                        </td>
+                                        <td>
+                                            <%= payment.amount %>₽
+                                        </td>
+                                        <td>
+                                            <%= payment.create %>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12 col-lg-4">
+                    <div class="panel panel-filled">
+                        <div class="panel-body">
+                            <h4>Список пользователей</h4>
+
+                            <% users.forEach(function(user) { 
+                                if (user.username == 'gistrec' || user.username == 'diman3289') return; %>
+                                <code><%= user.username %></code>
+                            <% }) %>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12 col-lg-8">
+                    <div id='info_panel' class="panel panel-filled">
+                        <div class="loader">
+                            <div class="loader-bar"></div>
+                        </div>
+                        <div class="panel-body">
+                            <h4>Статистика пользователя</h4>
+
+                            <form class="form-horizontal">
+                                <div class="form-group">
+                                    <label for="username" class="col-sm-3 control-label">Логин</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control" id="username" placeholder="Логин">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="username" class="col-sm-3 control-label">Количество</label> 
+                                    <div class="col-sm-6">
+                                        <input type="number" class="form-control" id="count" placeholder="Количество записей">
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6 pull-right">
+                                    <a onclick="showPayments()" class="btn btn-accent" aria-expanded="false">Пополнения</a>
+                                    <a onclick="showTasks()" class="btn btn-accent" aria-expanded="false">Задачи</a>
+                                </div>
+                            </form>
+
+                            <div id="info"></div>
+                        </div>
+                    </div>
+                </div>          
+            </div>
+
+        </div>
+    </section>
+    <!-- End main content-->
+
+</div>
+<!-- End wrapper-->
+
+<!-- Vendor scripts -->
+<script src="vendor\pacejs\pace.min.js"></script>
+<script src="vendor\jquery\dist\jquery.min.js"></script>
+<script src="vendor\bootstrap\js\bootstrap.min.js"></script>
+<script src="vendor\toastr\toastr.min.js"></script>
+
+<!-- App scripts -->
+<script src="scripts\luna.js"></script>
+<script src="scripts\statistics.js"></script>
+
+</body>
+
+</html>

@@ -18,6 +18,16 @@ exports.add = function(owner_id, group_id, name, last_post_id, min_likes,
     });
 }
 
+/**
+ * Удаляем постхантер
+ */
+exports.delete = function(group_id) {
+    var sql = `UPDATE posthunter SET status='removed' WHERE id=${group_id}`;
+    db.query(sql, function(err, rows) {
+        if (err) console.log(err);
+    }); 
+}
+
 exports.getByGroupId = function(group_id) {
     return new Promise(function(resolve, reject) {
         var sql = "SELECT * FROM `posthunter` WHERE `group_id`=" + group_id;
@@ -59,7 +69,7 @@ exports.getEnabled = function() {
 // Получаем все группы владельца owner_id
 exports.getByOwner = function(owner_id) {
     return new Promise(function(resolve, reject) {
-        var sql = "SELECT * FROM `posthunter` WHERE `owner_id`=" + owner_id;
+        var sql = `SELECT * FROM posthunter WHERE owner_id=${owner_id} AND (status='enable' OR status='disable')`;
         sql += " ORDER BY `status`";
 
         db.query(sql, function(err, rows) {

@@ -19,6 +19,7 @@ $('#repeat, #password, #mail').change(function() {
 function applyChange() {
 	let error = 0;
 
+    // Для того чтобы что-то изменить нужен текущий пароль
 	let repeat = $('#repeat').val();
 	if (repeat == '') {
         toastr.error('Введите текущий пароль')
@@ -27,22 +28,35 @@ function applyChange() {
     }
 
     let password = $('#password').val()
-    if (password != '' && (password.length < 6 || password.length > 20)) {
-        toastr.error('Пароль может содержать от 6 до 20 символов')
-        $('#password').css('border', '1px solid red')
-        error++
-    }
-
     let mail = $('#mail').val()
 
-    // Если раньше почты не было, 
-    if ($('#mail').attr("placeholder") != mail && mail != "") {
-	    const regex = /.*@.*\..*/; // Вид у почты <название>@<поддомен>.<домен>
-	    if (regex.exec(mail) == null) {
-	    	toastr.error('Почтовый адрес не валиден')
-	    	$('#mail').css('border', '1px solid red')
-	    	error++;
-	    }
+    if (password == '' && mail == '') {
+        toastr.error('Вы можете изменить почту и/или пароль')
+        error++;
+    }
+    if (error) return;
+
+    // Если изменен пароль
+    if (password != '' && (password.length < 6 || password.length > 30)) {
+        toastr.error('Пароль может содержать от 6 до 30 символов')
+        $('#password').css('border', '1px solid red')
+        error++;
+    }
+
+    // Проверка допустимых символов в пароле
+    let format = /^[a-zA-Z0-9а-яА-Я]+$/;
+    if (password != '' && !format.test(password)) {
+        toastr.error('Пароль может содержать только буквы и цифры')
+        $('#password').css('border', '1px solid red')
+        error++;
+    } 
+
+    // Если изменена почта
+    format = /^[a-zA-Z0-9!$&*-=^|~#%+\/?_{}]+@[a-zA-Z0-9]+\.[a-zA-Z0-9]+$/
+    if (mail != '' && !format.test(mail)) {
+        $("#email").css("border", "1.5px solid red");
+        toastr.error("Почтовый адрес не валиден");
+        error++;
     }
 
     if (error) return;

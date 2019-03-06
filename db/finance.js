@@ -3,6 +3,7 @@ var db = require('./index.js').db;
 var moment = require('moment');
 require('moment/locale/ru');
 
+
 exports.getBalanceAtDate = function(user_id, date) {
 	return new Promise(async function(resolve, reject){
 		sql = `SELECT balance FROM balance WHERE user_id=${user_id} AND date<='${date}' ORDER BY \`date\` ASC LIMIT 1`
@@ -50,14 +51,93 @@ exports.getBalanceHistory = function(user, days) {
 	})
 }
 
+/**
+ * Получаем список последних задач [для админки]
+ */
+exports.getRecentPayments = function() {
+    return new Promise(function(resolve, reject) {
+        let sql = "SELECT payment.*, users.username FROM devlikepanel.payment RIGHT JOIN devlikepanel.users ON payment.user_id = users.id ORDER BY \`create\` DESC LIMIT 10";
+
+        db.query(sql, function(err, rows) {
+            if (err) return reject(err)
+            if (rows.length == 0) return resolve([])
+
+            // resolve( rows.parseSqlResult() )
+            resolve( JSON.parse(JSON.stringify(rows)) )
+        })
+    });
+}
+
+/**
+ * Получаем список транзакций у пользователя
+ * @param user_id - id пользователя
+ * @param count  - количество задач
+ * @param offset - смещение
+ */
+exports.getUserTransactions = function(user_id, count = 10, offset = 0) {
+	return new Promise(function(resolve, reject) {
+        var sql = `SELECT * FROM balance WHERE user_id=${user_id} ORDER BY \`date\` DESC LIMIT ${count} OFFSET ${offset}`;
+
+        db.query(sql, function(err, rows) {
+        	if (err) return reject(err)
+            if (rows.length == 0) return resolve([])
+
+            // resolve( rows.parseSqlResult() )
+            resolve( JSON.parse(JSON.stringify(rows)) )
+        })
+    });
+}
+
+/**
+ * Получаем список пополнений пользователя
+ * @param user_id - id пользователя
+ * @param count  - количество задач
+ * @param offset - смещение
+ */
+exports.getUserPayments = function(user_id, count = 10, offset = 0) {
+	return new Promise(function(resolve, reject) {
+        var sql = `SELECT * FROM payment WHERE user_id=${user_id} ORDER BY \`create\` DESC LIMIT ${count} OFFSET ${offset}`;
+
+        db.query(sql, function(err, rows) {
+        	if (err) return reject(err)
+            if (rows.length == 0) return resolve([])
+
+            // resolve( rows.parseSqlResult() )
+            resolve( JSON.parse(JSON.stringify(rows)) )
+        })
+    });
+}
+
+/**
+ * Получаем количество транзакций
+ * @param user - пользователь
+ */
+exports.getTransactionsCount = function(user) {
+	return new Promise(function(resolve, reject){
+        var sql = `SELECT COUNT(user_id) as COUNT FROM balance WHERE user_id=${user.id}`
+
+        db.query(sql, function(err, rows) {
+            if (err) return reject(err)
+
+            if (rows.length == 0) return resolve(0)
+
+            // rows.parseSqlResult()[0]['COUNT']
+			let sum = JSON.parse(JSON.stringify(rows))[0]['COUNT'];
+			if (sum) return resolve(sum);
+			
+			resolve(0);
+        })
+    });
+}
 
 /**
  * Получить колчисевто денег, который пополнил пользователь
  * @param user_id - ID пользователя
+ * @return десятые доли копеек
  */
 exports.getTotalRefill = function(user_id) {
     return new Promise(function(resolve, reject){
-        var sql = `SELECT SUM(amount) as SUM FROM balance WHERE user_id=${user_id} AND type='add'`
+        var sql = `SELECT SUM(amount) as SUM FROM payment WHERE user_id=${user_id} AND status='paid'`
 
         db.query(sql, function(err, rows) {
             if (err) return reject(err)
@@ -66,7 +146,7 @@ exports.getTotalRefill = function(user_id) {
 
             // rows.parseSqlResult()[0]['SUM']
 			let sum = JSON.parse(JSON.stringify(rows))[0]['SUM'];
-			if (sum) return resolve(sum);
+			if (sum) return resolve(sum * 1000);
 			
 			resolve(0);
         })

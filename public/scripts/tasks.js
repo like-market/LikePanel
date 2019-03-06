@@ -10,7 +10,8 @@ function updatePagination() {
 
 	let from = (page - 1) * count + 1;
 
-	$('#from').text(from);
+	if (tasks_count == 0) $('#from').text(0);
+	else $('#from').text(from);
 	$('#to').text(to)
 
 	console.log(`From: ${from} To: ${to}`)

@@ -54,7 +54,7 @@ $('#change-balance').click(function() {
         toastr.error('Введите количество денег')
         return;
     }
-    count = parseFloat(count) * 100;
+    count = parseFloat(count) * 1000;
 
     var type = $('#operation-type').val()
 

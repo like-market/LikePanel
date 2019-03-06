@@ -6,7 +6,7 @@ const queue = require('./index.js').queue;
 const logger = require('../logger.js')
 const db = require('../db')
 const vkapi = require('../vkapi')
-
+ 
 /**
  * Добавляем новый аккаунт
  *
@@ -19,53 +19,61 @@ const vkapi = require('../vkapi')
  * @parallel 5
  * @params {login, password}
  */
-queue.process('auth', 3, async function(job, done) {
-	const login    = job.data.login
+queue.process('auth', 5, async function(job, done) {
+	const login    = job.data.login.replace(/ |\(|\)|\+|\-/g, "") // Убираем лишние символы +-() из логина
 	const password = job.data.password
 
-	const proxy = await db.proxy.getRandom();
-
-	// Проверяем аккаунт в бд
-	const account = await db.vk.getAccount(login)
-	if (account && account.length != 0) {
-		// Изменились ли какие-нибудь данные (пароль)
-		if (account.password == password || account.status == 'active') {
-			logger.warn('Попытка добавления существующего аккаунта ' + login)
+	// Проверка на то, что аккаунт уже активен
+	// Или данные (логин пароль) уже есть в бд
+	const rows = await db.vk.getRowsByLogin(login);
+	for (let row of rows) {
+		// Если такие данные уже есть в бд
+		if (row.login == login && row.password == password) {
+			logger.warn(`Сочетание логина и пароля у акк ${login} уже есть в бд`)
+			return done()
+		} 
+		if (row.status == 'active') {
+			logger.warn(`Аккаунт ${login} уже активен с другим паролем`)
 			return done()
 		}
 	}
 
+	// Получаем случайный прокси
+	const proxy = await db.proxy.getRandom();
+
 	const response = await vkapi.authorize(login, password, proxy);
 
-	// Если неправильный логин или пароль
-	if (response.error_type && response.error_type == 'username_or_password_is_incorrect') {
-		logger.warn('Не удалось добавить новый аккаунт ' + login + ' - неверый пароль')
+	// Если авторизация прошла успешно
+	if (response.access_token) {
+		// Проверяем что нужный user_id еще не авторизован в бд
+		let account = await db.vk.getAccount(response.user_id);
+		if (account && account.status == 'active') {
+			logger.warn(`Пользователем ${login} с таким user_id уже авторизован`)
+			return done();
+		} 
+
+		db.vk.addAccount(response.user_id, login, password, response.access_token, proxy.id)
+		logger.info(`Добавили нового пользователя ${response.user_id}`)
 		return done()
 	}
-	if (response.error && response.error == 'need_captcha') {
-		logger.error('Нужна капча для авторизации ' + login)
-		return done()
-	}
-	if (response.error && response.error == 'need_validation') {
-		logger.warn('Нужна валидация ' + login)
-		return done()
+
+	// Если не удалось авторизовать
+	if (response.error_type || response.error) {
+		// Если неправильный логин или пароль
+		if (response.error_type == 'username_or_password_is_incorrect') {
+			logger.warn(`Не удалось добавить новый аккаунт ${login} - неверый пароль`)
+			db.vk.addInvalidAccount(login, password)
+			return done()
+		}
+		if (response.error == 'need_validation') {
+			logger.warn(`Нужна валидация ${login}`)
+			db.vk.addInvalidAccount(login, password)
+			return done()
+		}
 	}
 
 	// Если нет токена - значит произошла какая-то ошибка
-	if (!response.access_token) {
-		logger.error('Неотслеживаемая ошибка ' + login)
-		console.log(response.data)
-		return done()
-	}
-
-	// На этом этапе авторизация прошла успешно
-	if (account && account.length != 0) {
-		await db.vk.removeAccount(response.user_id) // Удаляем старую инфу о клиенте
-		db.vk.addAccount(response.user_id, login, password, response.access_token, proxy.id)
-		logger.info('Обновили данные о пользователе ' + response.user_id)
-	}else {
-		db.vk.addAccount(response.user_id, login, password, response.access_token, proxy.id)
-		logger.info('Добавили нового пользователя ' + response.user_id)
-	}
+	logger.error(`Неотслеживаемая ошибка при авторизации ${login}`)
+	console.log(response)
 	done()
 })

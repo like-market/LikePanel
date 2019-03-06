@@ -56,7 +56,7 @@ exports.checkBill = async function(pay_id, amount, sign) {
 	}
 
 	user = await db.users.findById(bill.user_id);
-	utils.user.changeBalance(user, 'add', amount * 100, `Пополнение баланса. Платеж №${pay_id}`);
+	utils.user.changeBalance(user, 'add', amount * 1000, `Пополнение баланса. Платеж №${pay_id}`);
 	db.finance.setBillStatus(pay_id, 'paid');
 
 	logger.info(`Пользователь ${user.username} пополнил баланс на ${amount} рублей`);

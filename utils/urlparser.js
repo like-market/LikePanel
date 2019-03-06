@@ -45,3 +45,17 @@ exports.createURL = function(type, owner_id, item_id) {
 		default: return 'error';
 	}
 }
+
+/**
+ * Создаем URL страницы пользователя или сообщества
+ * @param object_id - ID группы/пользователя
+ * @param type - тип объекта [group, user]
+ */
+exports.createPageURL = function(object_id, type = 'group') {
+	// Убираем минус
+	object_id = object_id.toString(10).replace(/-/g, '')
+	switch (type) {
+		case 'group': return `https://vk.com/club${object_id}`
+		case 'user':  return `https://vk.com/ip${object_id}`
+	}
+}

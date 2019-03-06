@@ -34,7 +34,7 @@
     <!-- End header-->
 
     <!-- Navigation-->
-    <%- include('navigation', {isAdmin: user.admin, page: 'addtask'}); %>
+    <%- include('navigation', {user, page: 'addtask'}); %>
     <!-- End navigation-->
 
 
@@ -88,11 +88,11 @@
                                                 <% if (maxLikeCount == 0) { %>
                                                     <input id="like_count" type="number" class="form-control" placeholder="Недостаточно средств" min="0" max="0">
                                                 <% } else { %>
-                                                    <input id="like_count" type="number" class="form-control" placeholder="От 1 до <%= maxLikeCount %>" min="1" max="<%= maxLikeCount %>">
+                                                    <input id="like_count" type="number" class="form-control" placeholder="От <%= minLikeCount %> до <%= maxLikeCount %>" min="<%= minLikeCount %>" max="<%= maxLikeCount %>">
                                                 <% } %>
                                             </div>
                                             <div class="col-lg-6 ml-auto" style="height: 34px; padding-top: 7px">
-                                                Максимум <a><%= maxLikeCount %></a>   <small>(Учитывается ваш баланс и доступные аккаунты)</small>
+                                                Максимум <a><%= maxLikeCount %></a>   <small>(Учитывается ваш баланс и загруженность системы)</small>
                                             </div>
                                         </div>
                                     </div>
@@ -140,7 +140,7 @@
                                                 <% if (maxCommentCount == 0) { %>
                                                     <input id="comment_count" type="number" class="form-control" placeholder="Недостаточно средств" min="0" max="0">
                                                 <% } else { %>
-                                                    <input id="comment_count" type="number" class="form-control" placeholder="От 1 до <%= maxCommentCount %>" min="1" max="<%= maxLikeCount %>">
+                                                    <input id="comment_count" type="number" class="form-control" placeholder="От <%= minCommentCount %> до <%= maxCommentCount %>" min="<%= minCommentCount %>" max="<%= maxCommentCount %>">
                                                 <% } %>
                                             </div>
                                             <div class="col-lg-6 ml-auto" style="height: 34px; padding-top: 7px">
@@ -159,7 +159,7 @@
 
                                     <div class="form-group">
                                         <div class="col-md-6 col-md-offset-4">
-                                        <a id="createComments" class="btn btn-w-md btn-accent" style="align: center">Создать задачу</a>
+                                            <a id="createComments" class="btn btn-w-md btn-accent" style="align: center">Создать задачу</a>
                                         </div>
                                     </div>
                                 </div>
@@ -172,14 +172,13 @@
                         <div class="panel-heading">
                             <h4>Инструкции</h4>
                         </div>
-                        <div class="panel-body">
-                            <p>1. Введите url, вида</p>
-                            <code>https://vk.com/id266510818?w=wall266510818_67</code>
-                            или
-                            <code>https://vk.com/ngc666?w=wall-52884277_1020</code>
-                            или
-                            <code>https://vk.com/wall-52884277_1020</code>
-                            <p>2. Введите количество лайков</p>
+                        <div id="info" class="panel-body">
+                            <p>
+                                1. Введите url на запись на стене, фотографию, видео или товар<br/>
+                                Например <code>https://vk.com/wall266510818_2435</code><br/>
+                                или <code>https://vk.com/id266510818?w=wall266510818_2435</code>
+                            </p>
+                            <p>2. Введите количество лайков для накрутки</p>
                             <p>3. Нажмите на кнопку "Создать задачу"</p>
                         </div>
                     </div>
@@ -188,46 +187,6 @@
         </div>
     </section>
     <!-- End main content-->
-
-    <!-- Start modal -->
-    <!-- <div class="modal fade" id="Modal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header text-center">
-                    <h4 class="modal-title">Modal title</h4>
-                    <small>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</small>
-                </div>
-                <div class="modal-body">
-                    <h4 class="m-t-none">Lorem Ipsum is simply</h4>
-                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever.</p>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <small class="stat-label">Today</small>
-                            <h4 class="m-t-xs">170,20 <i class="fa fa-level-up text-accent"></i></h4>
-                        </div>
-                        <div class="col-md-4">
-                            <small class="stat-label">Last month %</small>
-                            <h4 class="m-t-xs">%20,20 <i class="fa fa-level-down c-white"></i></h4>
-                        </div>
-                        <div class="col-md-4">
-                            <small class="stat-label">Last year</small>
-                            <h4 class="m-t-xs">246,40 <i class="fa fa-level-up text-accent"></i></h4>
-                        </div>
-                    </div>
-                    <div class="progress m-t-xs full progress-small">
-                        <div style="width: 65%" aria-valuemax="100" aria-valuemin="0" aria-valuenow="65" role="progressbar" class=" progress-bar progress-bar-warning">
-                            <span class="sr-only">65% Complete (success)</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-accent">Save changes</button>
-                </div>
-            </div>
-        </div>
-    </div> -->
-    <!-- End modal -->
 </div>
 <!-- End wrapper-->
 
@@ -240,9 +199,16 @@
 
 <!-- App scripts -->
 <script>
-const likePrice = <%= likePrice %>; // Цена каждого лайка
-const commentPrice = <%= commentPrice %> // Цена каждого комментария
-const balance = <%= (user.balance / 100).toFixed(2) %>; // Баланс пользователя
+// Лимиты на лайки/комменты
+const minLikeCount = <%= minLikeCount %>;
+const maxLikeCount = <%= maxLikeCount %>;
+const minCommentCount = <%= minCommentCount %>;
+const maxCommentCount = <%= maxCommentCount %>;
+
+// Все деньги считаются в десятых долях копейки
+const likePrice    = <%= user.like_price %>;    // Цена лайка 
+const commentPrice = <%= user.comment_price %>; // Цена комментария
+const balance      = <%= user.balance %>;       // Баланс пользователя
 </script>
 
 <script src="scripts\luna.js"></script>

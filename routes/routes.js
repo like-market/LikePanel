@@ -59,10 +59,15 @@ router.get('/logout', function(req, res){
 
 // Вывод главной страницы
 router.get('/', function(req, res) {
-	res.render('index')
+    // Если юзер авторизован - перенаправляем его в панель
+    if (req.isAuthenticated()) return res.redirect("/addtask");
+	
+    res.render('index')
 })
 
 router.use('/admin', require('./admin.js'));
+router.use('/statistics', require('./statistics.js'));
+
 router.use('/login', require('./login.js'));
 router.use('/register', require('./register.js'));
 router.use('/forgotPassword', require('./forgotPassword.js'));

@@ -33,11 +33,11 @@
 <div class="wrapper">
 
     <!-- Header-->
-    <%- include('header', {user:user}); %>
+    <%- include('header', { user }); %>
     <!-- End header-->
 
     <!-- Navigation-->
-    <%- include('navigation', {isAdmin: user.admin, page: 'posthunter'}); %>
+    <%- include('navigation', {user, page: 'posthunter'}); %>
     <!-- End navigation-->
 
 
@@ -70,7 +70,7 @@
                             <div class="table-responsive">
                             <table class="table table-striped table-hover">
             
-                                <%- include('grouplist', {groups, moment}); %>
+                                <%- include('grouplist', {groups}); %>
                                 
                             </table>
                             </div>
@@ -100,12 +100,12 @@
                                 <form class="form-inline">
                                     <div class="form-group">
                                         <label>От &nbsp;</label>
-                                        <input id="min_likes" type="number" class="form-control" placeholder="Минимум 10" min="10">
+                                        <input id="min_likes" type="number" class="form-control" placeholder="Минимум 50" min="50">
                                     </div>
                                     &nbsp;&nbsp;&nbsp;&nbsp;
                                     <div class="form-group">
                                         <label>До &nbsp;</label>
-                                        <input id="max_likes" type="number" class="form-control" placeholder="Максимум 1000" min="10">
+                                        <input id="max_likes" type="number" class="form-control" placeholder="Максимум 5000" max="5000">
                                     </div>
                                 </form>
                             </div>
@@ -120,7 +120,7 @@
                                     &nbsp;&nbsp;&nbsp;&nbsp;
                                     <div class="form-group">
                                         <label>До &nbsp;</label>
-                                        <input id="max_comments" type="number" class="form-control" placeholder="Максимум 500" min="0">
+                                        <input id="max_comments" type="number" class="form-control" placeholder="Максимум 3500" min="0">
                                     </div>
                                 </form>
                             </div>
@@ -162,12 +162,12 @@
                                 <form class="form-inline">
                                     <div class="form-group">
                                         <label>От &nbsp;</label>
-                                        <input id="min_likes" type="number" class="form-control" placeholder="Минимум 10" min="10">
+                                        <input id="new_min_likes" type="number" class="form-control" placeholder="Минимум 10" min="10">
                                     </div>
                                     &nbsp;&nbsp;&nbsp;&nbsp;
                                     <div class="form-group">
                                         <label>До &nbsp;</label>
-                                        <input id="max_likes" type="number" class="form-control" placeholder="Максимум 1000" min="10">
+                                        <input id="new_max_likes" type="number" class="form-control" placeholder="Максимум 1000" min="10">
                                     </div>
                                 </form>
                             </div>
@@ -177,19 +177,19 @@
                                 <form class="form-inline">
                                     <div class="form-group">
                                         <label>От &nbsp;</label>
-                                        <input id="min_comments" type="number" class="form-control" placeholder="Минимум 0" min="0">
+                                        <input id="new_min_comments" type="number" class="form-control" placeholder="Минимум 0" min="0">
                                     </div>
                                     &nbsp;&nbsp;&nbsp;&nbsp;
                                     <div class="form-group">
                                         <label>До &nbsp;</label>
-                                        <input id="max_comments" type="number" class="form-control" placeholder="Максимум 500" min="0">
+                                        <input id="new_max_comments" type="number" class="form-control" placeholder="Максимум 500" min="0">
                                     </div>
                                 </form>
                             </div>
 
                             <div class="form-group">
                                 <p>Наборы комментариев</p>
-                                <select id="comments_ids" class="form-control" multiple="multiple" style="width: 100%">
+                                <select id="new_comments_ids" class="form-control" multiple="multiple" style="width: 100%">
                                     <% comments.forEach(function(comment) { %>
                                         <option value="<%= comment.id %>"><%= comment.name %>
                                     <% }) %>
@@ -197,7 +197,8 @@
                             </div>
 
                             <div class="btn-group pull-right">
-                                <a class="btn btn-w-md btn-success pull-right" onclick="add();">Добавить</a>
+                                <a class="btn btn-w-md btn-accent" id="abort-edit">Отмена</a>
+                                <a class="btn btn-w-md btn-success" id="apply-edit">Изменить</a>
                             </div>
                         </div>
                     </div>

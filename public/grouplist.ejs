@@ -10,10 +10,14 @@
 <% /**
     * Вывод данных у таблицы с наборами групп в постхантере
     * @param groups [object] - список груп
-    * @param moment [module] - модуль для работы со временем
     */ %>
 <% groups.forEach(function(group) { %>
-    <tr id="group_<%= group.id %>">
+    <tr id="group_<%= group.id %>"
+        data-min_likes="<%= group.min_likes %>"
+        data-max_likes="<%= group.max_likes %>"
+        data-min_comments="<%= group.min_comments %>"
+        data-max_comments="<%= group.max_comments %>"
+        data-url="<%= group.url %>">
         <td>
             <% if (group.status == 'enable') { %>
                 <span id="group_status_<%= group.id %>" class="label label-success">Включено</span>
@@ -22,9 +26,9 @@
             <% } %>
         </td>
         <td>
-            <a href="#" id="group_name_<%= group.id %>"><%= group.name %></a>
+            <a href="<%= group.url %>" target="_blank" id="group_name_<%= group.id %>"><%= group.name %></a>
             <div class="small"><i class="fa fa-clock-o"></i>
-                Добавлена <%= moment(group.create).format("D MMMM YYYY") %>
+                Добавлена <%= group.create %>
             </div>
         </td>
         <td>
@@ -39,8 +43,9 @@
                 <% }else { %>
                     <button id="button_<%= group.id %>" onclick="updateStatus(<%= group.id %>, 'enable')" class="btn btn-success btn-xs"><i class="fa fa-pencil"></i> Включить </button>
                 <% } %>
-                <button onclick="stat(<%= group.id %>)" class="btn btn-default btn-xs"><i class="fa fa-folder"></i> Статистика </button>
-                <button onclick="edit(<%= group.id %>)" class="btn btn-default btn-xs"><i class="fa fa-folder"></i> Изменить </button>
+                <!-- <button onclick="stat(<%= group.id %>)" class="btn btn-default btn-xs"><i class="fa fa-folder"></i> Статистика </button> -->
+                <!-- <button onclick="edit(<%= group.id %>)" class="btn btn-default btn-xs"><i class="fa fa-folder"></i> Изменить </button> -->
+                <button onclick="del(<%= group.id %>)" class="btn btn-danger btn-xs"><i class="fa fa-folder"></i> Удалить </button>
             </div>
         </td>
     </tr>

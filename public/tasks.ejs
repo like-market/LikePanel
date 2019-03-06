@@ -28,11 +28,11 @@
 <div class="wrapper">
 
     <!-- Header-->
-    <%- include('header', {user:user}); %>
+    <%- include('header', { user }); %>
     <!-- End header-->
 
     <!-- Navigation-->
-    <%- include('navigation', {isAdmin: user.admin, page: 'tasks'}); %>
+    <%- include('navigation', {user, page: 'tasks'}); %>
     <!-- End navigation-->
 
 
@@ -75,7 +75,7 @@
 
                         <div class="row">
                             <div class="pull-left">
-                                <span>Показаны задачи с <a id="from">1</a> по <a id="to"><%= tasks_count > 10 ? 10 : tasks_count %></a> из <a><%= tasks_count %></a></span>
+                                <span>Показаны задачи с <a id="from"><%= tasks_count == 0 ? 0 : 1 %></a> по <a id="to"><%= tasks_count > 10 ? 10 : tasks_count %></a> из <a><%= tasks_count %></a></span>
                             </div>
 
                             <div class="pull-right">

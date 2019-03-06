@@ -13,6 +13,8 @@ router.get('/', function(req, res){
 
 /**
  * Изменяем баланс
+ * @param type - тип операции [add / spend]
+ * @param count - количество десятых долей копейки
  */
 router.post('/change_balance', async function(req, res) {
 	if (!req.isAuthenticated()) return res.redirect('/login');

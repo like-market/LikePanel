@@ -28,15 +28,24 @@ router.get('/', async function(req, res) {
 router.post('/add', async function(req, res) {
 	if (!req.isAuthenticated()) return res.send('Unauthorized');
 
-	var name = req.body.name
+	// Проверка названия 
+	let name = req.body.name.replace(/['"]/g, '')
+	if (name.length == 0 || name.length > 50) {
+		return res.send('Ошибка в названии')
+	}
+	
 	// Заменяем на ||| для удобства просмотра бд
-	var text = req.body.text.replace(/\n/gi, '|||');
-	var count = text.split('|||').length;
+	let text = req.body.text.replace(/\n/g, '|||').replace(/['"]/g, '');
+	// Проверка комментариев [длина общего текста]
+	if (text.length > 65000) {
+		return res.send('Комментариев слишком много<br/>Максимальная длинна 50000 символов')
+	}
 
-
-	// Корректность данных
-	if (count < 5) return res.send('Text too small');
-	if (name == '') return res.send('Name too small');
+	// Проверка комментариев [количество]
+	const count = text.split('|||').length;
+	if (count < 50) {
+		return res.send('Комментариев слишком мало')
+	}
 
 	db.comments.add(req.user.id, name, text, count);
 	res.send('Success');
@@ -49,7 +58,13 @@ router.post('/add', async function(req, res) {
 router.post('/get', async function(req, res) {
 	if (!req.isAuthenticated()) return res.send('Unauthorized');
 
-	var comment_id = req.body.id
+	let comment_id = req.body.id
+
+	// Проверка на то, что это число
+	if (!Number.isInteger(comment_id)) {
+		return res.send('Error ID');
+	}
+
 	var comment = await db.comments.get(comment_id);
 	
 	// Если пользователь - не админ, то проверяем, что набор принадлежит ему
@@ -72,14 +87,32 @@ router.post('/get', async function(req, res) {
 router.post('/edit', async function(req, res) {
 	if (!req.isAuthenticated()) return res.send('Unauthorized');
 
-	var comment_id = req.body.id;
-	var name = req.body.name
+	// Проверка комментариев
+	let comment_id = req.body.id;
+	if (!Number.isInteger(comment_id)) {
+		return res.send('Ошибка в comment id');
+	}
+
+	let name = req.body.name.replace(/['"]/g, '')
+	if (name.length == 0 | name.length > 50) {
+		return res.send('Ошибка в названии')
+	}
+
 	// Заменяем на | для удобства просмотра бд
-	var text = req.body.text.replace(/\n/gi, '|||');
-	var count = text.split('|||').length;
+	let text = req.body.text.replace(/\n/gi, '|||').replace(/['"]/g, '');;
+	// Проверка комментариев [длина общего текста]
+	if (text.length > 65000) {
+		return res.send('Комментариев слишком много<br/>Максимальная длинна 50000 символов')
+	}
+
+	// Проверка комментариев [количество]
+	const count = text.split('|||').length;
+	if (count < 50) {
+		return res.send('Комментариев слишком мало')
+	}
 
 	// Проверяем, что комментарий принадлежит пользователю
-	var comment = await db.comments.get(comment_id);
+	let comment = await db.comments.get(comment_id);
 	if (req.user.id != comment.owner_id) return res.send('Access error')
 
 	db.comments.edit(comment_id, name, text, count);
@@ -93,7 +126,10 @@ router.post('/edit', async function(req, res) {
 router.post('/delete', async function(req, res) {
 	if (!req.isAuthenticated()) return res.send('Unauthorized');
 
-	var comment_id = req.body.id;
+	let comment_id = req.body.id;
+	if (!Number.isInteger(comment_id) || /['"]/g.test(comment_id)) {
+		res.send('Ошибка в comment id')
+	}
 
 	// Если пользователь не админ, то проверяем, что набор принадлежит юзеру
 	if (!req.user.admin) {

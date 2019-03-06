@@ -7,8 +7,8 @@ var vkapi = require('../vkapi')
 var express = require('express')
 var router  = express.Router()
 
-const likePrice    = 0.1; // Цена лайка
-const commentPrice = 0.1; // Цена комментария
+const minLikeCount    = 50;
+const minCommentCount = 50;
 
 router.get('/', async function(req, res) {
 	if (!req.isAuthenticated()) return res.redirect('/login');
@@ -17,19 +17,23 @@ router.get('/', async function(req, res) {
 	accountsCount = await db.vk.getActiveAccountsCount();
 	accountsCount = Math.floor(accountsCount * 0.9);
 
+	// Проверка на то, что хватает денег
+	maxLikeCount = Math.floor(req.user.balance / req.user.like_price);
+	if (maxLikeCount > accountsCount) maxLikeCount = accountsCount;
+ 
+	maxCommentCount = Math.floor(req.user.balance / req.user.comment_price);
+	if (maxCommentCount > 3500) maxCommentCount = 3500;
 
-	// Если ограничение по кол-ву аккаунтов
-	if (req.user.balance * likePrice < accountsCount) {
-		maxLikeCount = Math.floor(req.user.balance * likePrice); 
-	}else {
-		maxLikeCount = accountsCount;
-	}
-
-	// Максимальное колличество комментариев ограничено лишь балансом 
-	maxCommentCount = Math.floor(req.user.balance * commentPrice);
 	comments = await db.comments.getUserComments(req.user.id, true);
 	
-	res.render('addTask', {user: req.user, likePrice, commentPrice, maxLikeCount, maxCommentCount, comments});
+	res.render('addTask', {
+		user: req.user,
+		minLikeCount,
+		maxLikeCount,
+		minCommentCount,
+		maxCommentCount,
+		comments
+	});
 });
 
 /**
@@ -42,33 +46,42 @@ router.get('/', async function(req, res) {
 router.post('/add_likes', async function(req, res) {
 	if (!req.isAuthenticated()) return res.redirect('/login');
 
+	// Проверка названия [длина] + замена запрещенных символов
+	req.body.name = req.body.name.replace(/['"]/gi, '')
+	if (req.body.name.length > 75) {
+		res.send('Ошибка в названии')
+	}
+
+	// Проверка URL
     const data = utils.urlparser.parseURL(req.body.url)
-    console.log(req.body.url, data);
     if (data == null) {
     	res.send("Error url");
     	return
     }
 
+    // Проверка количества лайков
 	const like_need = req.body.count
 
-	// Проверка на количество лайков
-	maxCount = await db.vk.getActiveAccountsCount();
-	maxCount = Math.floor(maxCount * 0.9);
+	accountsCount = await db.vk.getActiveAccountsCount();
+	accountsCount = Math.floor(accountsCount * 0.95);
 
-	if (parseInt(like_need) != like_need || like_need == "" || like_need <= 0 || like_need > maxCount) {
-		return res.send('Invalid amount')
-	}
-	if (like_need > req.user.balance * 10) {
-		return res.send('Not enough money')
+	maxLikeCount = Math.floor(req.user.balance / req.user.like_price);
+	if (maxLikeCount > accountsCount) maxLikeCount = accountsCount;
+
+	if (parseInt(like_need) != like_need ||	like_need < minLikeCount || like_need > maxLikeCount) {
+		return res.send('Invalid amount likes')
 	}
 
-	// Проверка на наличие объекта
+	// Проверка на наличие объекта (пытаемся получить список поставленных лайков)
 	let likes = await vkapi.getLikeList(data.type, data.owner_id, data.item_id, 1);
 	if (likes.error) {
-		if (likes.error.error_code == 5) return res.send('Access restriction')
-		else return res.send('Error')
+		if (likes.error.error_code == 5) {
+			return res.send('Запись не найдена или не хватает прав для комментирования')
+		} else {
+			return res.send('Ошибка при получении информации о записе')
+		}
 	}
-
+	
 	utils.task.addLikes(req.user, req.body.name, data.owner_id, data.type, data.item_id, like_need);
 
 	res.send('Success')
@@ -85,6 +98,13 @@ router.post('/add_likes', async function(req, res) {
 router.post('/add_comments', async function(req, res) {
 	if (!req.isAuthenticated()) return res.redirect('/login');
 
+	// Проверка названия [длина] + замена запрещенных символов
+	req.body.name = req.body.name.replace(/['"]/gi, '')
+	if (req.body.name.length > 75) {
+		res.send('Ошибка в названии')
+	}
+
+	// Проверка url
 	const data = utils.urlparser.parseURL(req.body.url)
     if (data == null) {
     	res.send("Error url");
@@ -93,12 +113,12 @@ router.post('/add_comments', async function(req, res) {
 
     const comment_need = req.body.count
 
+	maxCommentCount = Math.floor(req.user.balance / req.user.comment_price);
+	if (maxCommentCount > 3500) maxCommentCount = 3500;    
+
 	// Проверка на количество
-	if (parseInt(comment_need) != comment_need || comment_need == "" || comment_need <= 0 || comment_need > 1000) {
-		return res.send('Invalid amount')
-	}
-	if (comment_need > req.user.balance * 10) {
-		return res.send('Not enough money')
+	if (parseInt(comment_need) != comment_need || comment_need < minCommentCount || comment_need > maxCommentCount) {
+		return res.send('Invalid amount comments')
 	}
 
 	// Проверка на наличие объекта

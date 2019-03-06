@@ -67,7 +67,6 @@ exports.updateUserToken = function(user_id) {
 	return new Promise(async function(resolve, reject) {
 		var account = await db.vk.getAccount(user_id)
 		var proxy = await db.proxy.get(account.proxy_id)
-
 		var data = await vkapi.authorize(account.login, account.password, proxy);
 
 		// Если авторизация прошла успешно
@@ -99,6 +98,12 @@ exports.updateUserToken = function(user_id) {
 					db.vk.setAccountStatus(user_id, 'invalid')
 					break;
 				}
+				// Двухфакторная авторизация
+				if (data.error_description == 'open redirect_uri in browser [5]. Also you can use 2fa_supported param') {
+					logger.warn('У аккаунта ' + user_id + ' включена двухфакторная авторизация')
+					db.vk.setAccountStatus(user_id, 'invalid')
+					break;
+				}
 			default:
 				db.vk.setAccountStatus(user_id, 'error')
 				logger.warn('Неотслеживаемая ошибка у аккаунта ' + user_id)
@@ -124,6 +129,7 @@ exports.addAccounts = async function(accounts) {
  */
 exports.updateAccounts = async function(cb = null) {
 	var accounts = await db.vk.getAllAccounts();
+
 	for (i = 0; i < accounts.length; i++) {
 		if (accounts[i].status == 'need_token' || accounts[i].status == 'error') {
 			// Обновляем токен

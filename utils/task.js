@@ -14,7 +14,7 @@ let tasks = worker.tasks;
 /**
  * Обрабатываем запрос на комментирование
  * @param user     - объект пользователя, создавшего задачу
- * @param type     - тип объекта, который будем комментировать (пока что post)
+ * @param type     - тип объекта, который будем комментировать
  * @param name     - название задачи
  * @param owner_id - идентификатор пользователя или сообщества, на чьей стене находится запись
  * @param post_id  - идентификатор записи на стене
@@ -30,7 +30,7 @@ exports.addComments = async function(user, type, name, owner_id, item_id, commen
     logger.debug('User: ' + user.username + ' Comment_need: ' + comment_need + ' TaskId: ' + task_id)
 
     // Уменьшаем баланс
-    db.finance.changeBalance(user, 'spend', comment_need * 10, 'Задача ' + task_id + ' накрутка ' + comment_need + ' комментариев')
+    db.finance.changeBalance(user, 'spend', comment_need * user.comment_price, 'Задача ' + task_id + ' накрутка ' + comment_need + ' комментариев')
 
     task_data = {
         user_id: user.id,
@@ -62,14 +62,14 @@ exports.addLikes = async function(user, name, owner_id, type, item_id, like_need
     logger.debug('User: ' + user.username + ' Like_need: ' + like_need + ' TaskId: ' + task_id)
 
     // Уменьшаем баланс
-    db.finance.changeBalance(user, 'spend', like_need * 10,  'Задача ' + task_id + ' накрутка ' + like_need + ' лайков')
+    db.finance.changeBalance(user, 'spend', like_need * user.like_price,  'Задача ' + task_id + ' накрутка ' + like_need + ' лайков')
     
     task_data = {
         user_id: user.id,
         type,
         owner_id,
         item_id,
-        like_need
+        like_need,
     }
 
     // Создаем задачу в воркере
@@ -102,13 +102,17 @@ exports.onError = async function(task_id) {
     db.tasks.setStatus(task_id, 'error')
 
 
-    const task = await db.tasks.findById(task_id);
+    const task = await db.tasks.findById(task_id)
     const user = await db.users.findById(task.owner_id)
 
+    let price;
+    if (task.type == 'like')    price = user.like_price
+    if (task.type == 'comment') price = user.comment_price
+
     // Количество денег для возврата
-    const amount = (task.need_add - task.now_add) * 10; 
+    const amount = (task.need_add - task.now_add) * price; 
     utils.user.changeBalance(user, 'add', amount, `Возврат по задаче ${task_id}`);
-    logger.warn(`Возвращаем пользователю ${user.username} ${(amount / 100).toFixed(2)}₽`)
+    logger.warn(`Возвращаем пользователю ${user.username} ${(amount / 1000).toFixed(2)}₽`)
 
     delete tasks[task_id];
 }
@@ -117,6 +121,11 @@ exports.onError = async function(task_id) {
  * Вызывается при успешном выполнении таска
  */
 exports.onSuccess = async function(task_id) {
+    logger.info(`Ждем все асинхронные функции в задаче ${task_id}, чтобы завершить задачу`)
+    while (tasks[task_id].async_count) {
+        await utils.sleep(500);
+    }
+    
     db.tasks.setStatus(task_id, 'finish')
     logger.info('Задача ' + task_id + ' выполнена')
 

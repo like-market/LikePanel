@@ -29,11 +29,11 @@
 <div class="wrapper">
 
     <!-- Header-->
-     <%- include('header', {user:user}); %>
+     <%- include('header', { user }); %>
     <!-- End header-->
 
     <!-- Navigation-->
-    <%- include('navigation', {isAdmin: user.admin, page: 'profile'}); %>
+    <%- include('navigation', {user, page: 'profile'}); %>
     <!-- End navigation-->
 
 
@@ -148,7 +148,7 @@
                                 </div>
                                 <div class="col-md-3 col-xs-6 text-center">
                                     <h2 class="no-margins">
-                                        <%= (money_add / 100).toFixed(2) %>
+                                        <%= (money_add / 1000).toFixed(2) %>
                                     </h2>
                                     <span class="c-white">Рублей</span> пополнено
                                 </div>
