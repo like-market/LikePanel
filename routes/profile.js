@@ -38,7 +38,7 @@ router.post('/change', async function(req, res) {
 		return res.send('Старый пароль введен неверно');
 	}
 
-	if (data.new_password == "" || data.mail == "") {
+	if (data.new_password == "" && data.mail == "") {
 		return res.send('Нужно изменить почту и/или пароль');
 	}
 

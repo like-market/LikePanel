@@ -44,6 +44,11 @@
 
             <li class="nav-info">
                 <div class="m-t-xs">
+                    Баланс: <a><%= (user.balance / 1000).toFixed(2) %>₽</a><br/>
+                    1к&nbsp;&nbsp<i style="font-size: 12px" class="fa pe-7s-like"></i>&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;<a><%= user.like_price %>₽</a><br/>
+                    1к&nbsp;&nbsp<i style="font-size: 12px" class="fa fa-commenting-o"></i>&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;<a><%= user.comment_price %>₽</a><br/>
+                </div>
+                <div class="m-t-md">
                     <span class="c-white">LikeMarket</span> сервис для накрутки лайков
                 </div>
                 <div class="m-t-xs">
@@ -51,11 +56,6 @@
                 </div>
                 <div class="m-t-xs">
                     Менеджер<br/><a class="c-white" href="https://tgdo.me/olkaf" target="_blank">@olkaf</a>
-                </div>
-                <div class="m-t-xl">
-                    Баланс: <a><%= (user.balance / 1000).toFixed(2) %>₽</a><br/>
-                    1к&nbsp;&nbsp<i style="font-size: 12px" class="fa pe-7s-like"></i>&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;<a><%= user.like_price %>₽</a><br/>
-                    1к&nbsp;&nbsp<i style="font-size: 12px" class="fa fa-commenting-o"></i>&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;<a><%= user.comment_price %>₽</a><br/>
                 </div>
             </li>
         </ul>

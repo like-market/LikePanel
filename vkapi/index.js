@@ -34,9 +34,8 @@ exports.authorize = async function(login, password, account_proxy = null, captch
     }
 
     // Добавляем прокси
-    let proxy = {}
     if (account_proxy) {
-        proxy = {
+        var proxy = {
             host: account_proxy.ip,
             port: account_proxy.port,
             auth: {

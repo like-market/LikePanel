@@ -4,7 +4,7 @@ var MySQLStore = require('express-mysql-session')(session);
 var options = {
     host: 'localhost',
     port: 3306,
-    user: 'likepanel',
+    user: 'devlikepanel',
     password: 'r35ImTyr52Ks666',
     database: 'devlikepanel',
     schema: {

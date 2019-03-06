@@ -47,8 +47,8 @@ router.post('/payments', async function(req, res) {
 	if ((user.username == 'gistrec' || user.username == 'diman3289') && (req.user.username != 'gistrec' && req.user.username != 'diman3289')) {
 		return res.send('User not found')
 	}
-
-	let payments = await db.finance.getUserPayments(user.id, req.body.count, req.body.offset);
+	
+	let payments = await db.finance.getUserPayments(user.id, req.body.count, 0);
 	payments.forEach(function(payment) {
 		payment.create = moment(payments.create).format("DD MMMM HH:mm:ss")
 	})

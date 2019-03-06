@@ -38,7 +38,7 @@ router.post("/", async function(req, res) {
     if (user != null) return res.send("User already exist");
 
     // Регестрируем клиента
-    await db.users.register(username, password, email);
+    await db.users.addUser(username, password, email);
     user = await db.users.findByUsername(username);
 
     // Авторизуем пользователя

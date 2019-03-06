@@ -18,7 +18,7 @@ exports.updateProxyList = async function() {
 		}
 	}
 
-	logger.info('Список прокси обновлен')
+	logger.info('Список прокси загружен в массив')
 }
 
 exports.proxies = proxies;

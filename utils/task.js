@@ -105,8 +105,9 @@ exports.onError = async function(task_id) {
     const task = await db.tasks.findById(task_id)
     const user = await db.users.findById(task.owner_id)
 
-    if (tasks.type == 'like')    price = user.like_price
-    if (tasks.type == 'comment') price = user.comment_price
+    let price;
+    if (task.type == 'like')    price = user.like_price
+    if (task.type == 'comment') price = user.comment_price
 
     // Количество денег для возврата
     const amount = (task.need_add - task.now_add) * price; 

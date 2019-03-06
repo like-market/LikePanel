@@ -10,13 +10,15 @@ toastr.options = {
  * Вывести все пополнения пользователя
  */
 function showPayments() {
+	let login = $('#username').val();
+	let count = Number.isInteger($('#count').val()) ? $('#count').val() : 10;
+	
 	$('#info_panel').toggleClass('ld-loading');
 	$.ajax({
 	    type: 'POST',
 	    url: '/statistics/payments',
 	    data: {
-	        count: $('#count').val(),
-	        offset: 0,
+	        count: count,
 	        login: $('#username').val()
 	    },
 	    success: function(res) {
@@ -61,16 +63,13 @@ function showPayments() {
  */
 function showTasks() {
 	let login = $('#username').val();
-	
+	let count = Number.isInteger($('#count').val()) ? $('#count').val() : 10;
+
 	$('#info_panel').toggleClass('ld-loading');
 	$.ajax({
 	    type: 'POST',
 	    url: '/statistics/tasks',
-	    data: {
-	        count: $('#count').val(),
-	        offset: 0,
-	        login: $('#username').val()
-	    },
+	    data: { count, login },
 	    success: function(res) {
 	    	if (res == 'User not found') {
 				toastr.error('Пользователь не найден')

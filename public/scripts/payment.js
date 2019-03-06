@@ -62,7 +62,9 @@ function updatePagination() {
 
 	let from = (page - 1) * count + 1;
 
-	$('#from').text(from);
+	// Если транзакций нет
+	if (transactions_count == 0) $('#from').text(0);
+	else $('#from').text(from);
 	$('#to').text(to)
 
 	console.log(`From: ${from} To: ${to}`)
@@ -74,7 +76,7 @@ function updatePagination() {
  * @param page  - номер страницы
  */
 function updateTransactions() {
-	$('#info_panel').toggleClass('ld-loading');
+	$('#transactions_panel').toggleClass('ld-loading');
 	$.ajax({
 	    type: 'POST',
 	    url: '/payment/get_transactions',
@@ -107,6 +109,8 @@ function updateTransactions() {
 }
 
 function setCountOnPage(new_count) {
+	// Если не изменили страницу
+	if (count == new_count) return;
 	count = new_count;
 	
 	max_page = Math.ceil(transactions_count / count);

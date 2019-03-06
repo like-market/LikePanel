@@ -110,8 +110,10 @@
                                     </tr>
                                 </thead>
                                 <tbody id="transactions-data">
-                                    <% transactions.reverse().forEach(function(trx) { 
-                                        if (trx.id == 'start' || trx.id == 'end') return; %>
+                                    <%  let count = 0;
+                                        transactions.reverse().forEach(function(trx) {
+                                        if (trx.id == 'start' || trx.id == 'end') return;
+                                        if (++count > 10) return;  %>
                                         <tr>
                                             <td><%= trx.id %></td>
                                             <td>
@@ -139,7 +141,7 @@
 
                             <div class="row">
                                 <div class="col-sm-12" style="margin-bottom: 10px;">
-                                    <span>Показаны последние операции с <a id="from">1</a> по <a id="to"><%= transactions_count > 10 ? 10 : transactions_count %></a> из <a><%= transactions_count %></a></span>
+                                    <span>Показаны последние операции с <a id="from"><%= transactions_count == 0 ? 0 : 1 %></a> по <a id="to"><%= transactions_count > 10 ? 10 : transactions_count %></a> из <a><%= transactions_count %></a></span>
                                 </div>
 
                                 <div class="col-sm-12">

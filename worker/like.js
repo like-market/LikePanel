@@ -20,7 +20,6 @@ const utils = require('../utils')
  */
 let tasks = require('./index.js').tasks;
 
-
 /**
  * Выполняем запрос к апи и обрабатываем ошибки
  * При начале выполнения запроса увеличиваем счетчик async_count
@@ -37,7 +36,7 @@ const createRequest = async function(task_id, account) {
 	tasks[task_id].async_count++;
 
 	// Пытаемся поставить лайк
-	const response = await vkapi.addLike(tasks[task_id].type, tasks[task_id].owner_id, tasks[task_id].item_id, account);
+	let response = await vkapi.addLike(tasks[task_id].type, tasks[task_id].owner_id, tasks[task_id].item_id, account);
 
 	// Если лайк успешно поставлен
 	if (response.response) {
@@ -78,7 +77,7 @@ const createRequest = async function(task_id, account) {
 			logger.warn(`Один из параметров не верный`, {json: response.error})
 			// Если запись была удалена
 			if (response.error.error_msg == "One of the parameters specified was missing or invalid: object not found") {
-				tasks[task_id].Fatall_error = true;
+				tasks[task_id].fatall_error = true;
 			}else {
 				tasks[task_id].error_count++;
 			}
@@ -111,7 +110,7 @@ const createRequest = async function(task_id, account) {
  * @param task_id   - id задачи в бд
  * @param task_data - данные задачи
  */
-queue.process('like', 2, async function(job, done){
+queue.process('like', 3, async function(job, done){
 	const task_id = job.data.task_id
 	tasks[task_id] = job.data.task_data;
 	logger.info(`Начала выполнятся задача ${task_id} на накрутку лайков`)
@@ -132,7 +131,8 @@ queue.process('like', 2, async function(job, done){
 
 	// Получаем аккаунты, которые уже поставили лайки
 	let already_set = await vkapi.getLikeList(tasks[task_id].type, tasks[task_id].owner_id, tasks[task_id].item_id);
-	if (!already_set) {
+	if (!already_set || !already_set.response || !already_set.response.items) {
+		console.log(already_set);
 		logger.error('getLikeList вернуло null')
 		already_set = []	
 	}else {
@@ -154,7 +154,7 @@ queue.process('like', 2, async function(job, done){
 	// И добавляет новые, если есть свободные места
 	const addRequests = async function() {
 		// Синхронный режим (когда осталось накрутить мало лайков)
-		if (tasks[task_id].like_need - tasks[task_id].now_add < 50) {
+		if (tasks[task_id].like_need - tasks[task_id].now_add < 60) {
 			if (timerID != -1) {
 				clearInterval(timerID)
 				timerID = -1;
@@ -175,11 +175,12 @@ queue.process('like', 2, async function(job, done){
 				db.tasks.updateCount(task_id, tasks[task_id].now_add);
 
 				// Проверка на то, что все лайки поставлены
-				if (tasks[task_id].now_add >= tasks[task_id].like_need) {
+				if (tasks[task_id].now_add == tasks[task_id].like_need) {
 					utils.task.onSuccess(task_id);
 					return done();
 				}
-			}		
+			}
+			// Перекрутили комментов
 			utils.task.onSuccess(task_id);
 			return done();
 		// Асинхронный режим
@@ -205,10 +206,19 @@ queue.process('like', 2, async function(job, done){
 			if (tasks[task_id].fatal_error || tasks[task_id].error_count > 50) {
 				clearInterval(timerID)
 				utils.task.onError(task_id);
-				done();
+				return done();
 			}
 		}
 	}
 	// Запускаем функцию каждую секунду
 	timerID = setInterval(addRequests, 500);
+	//console.log(tasks[task_id]);
+	//console.log(task_id)
+	//setInterval(dump, 1000, task_id);
 });
+
+
+
+dump = function(task_id) {
+	console.log(`Add: ${tasks[task_id].now_add}  Async: ${tasks[task_id].async_count}`)
+}

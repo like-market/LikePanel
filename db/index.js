@@ -4,7 +4,7 @@ const mysql = require('mysql');
 const db = mysql.createPool({
     connectionLimit: 5,
     host: "localhost",
-    user: "likepanel",
+    user: "devlikepanel",
     database: "devlikepanel",
     password: "r35ImTyr52Ks666",
     charset: 'utf8'
@@ -13,7 +13,7 @@ const db = mysql.createPool({
 
 db.on('connection', function (connection) {
     logger.info("Подключение к БД прошло успешно");
-    
+
     var options = "SET character_set_client='utf8mb4';"
     options += "SET character_set_connection='utf8mb4';"
     options += "SET character_set_results='utf8mb4';"

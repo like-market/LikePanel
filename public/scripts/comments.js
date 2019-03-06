@@ -15,7 +15,7 @@ function addComments() {
     let error = 0;
 
     let name = $('#new-comments-name').val();
-    if (name.val() == '' || name.length > 50) {
+    if (name == '' || name.length > 50) {
         toastr.error('Название должно содержать от 1 до 50 символов');
         $('#new-comments-name').css('border', '1px solid red')
         error++;

@@ -38,6 +38,24 @@ exports.findByUsername = function(username) {
 }
 
 /**
+ * Получить список всех пользователей
+ */
+exports.getAllUsers = function() {
+    return new Promise(function(resolve, reject){
+        var sql = `SELECT username FROM users`
+
+        db.query(sql, function(err, rows) {
+            if (err) return reject(err)
+
+            if (rows.length == 0) return resolve([]);
+
+            // resolve( rows.parseSqlResult()[0] );
+            resolve( JSON.parse(JSON.stringify(rows)) )
+        })
+    })
+}
+
+/**
  * Добавляем нового пользователя
  * @param username - логин
  * @param password - пароль
