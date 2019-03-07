@@ -3,6 +3,7 @@ const md5 = require('md5');
 const utils  = require('../utils')
 const logger = require('../logger.js')
 const querystring = require('querystring');
+const axios = require('axios')
 
 // wUAlQ4H155j3OyQ
 const secret_key = 'VdTH9K2lTBE3V9q'; // Секретный ключ
@@ -58,6 +59,17 @@ exports.checkBill = async function(pay_id, amount, sign) {
 	user = await db.users.findById(bill.user_id);
 	utils.user.changeBalance(user, 'add', amount * 1000, `Пополнение баланса. Платеж №${pay_id}`);
 	db.finance.setBillStatus(pay_id, 'paid');
+
+	// СМС о пополнении
+	{
+		const params = {
+			login: "gistrec",
+			psw: "SibXavxq4H8eseE",
+			phones: "+79617370099",
+			mes: `${user.username} пополнил ${amount} рублей`
+		}
+		axios.get('https://smsc.ru/sys/send.php', {params} );
+	}
 
 	logger.info(`Пользователь ${user.username} пополнил баланс на ${amount} рублей`);
 }

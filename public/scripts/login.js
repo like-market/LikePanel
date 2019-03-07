@@ -74,7 +74,7 @@ $("#loginForm").submit(function(e) {
                     break;
                 case "Unauthorized":
                     $("button").prop("disabled", false);
-                    // Разные сообщения об ошибке авторизации
+                    
                     if (format.test(username)) {
                         toastr.error("Логин или пароль введены неверно");
                     }else {
