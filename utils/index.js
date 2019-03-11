@@ -25,6 +25,14 @@ Array.prototype.popRandom = function() {
 	return this.splice(Math.floor(Math.random() * this.length), 1)[0];
 }
 
+Array.prototype.includeOnlyNumbers = function() {
+	let numbers = true;
+	this.forEach(function(elem) {
+		if (parseInt(elem) != elem) numbers = false;
+	})
+	return numbers;
+}
+
 /*
 Object.prototype.parseSqlResult = function () {
     return JSON.parse(JSON.stringify(this))

@@ -20,8 +20,9 @@ let tasks = worker.tasks;
  * @param post_id  - идентификатор записи на стене
  * @param comments_ids - список id наборов комментариев
  * @param comment_need - количество комментариев для накрутки
+ * @param use_custom - используются ли клиентские наборы комментариев
  */
-exports.addComments = async function(user, type, name, owner_id, item_id, comments_ids, comment_need) {
+exports.addComments = async function(user, type, name, owner_id, item_id, comments_ids, comment_need, use_custom) {
     logger.debug('Пришел запрос на комментирование')
 
     // Добавляем задачу в бд, получаем её id
@@ -38,7 +39,8 @@ exports.addComments = async function(user, type, name, owner_id, item_id, commen
         owner_id,
         item_id,
         comments_ids,
-        comment_need
+        comment_need,
+        use_custom
     }
 
     // Создаем задачу в воркере

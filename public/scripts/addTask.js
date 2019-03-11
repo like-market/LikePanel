@@ -1,4 +1,5 @@
 $(document).ready(function(){
+    // Список комментариев
     $("#comments").select2();
 })
 
@@ -22,7 +23,6 @@ $("a[href='#comment']").on('shown.bs.tab', function(e) {
     $('#info').html(code)
 });
 
-
 // При изменении количества лайков изменяем цену
 $('#like_count').change(function() {
     $(this).css('border', '')
@@ -39,6 +39,45 @@ $('#comment_count').change(function() {
     $('#total_comment_cost').html(`Стоимость <mark>${new_cost}₽</mark>`)
 })
 
+// Используется ли клентский набор
+let use_custom = false;
+
+// При выборе нового набора комментариев
+$('#comments').on('change', function() {
+    use_custom = false; 
+
+    if ($('#comments').val() != null) {
+        for (let id of $('#comments').val()) {
+            let custom = $(this).find(`[value="${id}"]`).attr('data-custom');
+            if (custom == 'true') use_custom = true;
+        }
+    }
+
+    let max_count;
+
+    if (use_custom) {
+        $('#custom_comment_info').show(300);
+        max_count = maxCustomCommentCount;
+    }else{
+        $('#custom_comment_info').hide(300);
+        max_count = maxCommentCount;
+    }
+
+    // Если не хватает баланса
+    if (max_count < minCommentCount) {
+        $('#comment_count').prop('min', 0)
+        $('#comment_count').prop('max', 0)
+        $('#comment_count').attr('placeholder', `[От ${minCommentCount}] Недостаточно средств`)
+        $('#max_comment_count').text(0)
+    }else {
+        $('#comment_count').prop('min', minCommentCount)
+        $('#comment_count').prop('max', max_count)
+        $('#comment_count').attr('placeholder', `От ${minCommentCount} до ${max_count}`)
+        $('#max_comment_count').text(max_count)
+    }
+});
+
+// Убираем красную обводку
 $('#url_like, #url_comment, #task_name_like, #task_name_comment').change(function() {
     $(this).css('border', '')
 })
@@ -122,13 +161,17 @@ $('#createLikes').click(function() {
 })
 
 
-let canUseCommentButton = true;
 // При клике на кнопку 'накрутить комменты'
+let canUseCommentButton = true;
 $('#createComments').click(function() {
     if (!canUseCommentButton) return;
 
     let error = 0;
     $("#createComments").prop("disabled", true);
+
+    // Различные лимиты для комментариев
+    if (use_custom) max_comment_count = maxCustomCommentCount;
+    else            max_comment_count = maxCommentCount;
 
     // Проверка количества комментариев
     if ($('#comment_count').val() == '' ||  parseInt($('#comment_count').val()) != $('#comment_count').val()) {
@@ -136,8 +179,8 @@ $('#createComments').click(function() {
         $('#comment_count').css('border', '1px solid red')
         error++;
     }else {
-        if ($('#comment_count').val() > maxCommentCount) {
-            toastr.error(`Вы можете заказать максимум ${maxCommentCount} комментариев`);
+        if ($('#comment_count').val() > max_comment_count) {
+            toastr.error(`Вы можете заказать максимум ${max_comment_count} комментариев`);
             $('#comment_count').css('border', '1px solid red')
             error++;
         }

@@ -141,11 +141,18 @@ exports.getLikeList = async function(type, owner_id, item_id, count = 1000) {
  * @param type - тип комментария
  * @param owner_id - идентификатор пользователя или сообщества
  * @param item_id  - идентификатор
- * @param message  - текст комментария
+ * @param comment  - комментарий (Объект вида {type: 'text/sticker', value: 'текст/id стикера'})
  * @param account  - данные об аккаунте
  */
-exports.createComment = async function(type, owner_id, item_id, message, account, captcha_sid = null, captcha_key = null) {
-    let params = { owner_id, message, access_token: account.access_token, v: 5.56 }
+exports.createComment = async function(type, owner_id, item_id, comment, account, captcha_sid = null, captcha_key = null) {
+    let params = { owner_id, access_token: account.access_token, v: 5.56 }
+
+    if (comment.type == 'text') {
+        params['message'] = comment.value;
+    }
+    if (comment.type == 'sticker') {
+        params['sticker_id'] = comment.value;
+    }
 
     let method;
     switch (type) {
@@ -187,7 +194,7 @@ exports.createComment = async function(type, owner_id, item_id, message, account
         let [error, captcha_key] = await utils.anticaptcha.getCaptcha(captcha_img)
         logger.debug(`Получена капча ${captcha_key} для акк ${account.user_id}`)
         if (!error) {
-            const response = await exports.createComment(type, owner_id, item_id, message, account, captcha_sid, captcha_key);
+            const response = await exports.createComment(type, owner_id, item_id, comment, account, captcha_sid, captcha_key);
             return response;
         }else {
             logger.error("Ошибка от капчи")

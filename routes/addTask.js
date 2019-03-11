@@ -10,19 +10,28 @@ var router  = express.Router()
 const minLikeCount    = 50;
 const minCommentCount = 50;
 
+
 router.get('/', async function(req, res) {
 	if (!req.isAuthenticated()) return res.redirect('/login');
 
-	// Получаем количество доступных аккаунтов
+	// Получаем количество всех доступных аккаунтов
 	accountsCount = await db.vk.getActiveAccountsCount();
 	accountsCount = Math.floor(accountsCount * 0.9);
 
+	// Получаем количество доступных аккаунтов для клиентских наборов
+	сustomAccountCount = await db.vk.getActiveAccountsCount(1); // Группа аккаунтов равна 1
+	customAccountCount = Math.floor(сustomAccountCount * 0.9);
+	
 	// Проверка на то, что хватает денег
 	maxLikeCount = Math.floor(req.user.balance / req.user.like_price);
 	if (maxLikeCount > accountsCount) maxLikeCount = accountsCount;
  
 	maxCommentCount = Math.floor(req.user.balance / req.user.comment_price);
 	if (maxCommentCount > 3500) maxCommentCount = 3500;
+
+	// Максимальное количество комментариев по балансу
+	maxCustomCommentCount = Math.floor(req.user.balance / req.user.comment_price);
+	if (maxCustomCommentCount > customAccountCount * 3) maxCustomCommentCount = customAccountCount * 3;
 
 	comments = await db.comments.getUserComments(req.user.id, true);
 	
@@ -31,7 +40,7 @@ router.get('/', async function(req, res) {
 		minLikeCount,
 		maxLikeCount,
 		minCommentCount,
-		maxCommentCount,
+		maxCustomCommentCount,
 		comments
 	});
 });
@@ -111,10 +120,33 @@ router.post('/add_comments', async function(req, res) {
     	return
     }
 
-    const comment_need = req.body.count
+    // 
+    if (!Array.isArray(req.body.comment_ids) || req.body.comment_ids.length == 0 || !req.body.comment_ids.includeOnlyNumbers()) {
+    	return res.send('Ошибка в наборах комментариев')
+    }
+    // Получение данных о наборах комментариях
+    const comments_data = await db.comments.getCommentsData(req.body.comment_ids);
+    if (comments_data.length != req.body.comment_ids.length) {
+    	return res.send('ID одного из наборов не существует')
+    }
+    let use_custom = false; // Используются ли пользовательские комментарии
+    for (comment_data of comments_data) {
+    	if (comment_data.owner_id != 0 && comment_data.owner_id != req.user.id) return res.send('Нет доступа к одному из наборов')
+    	if (comment_data.status != 'accept') return res.send('Один из наборов не активен')
+    	if (comment_data.owner_id != 0) use_custom = true;
+    }
 
-	maxCommentCount = Math.floor(req.user.balance / req.user.comment_price);
-	if (maxCommentCount > 3500) maxCommentCount = 3500;    
+    if (use_custom) {
+		// Получаем количество доступных аккаунтов для клиентских наборов
+		customAccountCount = await db.vk.getActiveAccountsCount(1);
+		var maxCommentCount = Math.floor(req.user.balance / req.user.comment_price);
+		if (maxCommentCount > customAccountCount * 3) maxCommentCount = customAccountCount * 3;
+    }else {
+		var maxCommentCount = Math.floor(req.user.balance / req.user.comment_price);
+		if (maxCommentCount > 3500) maxCommentCount = 3500;    
+    }
+
+    const comment_need = req.body.count
 
 	// Проверка на количество
 	if (parseInt(comment_need) != comment_need || comment_need < minCommentCount || comment_need > maxCommentCount) {
@@ -135,7 +167,8 @@ router.post('/add_comments', async function(req, res) {
 		data.owner_id,       // Id юзера или сообщества, где находится запись
 		data.item_id,        // Идентификатор записи
 		req.body.comment_ids,// Список Id наборов комментариев
-		req.body.count       // Количество комментариев для накрутки
+		req.body.count,      // Количество комментариев для накрутки
+		use_custom      // Используются ли клиентские наборы комментариев
 	);
 
 	res.send('Success')

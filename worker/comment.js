@@ -29,15 +29,15 @@ let tasks = require('./index.js').tasks;
  * При обычной ошибки - увеличиваем счетчик error_count
  *
  * @param task_id - ID задания
- * @param message - комментарий для накрутки
+ * @param comment - комментарий для накрутки
  * @param account - аккаунт
  */
-const createRequest = async function(task_id, message, account) {
+const createRequest = async function(task_id, comment, account) {
 	tasks[task_id].now_add++;
 	tasks[task_id].async_count++;
 
 	// Пытаемся добавить комментарий
-	var response = await vkapi.createComment(tasks[task_id].type, tasks[task_id].owner_id, tasks[task_id].item_id, message, account);
+	var response = await vkapi.createComment(tasks[task_id].type, tasks[task_id].owner_id, tasks[task_id].item_id, comment, account);
 
 	// Если коммент успешно добавлен
 	if (response.response) {
@@ -131,8 +131,13 @@ queue.process('comment', 3, async function(job, done){
 	tasks[task_id]['error_count'] = 0;     // Количество ошибок
 	tasks[task_id]['fatal_error'] = false; // Флаг фатальной ошибки (прекращения накрутки)
 
-    // Получаем все аккаунты
-	const accounts = await db.vk.getActiveAccounts();
+    if (tasks[task_id].use_custom) {
+		// Если используются клиентские наборы комментариев, то получаем набор аккаунтов под номером 1
+    	var accounts = await db.vk.getActiveAccounts(1);
+    }else {
+		// Иначе получаем все активные аккаунты 
+		var accounts = await db.vk.getActiveAccounts();
+    }
 	// Получаем все комментарии
 	const comments = await db.comments.getComments(tasks[task_id].comments_ids);
 
@@ -149,11 +154,11 @@ queue.process('comment', 3, async function(job, done){
 			}
 			while (tasks[task_id].comment_need > tasks[task_id].now_add) {
 				// Выбираем случайные значения из массивов
-				const message = comments.random()
+				const comment = comments.random()
 				const account = accounts.random()
 
 				// Создаем синхронный запрос
-				await createRequest(task_id, message, account);
+				await createRequest(task_id, comment, account);
 
 				db.tasks.updateCount(task_id, tasks[task_id].now_add);
 
@@ -180,10 +185,10 @@ queue.process('comment', 3, async function(job, done){
 			// Создаем асинхронные запросы
 			while (tasks[task_id].async_count < 50) {
 				// Выбираем случайные значения из массивов
-				const message = comments.random()
+				const comment = comments.random()
 				const account = accounts.random()
 
-				createRequest(task_id, message, account);
+				createRequest(task_id, comment, account);
 			}
 			// Если в асинхронных функция произошла фатальная ошибки
 			if (tasks[task_id].fatal_error || tasks[task_id].error_count > 20) {
