@@ -128,23 +128,28 @@
                                         <p>Наборы комментариев</p>
                                         <select id="comments" class="form-control" multiple="multiple" style="width: 100%">
                                             <% comments.forEach(function(comment) { %>
-                                                <option value="<%= comment.id %>"><%= comment.name %>
+                                                <option value="<%= comment.id %>" data-custom="<%= (comment.owner_id != 0) %>"><%= comment.name %>
                                             <% }) %>
                                         </select>
+                                    </div>
+
+                                    <div id="custom_comment_info" style="font-size: 14px; color: #f6a821; padding-bottom: 10px; display: none;">
+                                        <i class="pe pe-7s-info"></i>
+                                        Для наборов клиентов используются разные алгоритмы накрутки, поэтому максимальное количество может отличаться.
                                     </div>
 
                                     <div class="form-group">
                                         <p>Количество комментариев</p>
                                         <div class="row">
                                             <div class="col-lg-6">
-                                                <% if (maxCommentCount < 50) { %>
+                                                <% if (maxCommentCount < minCommentCount) { %>
                                                     <input id="comment_count" type="number" class="form-control" placeholder="[От 50] Недостаточно средств" min="0" max="0">
                                                 <% } else { %>
                                                     <input id="comment_count" type="number" class="form-control" placeholder="От <%= minCommentCount %> до <%= maxCommentCount %>" min="<%= minCommentCount %>" max="<%= maxCommentCount %>">
                                                 <% } %>
                                             </div>
                                             <div class="col-lg-6 ml-auto" style="height: 34px; padding-top: 7px">
-                                                Максимум <a><%= maxCommentCount %></a>   <small>(Учитывается ваш баланс)</small>
+                                                Максимум <a id="max_comment_count"><%= maxCommentCount %></a>   <small>(Учитывается ваш баланс и загруженность системы)</small>
                                             </div>
                                         </div>
                                     </div>
@@ -202,8 +207,12 @@
 // Лимиты на лайки/комменты
 const minLikeCount = <%= minLikeCount %>;
 const maxLikeCount = <%= maxLikeCount %>;
+
 const minCommentCount = <%= minCommentCount %>;
 const maxCommentCount = <%= maxCommentCount %>;
+
+// Максимальное число комментариев клиентов
+const maxCustomCommentCount = <%= maxCustomCommentCount %>;
 
 // Все деньги считаются в десятых долях копейки
 const likePrice    = <%= user.like_price %>;    // Цена лайка 

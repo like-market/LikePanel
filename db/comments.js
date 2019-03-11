@@ -27,7 +27,7 @@ exports.getUserComments = function(user_id, activeOnly = false) {
  */
 exports.getComments = function(ids) {
 	return new Promise(async function(resolve, reject) {
-		var sql = "SELECT `text` FROM `comments` WHERE "
+		var sql = "SELECT `type`, `text` FROM `comments` WHERE "
 		for (i = 0; i < (ids.length - 1); i++) {
 			sql += "`id`=" + ids[i] + " OR "
 		}
@@ -35,17 +35,46 @@ exports.getComments = function(ids) {
 
 		db.query(sql, function(err, rows) {
         	if (err) console.log(err);
-        	const comments = JSON.parse(JSON.stringify(rows));
+        	// Наборы комментариев
+        	const sets = JSON.parse(JSON.stringify(rows));
 			
-			// Склеиваем все комментарии
-        	var result = [];
-        	for (comment of comments) {
-        		result = result.concat(comment.text.split('|||'))
+			// Объекты комментариев
+			// {type: text/sticker, value: 'комментарий/id стикера'}
+        	var comments = [];
+
+        	// Для всех наборов
+        	for (let set of sets) {
+        		// Для всех комментариев в наборе
+        		for (comment of set.text.split('|||')) {
+        			comments.push({type: set.type, value: comment})
+        		}
         	}
-        	resolve(result);
+        	resolve(comments);
 		});
 	})
 }
+
+/**
+ * Получаем массив с данными комментариев
+ * @param ids - список id наборов комментариев
+ */
+exports.getCommentsData = function(ids) {
+	return new Promise(async function(resolve, reject) {
+		var sql = "SELECT `owner_id`, `status` FROM `comments` WHERE "
+		for (i = 0; i < (ids.length - 1); i++) {
+			sql += "`id`=" + ids[i] + " OR "
+		}
+		sql += "`id`=" + ids[ids.length - 1]
+
+		db.query(sql, function(err, rows) {
+        	if (err) console.log(err);
+        	if (rows.length == 0) return resolve([])
+
+        	resolve( JSON.parse(JSON.stringify(rows)) );
+		});
+	})
+}
+
 /**
  * Добавляем новый набор комментариев
  */

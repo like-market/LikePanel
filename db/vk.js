@@ -86,11 +86,16 @@ exports.addInvalidAccount = function(login, password) {
 
 /**
  * Получаем токены активных аккаунтов
+ * @param group - группа комментариев (число или 'all')
  */
-exports.getActiveAccounts = function() {
-	return new Promise(function(resolve, reject){
-		var sql = "SELECT `user_id`, `access_token`, `proxy_id` FROM `account_vk`";
-		sql += " WHERE `access_token` IS NOT NULL AND `status` = 'active' ORDER BY RAND()"
+exports.getActiveAccounts = function(group = 'all') {
+	return new Promise(function(resolve, reject) {
+		let sql = "SELECT user_id, access_token, proxy_id FROM account_vk WHERE access_token IS NOT NULL AND status='active' "
+
+		// Если выбираем группу аккаунтов - то добавляем еще одно условие
+		if (group != 'all') sql += `AND account_vk.group=${group} `
+		
+		sql +=  "ORDER BY RAND()"
 
 		db.query(sql, function(err, rows) {
 			if (err) return reject(err)
@@ -105,11 +110,14 @@ exports.getActiveAccounts = function() {
 
 /**
  * Получаем количество активных аккаунтов
+ * @param group - группа комментариев (число или 'all')
  */
-exports.getActiveAccountsCount = function() {
+exports.getActiveAccountsCount = function(group = 'all') {
 	return new Promise(function(resolve, reject){
-		var sql = "SELECT COUNT(*) FROM `account_vk`"
-		sql += " WHERE `access_token` IS NOT NULL AND `status` = 'active'";
+		let sql = "SELECT COUNT(*) FROM account_vk WHERE access_token IS NOT NULL AND status='active' ";
+		
+		// Если выбираем группу аккаунтов - то добавляем еще одно условие
+		if (group != 'all') sql += `AND account_vk.group=${group}`
 	
 		db.query(sql, function(err, rows) {
 			if (err) return reject(err)
