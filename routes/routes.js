@@ -13,7 +13,15 @@ const Strategy = require('passport-local').Strategy;
 
 passport.use(new Strategy(
     async function(username, password, cb) {
-        user = await db.users.findByUsername(username);
+        let user;
+
+        // Если это почта
+        if (username.indexOf('@') > -1) {
+            user = await db.users.findByMail(username);
+        }else {
+            user = await db.users.findByUsername(username);
+        }
+
         if (!user) {
             return cb(null, false);
         }

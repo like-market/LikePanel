@@ -11,7 +11,7 @@ toastr.options = {
  */
 function showPayments() {
 	let login = $('#username').val();
-	let count = Number.isInteger($('#count').val()) ? $('#count').val() : 10;
+	let count = Number.isInteger(parseInt($('#count').val())) ? $('#count').val() : 10;
 	
 	$('#info_panel').toggleClass('ld-loading');
 	$.ajax({
@@ -63,7 +63,7 @@ function showPayments() {
  */
 function showTasks() {
 	let login = $('#username').val();
-	let count = Number.isInteger($('#count').val()) ? $('#count').val() : 10;
+	let count = Number.isInteger(parseInt($('#count').val())) ? $('#count').val() : 10;
 
 	$('#info_panel').toggleClass('ld-loading');
 	$.ajax({

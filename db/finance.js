@@ -56,7 +56,7 @@ exports.getBalanceHistory = function(user, days) {
  */
 exports.getRecentPayments = function() {
     return new Promise(function(resolve, reject) {
-        let sql = "SELECT payment.*, users.username FROM devlikepanel.payment RIGHT JOIN devlikepanel.users ON payment.user_id = users.id ORDER BY \`create\` DESC LIMIT 10";
+        let sql = "SELECT payment.*, users.username FROM payment INNER JOIN users ON payment.user_id = users.id ORDER BY \`create\` DESC LIMIT 10";
 
         db.query(sql, function(err, rows) {
             if (err) return reject(err)

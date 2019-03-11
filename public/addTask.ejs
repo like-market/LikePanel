@@ -85,8 +85,8 @@
                                         <p>Количество лайков</p>
                                         <div class="row">
                                             <div class="col-lg-6">
-                                                <% if (maxLikeCount == 0) { %>
-                                                    <input id="like_count" type="number" class="form-control" placeholder="Недостаточно средств" min="0" max="0">
+                                                <% if (maxLikeCount < 50) { %>
+                                                    <input id="like_count" type="number" class="form-control" placeholder="[От 50] Недостаточно средств" min="0" max="0">
                                                 <% } else { %>
                                                     <input id="like_count" type="number" class="form-control" placeholder="От <%= minLikeCount %> до <%= maxLikeCount %>" min="<%= minLikeCount %>" max="<%= maxLikeCount %>">
                                                 <% } %>
@@ -137,8 +137,8 @@
                                         <p>Количество комментариев</p>
                                         <div class="row">
                                             <div class="col-lg-6">
-                                                <% if (maxCommentCount == 0) { %>
-                                                    <input id="comment_count" type="number" class="form-control" placeholder="Недостаточно средств" min="0" max="0">
+                                                <% if (maxCommentCount < 50) { %>
+                                                    <input id="comment_count" type="number" class="form-control" placeholder="[От 50] Недостаточно средств" min="0" max="0">
                                                 <% } else { %>
                                                     <input id="comment_count" type="number" class="form-control" placeholder="От <%= minCommentCount %> до <%= maxCommentCount %>" min="<%= minCommentCount %>" max="<%= maxCommentCount %>">
                                                 <% } %>
