@@ -1,0 +1,33 @@
+<% /**
+    * Вывод списка активности пользователя
+    * @param user [object] - объект пользователя
+    */ %>
+<!-- Chatra {literal} -->
+<script>
+    window.ChatraSetup = {
+        colors: {
+            buttonText: '#FFFFFF', /* цвет текста кнопки чата */
+            buttonBg: '#F7AF3E'    /* цвет фона кнопки чата */
+        }
+    };
+    
+    (function(d, w, c) {
+        w.ChatraID = 'pmEAGvr6z2Zo4W6JE';
+        ChatraGroupID = 'KrDHw4joyyr5X4xXc';
+        var s = d.createElement('script');
+        w[c] = w[c] || function() {
+            (w[c].q = w[c].q || []).push(arguments);
+        };
+        s.async = true;
+        s.src = 'https://call.chatra.io/chatra.js';
+        if (d.head) d.head.appendChild(s);
+        Chatra('setIntegrationData', {
+            name: '<%= user.username %>',
+            email: '<%= user.email %>',
+            'Баланс': '<%= (user.balance / 1000).toFixed(2) %>₽',
+            'Цена 1к лайков': '<%= user.like_price %>₽',
+            'Цена 1к комментов': '<%= user.comment_price %>₽'
+        });
+    })(document, window, 'Chatra');
+</script>
+<!-- /Chatra {/literal} -->
