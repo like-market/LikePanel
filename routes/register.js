@@ -5,8 +5,7 @@ var path = require("path");
 
 router.get("/", function(req, res) {
     if (req.isAuthenticated()) return res.redirect("/tasks");
-
-    res.sendFile(path.join(__dirname + "/../public/register.htm"));
+    res.render('register');
 });
 
 router.post("/", async function(req, res) {

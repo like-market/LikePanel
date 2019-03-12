@@ -7,7 +7,7 @@ var db = require("../db");
 router.get("/", function(req, res) {
     // Если юзер авторизован - перенаправляем его в панель
     if (req.isAuthenticated()) return res.redirect("/tasks");
-    res.sendFile(path.join(__dirname + "/../public/login.htm"));
+    res.render('login')
 });
 
 router.post("/", function(req, res, next) {

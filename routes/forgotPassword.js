@@ -5,7 +5,7 @@ var router = express.Router()
 router.get('/', function(req, res) {
 	// Если юзер авторизован - перенаправляем его в панель
 	if (req.isAuthenticated()) return res.redirect('/panel');
-	res.sendFile(path.join(__dirname + '/../public/forgotPassword.htm'));
+	res.render('forgotPassword');
 });
 
 module.exports = router
