@@ -36,8 +36,17 @@ const createRequest = async function(task_id, comment, account) {
 	tasks[task_id].now_add++;
 	tasks[task_id].async_count++;
 
-	// Пытаемся добавить комментарий
-	var response = await vkapi.createComment(tasks[task_id].type, tasks[task_id].owner_id, tasks[task_id].item_id, comment, account);
+	/**
+     * В случае успеха возвращается
+     * {response}
+     *
+     * В случае ошибки ошибки авторизации
+     * {error}
+     *
+     * В случае ошибки в axios запросе
+     * {code, ...}
+     */
+	const response = await vkapi.createComment(tasks[task_id].type, tasks[task_id].owner_id, tasks[task_id].item_id, comment, account);
 
 	// Если коммент успешно добавлен
 	if (response.response) {
@@ -52,60 +61,68 @@ const createRequest = async function(task_id, comment, account) {
 	// Так как при вызове асинхронной функции мы предположили, что комментарий поставится
 	tasks[task_id].now_add--;
 
-	switch (response.error.error_code) {
-		case 17:
-			logger.warn('Требуется валидация пользователя', {json: response.error});
-			db.vk.setAccountStatus(account.user_id, 'need_token')
-			break;
+	// Если не удалось поставить комментарий
+	if (response.error) {
+		switch (response.error.error_code) {
+			case 17:
+				logger.warn('Требуется валидация пользователя', {json: response.error});
+				db.vk.setAccountStatus(account.user_id, 'need_token')
+				break;
 
-		case 5:
-			logger.warn(`Невалидная сессия у + ${account.user_id}`, {json: response.error})
-			db.vk.setAccountStatus(account.user_id, 'need_token')
-			break;
+			case 5:
+				logger.warn(`Невалидная сессия у + ${account.user_id}`, {json: response.error})
+				db.vk.setAccountStatus(account.user_id, 'need_token')
+				break;
 
-		case 6:
-		    logger.warn('Слишком много запросов в секунду')
-		    break;
+			case 6:
+			    logger.warn('Слишком много запросов в секунду')
+			    break;
 
-		// Fatal Error - прекращаем выполнение накрутки
-		case 213:
-			logger.warn('Нет доступа к комментированию записи', {json: response.error})
-			tasks[task_id].fatal_error = true;
-			break;
-
-		// Fatal Error - прекращаем выполнение накрутки
-		case 223:
-			logger.warn('Превышен лимит комментариев на стене', {json: response.error})
-			tasks[task_id].fatal_error = true;
-			break;
-
-		// Strange Error - прекращаем выполнения накрутки	
-		case 100:
-			logger.warn(`Один из параметров не верный`, {json: response.error})
-			// Если запись была удалена
-			if (response.error.error_msg == "One of the parameters specified was missing or invalid: object not found") {
-				tasks[task_id].Fatall_error = true;
-			}else {
-				tasks[task_id].error_count++;
-			}
-			break;
-
-		// Strange Error - лимит на количиство ошибок
-		case 10:
-			logger.warn('Внутренняя ошибка сервера', {json: response.error});
-			// Если запись была удалена
-			if (response.error.error_msg == "Internal server error: parent deleted") {
+			// Fatal Error - прекращаем выполнение накрутки
+			case 213:
+				logger.warn('Нет доступа к комментированию записи', {json: response.error})
 				tasks[task_id].fatal_error = true;
-			}else {
-				tasks[task_id].error_count++;
-			}
-			break;
+				break;
 
-		// Strange Error - лимит на количиство ошибок
-		default:
-			logger.warn('Неизвестная ошибка', {json: response})
-			tasks[task_id].error_count++;
+			// Fatal Error - прекращаем выполнение накрутки
+			case 223:
+				logger.warn('Превышен лимит комментариев на стене', {json: response.error})
+				tasks[task_id].fatal_error = true;
+				break;
+
+			// Strange Error - прекращаем выполнения накрутки	
+			case 100:
+				logger.warn(`Один из параметров не верный`, {json: response.error})
+				// Если запись была удалена
+				if (response.error.error_msg == "One of the parameters specified was missing or invalid: object not found") {
+					tasks[task_id].Fatall_error = true;
+				}else {
+					tasks[task_id].error_count++;
+				}
+				break;
+
+			// Strange Error - лимит на количиство ошибок
+			case 10:
+				logger.warn('Внутренняя ошибка сервера', {json: response.error});
+				// Если запись была удалена
+				if (response.error.error_msg == "Internal server error: parent deleted") {
+					tasks[task_id].fatal_error = true;
+				}else {
+					tasks[task_id].error_count++;
+				}
+				break;
+
+			// Strange Error - лимит на количиство ошибок
+			default:
+				logger.warn('Неизвестная ошибка', {json: response})
+				tasks[task_id].error_count++;
+		}
 	}
+
+	// Если ошибка в axios запросе
+    if (response.code) {
+        logger.error(`Ошибка в axios запросе: ${response.code}`)
+    }
 
 	tasks[task_id].async_count--;
 }
