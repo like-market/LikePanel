@@ -2,7 +2,7 @@
     <thead>
         <tr>
             <th>Статус</th>
-            <th>Название и URL</th>
+            <th>URL</th>
             <th>Заказано</th>
             <th>Прогресс</th>
         </tr>
@@ -32,7 +32,7 @@
             </td>
             <td>
                 <%= task.name %>
-                <div class="small"><a href="<%= task.url %>" target="_blank"><%= task.url %></a></div>
+                <div class="small"><a href="<%= task.url %>" target="_blank">Ссылка</a></div>
             </td>
             <td>
                 <% if (task.type == 'like') { %>

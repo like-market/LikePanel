@@ -50,7 +50,7 @@ router.post('/payments', async function(req, res) {
 	
 	let payments = await db.finance.getUserPayments(user.id, req.body.count, 0);
 	payments.forEach(function(payment) {
-		payment.create = moment(payments.create).format("DD MMMM HH:mm:ss")
+		payment.create = moment(payment.create).format("DD MMMM HH:mm:ss")
 	})
 
 	const refill = await db.finance.getTotalRefill(user.id);

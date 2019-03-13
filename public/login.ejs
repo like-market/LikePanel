@@ -22,6 +22,8 @@
     <link rel="stylesheet" href="styles\pe-icons\helper.css">
     <link rel="stylesheet" href="styles\stroke-icons\style.css">
     <link rel="stylesheet" href="styles\style.css">
+
+    <%- include('YandexMetrika'); %>
 </head>
 <body class="blank">
 
@@ -31,18 +33,17 @@
 
     <!-- Main content-->
     <section class="content">
-
-        <div class="container-center lg animated slideInDown">
+        <div class="container-center animated slideInDown">
 
 
             <div class="view-header">
                 <div class="header-icon">
-                    <i class="pe page-header-icon pe-7s-add-user"></i>
+                    <i class="pe page-header-icon pe-7s-unlock"></i>
                 </div>
                 <div class="header-title">
-                    <h3>Регистрация</h3>
+                    <h3>Вход</h3>
                     <small>
-                        Введите ваши данные для регистрации.
+                        Введите ваши данные для входа.
                     </small>
                 </div>
             </div>
@@ -50,31 +51,19 @@
             <div class="panel panel-filled">
                 <div class="panel-body">
                     <form id="loginForm" novalidate="">
-                        <div class="row">
-                            <div class="form-group col-lg-6">
-                                <label>Логин</label>
-                                <input type="" value="" id="username" class="form-control" name="username">
-                                <span class="help-block small">Ваш логин</span>
-                            </div>
-                            <div class="form-group col-lg-6">
-                                <label>Почта</label>
-                                <input type="" value="" id="email" class="form-control" name="email">
-                                <span class="help-block small">Ваша почта для восстановления пароля</span>
-                            </div>
-                            <div class="form-group col-lg-6">
-                                <label>Пароль</label>
-                                <input type="password" value="" id="password" class="form-control" name="password">
-                                <span class="help-block small">Ваш сложный пароль</span>
-                            </div>
-                            <div class="form-group col-lg-6">
-                                <label>Повторите пароль</label>
-                                <input type="password" value="" id="repeatpassword" class="form-control" name="repeatpassword">
-                                <span class="help-block small">Повторите ваш пароль</span>
-                            </div>
+                        <div class="form-group">
+                            <label class="control-label" for="username">Логин</label>
+                            <input type="text" placeholder="example@gmail.com" title="Please enter you username" required="" value="" name="username" id="username" class="form-control">
+                            <span class="help-block small">Ваш ник или почта</span>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" for="password">Пароль</label>
+                            <input type="password" title="Please enter your password" placeholder="******" required="" value="" name="password" id="password" class="form-control">
+                            <span class="help-block small">Ваш сложный пароль</span>
                         </div>
                         <div>
-                            <a class="btn btn-default" href="login">Вход</a>
-                            <button id="button" class="btn btn-accent">Регистрация</button>
+                            <button id="button" class="btn btn-accent">Вход</button>
+                            <a class="btn btn-default" href="register">Регистрация</a>
                         </div>
                     </form>
                 </div>
@@ -95,7 +84,7 @@
 
 <!-- App scripts -->
 <script src="scripts\luna.js"></script>
-<script src="scripts\register.js"></script>
+<script src="scripts\login.js"></script>
 
 </body>
 
