@@ -61,12 +61,12 @@ queue.process('auth', 5, async function(job, done) {
 	if (response.error_type || response.error) {
 		// Если неправильный логин или пароль
 		if (response.error_type == 'username_or_password_is_incorrect') {
-			logger.warn(`Не удалось добавить новый аккаунт ${login} - неверый пароль`)
+			logger.warn(`Не удалось добавить новый аккаунт ${login}:${password} - неверый пароль`)
 			db.vk.addInvalidAccount(login, password)
 			return done()
 		}
 		if (response.error == 'need_validation') {
-			logger.warn(`Нужна валидация ${login}`)
+			logger.warn(`Нужна валидация для нового аккаунта ${login}:${password}`)
 			db.vk.addInvalidAccount(login, password)
 			return done()
 		}
