@@ -11,36 +11,41 @@ toastr.options = {
     "progressBar": true
 };
 
-// При клике на вкладку 'Лайки'
-$("a[href='#like']").on('shown.bs.tab', function(e) {
-    const code = "<p>1. Введите url на запись на стене, фотографию, видео или товар<br/>Например <code>https://vk.com/wall266510818_2435</code><br/>или <code>https://vk.com/id266510818?w=wall266510818_2435</code></p><p>2. Введите количество лайков для накрутки</p><p>3. Нажмите на кнопку 'Создать задачу'</p>"
-    $('#info').html(code)
-});
-
-// При клике на вкладку 'Комментарии'
-$("a[href='#comment']").on('shown.bs.tab', function(e) {
-    const code = "<p>1. Введите url на запись на стене, фотографию, видео или товар<br/>Например <code>https://vk.com/wall266510818_2435</code><br/>или <code>https://vk.com/id266510818?w=wall266510818_2435</code></p><p>2. Выберите набор комментариев, который будет накручиваться<br/>(Можно добавить свой набор в разделе - Комментарии)</p><p>3. Введите количество комментариев </p><p>4. Нажмите на кнопку 'Создать задачу'</p>"
-    $('#info').html(code)
-});
-
-// При изменении количества лайков изменяем цену
-$('#like_count').change(function() {
-    $(this).css('border', '')
-    var new_cost = ($(this).val() * likePrice / 1000).toFixed(2)
-
-    $('#total_cost').html(`Стоимость <mark>${new_cost}₽</mark>`)
-})
-
-// При изменении количества комментариев изменяем цену
-$('#comment_count').change(function() {
-    $(this).css('border', '')
-
-    const new_cost = ($(this).val() * commentPrice / 1000).toFixed(2)
-    $('#total_comment_cost').html(`Стоимость <mark>${new_cost}₽</mark>`)
-})
 
 // Используется ли клентский набор
 let use_custom = false;
+
+// При изменении количества лайков изменяем цену
+$('#like_count').on('input', function() {
+    if ($(this).val() > maxLikeCount) $(this).val(maxLikeCount)
+    $(this).css('border', '')
+    const new_cost = ($('#like_count').val() * likePrice + $('#comment_count').val() * commentPrice)
+
+    $('#total_cost').html(`${(new_cost  / 1000).toFixed(2)}₽`)
+    // Обводка цены
+    if (new_cost > balance) $('#total_cost').css('background-color', 'red')
+    else $('#total_cost').css('background-color', '#e9e599')
+})
+// При изменении количества комментов изменяем цену и выводим список
+$('#comment_count').on('input', function() {
+    if (use_custom) max_count = maxCustomCommentCount;
+    else max_count = maxCommentCount;
+    if ($(this).val() > max_count) $(this).val(max_count)
+
+    $(this).css('border', '')
+    const new_cost = ($('#like_count').val() * likePrice + $('#comment_count').val() * commentPrice)
+
+    $('#total_cost').html(`${(new_cost  / 1000).toFixed(2)}₽`)
+    // Обводка цены
+    if (new_cost > balance) $('#total_cost').css('background-color', 'red')
+    else $('#total_cost').css('background-color', '#e9e599')
+
+    if ($('#comment_count').val()) {
+        $('#comments_list').show(300)
+    }else {
+        $('#comments_list').hide(300)
+    }
+})
 
 // При выборе нового набора комментариев
 $('#comments').on('change', function() {
@@ -75,177 +80,98 @@ $('#comments').on('change', function() {
         $('#comment_count').attr('placeholder', `От ${minCommentCount} до ${max_count}`)
         $('#max_comment_count').text(max_count)
     }
+    if ($('#comment_count').val() > max_count) $('#comment_count').val(max_count)
 });
 
 // Убираем красную обводку
-$('#url_like, #url_comment, #task_name_like, #task_name_comment').change(function() {
+$('#url, #url_comment, #task_name_like, #task_name_comment').change(function() {
     $(this).css('border', '')
 })
 
-// При клике на кнопку 'накрутить лайки'
-let canUseLikeButton = true;
-$('#createLikes').click(function() {
-    if (!canUseLikeButton) return;
-
+// При клике на кнопку 'Создать задачу'
+$('#create').click(function() {
+    toastr.remove();
     let error = 0;
 
-    // Проверка на количество комментариев
-    if ($('#like_count').val() == '' || parseInt($('#like_count').val()) != $('#like_count').val()) {
-        toastr.error('Введите количество лайков')
-        $('#like_count').css('border', '1px solid red')
-        error++;
-    }else {
-        if ($('#like_count').val() > maxLikeCount) {
-            toastr.error(`Вы можете заказать максимум ${maxLikeCount} лайков`);
-            $('#like_count').css('border', '1px solid red')
-            error++;
-        }
-        if ($('#like_count').val() < minLikeCount) {
-            toastr.error(`Вы можете заказать минимум ${minLikeCount} лайков`);
-            $('#like_count').css('border', '1px solid red')
-            error++;
-        }
-    }
-
     // Проверка URL
-    var url = $('#url_like').val()
+    const url = $('#url').val()
     const regex = /(https?:\/\/)?vk.com\/.*/i;
     if (regex.exec(url) == null) {
         toastr.error('Неверный URL')
-        $('#url_like').css('border', '1px solid red')
+        $('#url').css('border', '1px solid red')
         error++
     }
 
-    // Проверка названия
-    let name = $('#task_name_like').val()
-    if (name.length > 75) {
-        toastr.error('Название может быть не длиннее 75 символов')
-        $('#task_name_like').css('border', '1px solid red')
-        error++;
+    // Проверка лайков
+    const like_count = $('#like_count').val();
+    // Если поле like_count не пустое
+    if (like_count != '' && like_count != 0) {
+        // Если введено не число
+        if (like_count != parseInt(like_count)) {
+            toastr.error(`Укажите от ${minLikeCount} до ${maxLikeCount} лайков`)
+            $('#like_count').css('border', '1px solid red')
+            error++;
+        // Если количество лайков лежит вне диапазона
+        }else if (like_count > maxLikeCount || like_count < minLikeCount) {
+            toastr.error(`Укажите от ${minLikeCount} до ${maxLikeCount} лайков`)
+            $('#like_count').css('border', '1px solid red')
+            error++;
+        }
     }
 
-    if (error) return;
-    canUseLikeButton = false;
-    
-    $.ajax({
-        type: 'POST',
-        url: '/addtask/add_likes',
-        data: {
-            name,
-            url,
-            count: $('#like_count').val()
-        },
-        success: function(res) {
-            switch(res) {
-                case 'Error url':
-                    toastr.error('Неверный URL')
-                    $('#url_like').css('border', '1px solid red')
-                    break;
-                case 'Invalid amount likes':
-                    toastr.error(`Неверное количество лайков<br/>Можно заказать от ${minLikeCount} до ${maxLikeCount}`)
-                    $('#like_count').css('border', '1px solid red')
-                    break;
-                case 'Access restriction':
-                    toastr.error('Запись не найдена или не хватает прав для добавления лайка')
-                    break;
-                case 'Success':
-                    toastr.success('Задание успешно добавлено')
-                    $('#task_name_like').val('') //
-                    $('#like_count').val('')     // Обновляем поля
-                    $('#url_like').val('')       //
-                    break;
-            }
-            canUseLikeButton = true;
-        }
-    });
-})
+    // Проверка комментариев
+    const comment_count = $('#comment_count').val();
+    const comments = $('#comments').val();
+    // Если поле comment_count не пустое
+    if (comment_count != '' && comment_count != 0) {
+        // Различные лимиты для комментариев
+        if (use_custom) max_comment_count = maxCustomCommentCount;
+        else            max_comment_count = maxCommentCount;
 
-
-// При клике на кнопку 'накрутить комменты'
-let canUseCommentButton = true;
-$('#createComments').click(function() {
-    if (!canUseCommentButton) return;
-
-    let error = 0;
-    $("#createComments").prop("disabled", true);
-
-    // Различные лимиты для комментариев
-    if (use_custom) max_comment_count = maxCustomCommentCount;
-    else            max_comment_count = maxCommentCount;
-
-    // Проверка количества комментариев
-    if ($('#comment_count').val() == '' ||  parseInt($('#comment_count').val()) != $('#comment_count').val()) {
-        toastr.error('Введите количество комментариев')
-        $('#comment_count').css('border', '1px solid red')
-        error++;
-    }else {
-        if ($('#comment_count').val() > max_comment_count) {
-            toastr.error(`Вы можете заказать максимум ${max_comment_count} комментариев`);
+        // Если введено не число
+        if (comment_count != parseInt(comment_count)) {
+            toastr.error(`Укажите от ${minCommentCount} до ${max_comment_count} комментариев`)
             $('#comment_count').css('border', '1px solid red')
             error++;
         }
-        if ($('#comment_count').val() < minCommentCount) {
-            toastr.error(`Вы можете заказать минимум ${minCommentCount} комментариев`);
+        // Если количество комментариев лежит вне диапазона
+        if (comment_count > max_comment_count || comment_count < minCommentCount) {
+            toastr.error(`Укажите от ${minCommentCount} до ${max_comment_count} комментариев`)
             $('#comment_count').css('border', '1px solid red')
-            error++;            
+            error++;
+        }
+
+        // Проверка на то что выбран хотя бы один набор
+        if (comments == null) {
+            toastr.error('Выберите хотя бы один набор комментариев')
+            error++;
         }
     }
 
-    // Проверка на выбранный набор комментариев
-    if ($('#comments').val() == null) {
-        toastr.error('Выберите хотя бы один набор')
-        $('#comments').css('border', '1px solid red')
-        error++;
-    }
-
-    // Проверка на url
-    var url = $('#url_comment').val()
-    const regex = /(https?:\/\/)?vk.com\/.*/i;
-    if (regex.exec(url) == null) {
-        toastr.error('Неверный URL')
-        $('#url_comment').css('border', '1px solid red')
-        error++;
-    }
-
-    // Проверка названия
-    let name = $('#task_name_comment').val()
-    if (name.length > 75) {
-        toastr.error('Название может быть не длиннее 75 символов')
-        $('#task_name_like').css('border', '1px solid red')
+    if ((like_count == '' || like_count == 0) && (comment_count == '' || comment_count == 0)) {
+        toastr.error('Необходимо ввести количество лайков и/или комментариев')
         error++;
     }
 
     if (error) return;
-    canUseCommentButton = false;
-    
+    $('#create').addClass('disabled')
+
     $.ajax({
         type: 'POST',
-        url: '/addtask/add_comments',
-        data: {
-            name,
-            url,
-            count: $('#comment_count').val(),
-            comment_ids: $('#comments').val()
-        },
+        url: '/addtask/add',
+        data: { url, like_count, comment_count, comments },
         success: function(res) {
             switch(res) {
-                case 'Error url':
-                    toastr.error('Неверный URL')
-                    $('#url_comment').css('border', '1px solid red')
-                    break;
-                case 'Invalid amount comments':
-                    toastr.error(`Неверное количество комментариев<br/>Можно заказать от ${minCommentCount} до ${maxCommentCount}`)
-                    break;
                 case 'Success':
                     toastr.success('Задание успешно добавлено')
-                    $('#task_name_comment').val('') //
+                    $('#like_count').val('')        //
                     $('#comment_count').val('')     // Обновляем поля
-                    $('#url_comment').val('')       //
+                    $('#url').val('')               //
                     break;
                 default:
-                    toastr.error(res);
+                    toastr.error(res)
             }
-            canUseCommentButton = true;
+            $('#create').removeClass('disabled')
         }
     });
 })

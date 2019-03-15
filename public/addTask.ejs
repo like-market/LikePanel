@@ -65,111 +65,68 @@
 
             <div class="row">
                 <div class="col-lg-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <label class="control-label" for="url_like">URL записи</label>
+                                <input id="url" type="text" class="form-control" placeholder="Ссылка вида https://vk.com/wall-3223234_3423">
+                            </div>
 
-                    <div class="tabs-container">
-                        <ul class="nav nav-tabs">
-                            <li class="active"><a data-toggle="tab" href="#like" aria-expanded="true">Лайки</a></li>
-                            <li class=""><a data-toggle="tab" href="#comment" aria-expanded="false">Комментарии</a></li>
-                        </ul>
-                        <div class="tab-content">
-                            <div id="like" class="tab-pane active">
-                                <div class="panel-body">
-                                    <div class="form-group">
-                                        <p>Название задачи</p>
-                                        <input id="task_name_like" type="text" class="form-control" placeholder="Название задачи (не обязательно)">
-                                    </div>
-                                        
-                                    <div class="form-group">
-                                        <p>Введите URL записи</p>
-                                        <input id="url_like" type="text" class="form-control" placeholder="https://vk.com/wall-3223234_3423">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <p>Количество лайков</p>
-                                        <div class="row">
-                                            <div class="col-lg-6">
-                                                <% if (maxLikeCount < 50) { %>
-                                                    <input id="like_count" type="number" class="form-control" placeholder="[От 50] Недостаточно средств" min="0" max="0">
-                                                <% } else { %>
-                                                    <input id="like_count" type="number" class="form-control" placeholder="От <%= minLikeCount %> до <%= maxLikeCount %>" min="<%= minLikeCount %>" max="<%= maxLikeCount %>">
-                                                <% } %>
-                                            </div>
-                                            <div class="col-lg-6 ml-auto" style="height: 34px; padding-top: 7px">
-                                                Максимум <a><%= maxLikeCount %></a>   <small>(Учитывается ваш баланс и загруженность системы)</small>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div id="total_cost" class="form-group">
-                                        <% if (maxLikeCount == 0) { %>
-                                            Стоимость <mark>0.00₽</mark>
+                            <div class="form-group">
+                                <label class="control-label" for="like_count">Количество лайков</label>
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <% if (maxLikeCount < 50) { %>
+                                            <input id="like_count" type="number" class="form-control" placeholder="[От 50] Недостаточно средств" min="0" max="0">
                                         <% } else { %>
-                                            Стоимость <mark>0.10₽</mark>
+                                            <input id="like_count" type="number" class="form-control" placeholder="От <%= minLikeCount %> до <%= maxLikeCount %>" min="<%= minLikeCount %>" max="<%= maxLikeCount %>">
                                         <% } %>
                                     </div>
-
-                                    <div class="form-group">
-                                        <div class="col-md-6 col-md-offset-4">
-                                        <a id="createLikes" class="btn btn-w-md btn-accent" style="align: center">Создать задачу</a>
-                                        </div>
+                                    <div class="col-lg-6 ml-auto" style="height: 34px; padding-top: 7px">
+                                        Максимум <a><%= maxLikeCount %></a>
                                     </div>
                                 </div>
                             </div>
-                            <div id="comment" class="tab-pane">
-                                <div class="panel-body">
-                                    <div class="form-group">
-                                        <p>Название задачи</p>
-                                        <input id="task_name_comment" type="text" class="form-control" placeholder="Название задачи (не обязательно)">
-                                    </div>
 
-                                    <div class="form-group">
-                                        <p>Введите URL записи</p>
-                                        <input id="url_comment" type="text" class="form-control" placeholder="https://vk.com/wall-3223234_3423">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <p>Наборы комментариев</p>
-                                        <select id="comments" class="form-control" multiple="multiple" style="width: 100%">
-                                            <% comments.forEach(function(comment) { %>
-                                                <option value="<%= comment.id %>" data-custom="<%= (comment.owner_id != 0) %>"><%= comment.name %>
-                                            <% }) %>
-                                        </select>
-                                    </div>
-
-                                    <div id="custom_comment_info" style="font-size: 14px; color: #f6a821; padding-bottom: 10px; display: none;">
-                                        <i class="pe pe-7s-info"></i>
-                                        Для наборов клиентов используются разные алгоритмы накрутки, поэтому максимальное количество может отличаться.
-                                    </div>
-
-                                    <div class="form-group">
-                                        <p>Количество комментариев</p>
-                                        <div class="row">
-                                            <div class="col-lg-6">
-                                                <% if (maxCommentCount < minCommentCount) { %>
-                                                    <input id="comment_count" type="number" class="form-control" placeholder="[От 50] Недостаточно средств" min="0" max="0">
-                                                <% } else { %>
-                                                    <input id="comment_count" type="number" class="form-control" placeholder="От <%= minCommentCount %> до <%= maxCommentCount %>" min="<%= minCommentCount %>" max="<%= maxCommentCount %>">
-                                                <% } %>
-                                            </div>
-                                            <div class="col-lg-6 ml-auto" style="height: 34px; padding-top: 7px">
-                                                Максимум <a id="max_comment_count"><%= maxCommentCount %></a>   <small>(Учитывается ваш баланс и загруженность системы)</small>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div id="total_comment_cost" class="form-group">
-                                        <% if (maxCommentCount == 0) { %>
-                                            Стоимость <mark>0.00₽</mark>
+                            <div class="form-group">
+                                <label class="control-label" for="comment_count">Количество комментариев</label>
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <% if (maxCommentCount < minCommentCount) { %>
+                                            <input id="comment_count" type="number" class="form-control" placeholder="[От 50] Недостаточно средств" min="0" max="0">
                                         <% } else { %>
-                                            Стоимость <mark>0.10₽</mark>
+                                            <input id="comment_count" type="number" class="form-control" placeholder="От <%= minCommentCount %> до <%= maxCommentCount %>" min="<%= minCommentCount %>" max="<%= maxCommentCount %>">
                                         <% } %>
                                     </div>
-
-                                    <div class="form-group">
-                                        <div class="col-md-6 col-md-offset-4">
-                                            <a id="createComments" class="btn btn-w-md btn-accent" style="align: center">Создать задачу</a>
-                                        </div>
+                                    <div class="col-lg-6 ml-auto" style="height: 34px; padding-top: 7px">
+                                        Максимум <a id="max_comment_count"><%= maxCommentCount %></a>
                                     </div>
+                                </div>
+                            </div>
+
+                            <div id="comments_list" style="display: none;">
+                                <div class="form-group">
+                                    <label class="control-label" for="comments">Наборы комментариев</label>
+                                    <select id="comments" class="form-control" multiple="multiple" style="width: 100%">
+                                        <% comments.forEach(function(comment) { %>
+                                            <option value="<%= comment.id %>" data-custom="<%= (comment.owner_id != 0) %>"><%= comment.name %>
+                                        <% }) %>
+                                    </select>
+                                </div>
+
+                                <div id="custom_comment_info" style="font-size: 14px; color: #f6a821; padding-bottom: 10px; display: none;">
+                                    <i class="pe pe-7s-info"></i>
+                                    Для наборов клиентов используются разные алгоритмы накрутки, поэтому максимальное количество может отличаться.
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                Стоимость <mark id="total_cost">0.00₽</mark>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-md-6 col-md-offset-4">
+                                    <a id="create" class="btn btn-w-md btn-accent" style="align: center">Создать задачу</a>
                                 </div>
                             </div>
                         </div>
@@ -186,8 +143,9 @@
                                 Например <code>https://vk.com/wall266510818_2435</code><br/>
                                 или <code>https://vk.com/id266510818?w=wall266510818_2435</code>
                             </p>
-                            <p>2. Введите количество лайков для накрутки</p>
-                            <p>3. Нажмите на кнопку "Создать задачу"</p>
+                            <p>2. Введите количество лайков и/или комментариев для накрутки</p>
+                            <p>3. При накрутке комментариев нужно выбрать наборы комментов для накрутки</p>
+                            <p>4. Нажмите на кнопку "Создать задачу"</p>
                         </div>
                     </div>
                 </div>

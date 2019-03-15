@@ -95,10 +95,13 @@ exports.cancelTask = async function(task_id) {
  */
 exports.onError = async function(task_id) {
     logger.info(`Ждем все асинхронные функции в задаче ${task_id}, чтобы завершить задачу`)
+
     // Ждем завершения всех асинхронных функций
-    while (tasks[task_id].async_count) {
+    ttl = 20; // Время ожидания - 10 секунд, после чего принудительно завершаем задачу
+    while (ttl-- && tasks[task_id].async_count) {
         await utils.sleep(500);
     }
+    if (!ttl) logger.error(`Принудительно завершаем задачу ${task_id}`);
 
     logger.warn(`Останавливаем задачу ${task_id}`)
     db.tasks.setStatus(task_id, 'error')
@@ -123,13 +126,14 @@ exports.onError = async function(task_id) {
  * Вызывается при успешном выполнении таска
  */
 exports.onSuccess = async function(task_id) {
-    logger.info(`Ждем все асинхронные функции в задаче ${task_id}, чтобы завершить задачу`)
-    while (tasks[task_id].async_count) {
+    logger.info('Задача ' + task_id + ' выполнена')
+    db.tasks.setStatus(task_id, 'finish')
+
+    ttl = 20; // Время жизни данных 10 секунд
+    while (ttl-- && tasks[task_id].async_count) {
         await utils.sleep(500);
     }
-    
-    db.tasks.setStatus(task_id, 'finish')
-    logger.info('Задача ' + task_id + ' выполнена')
+    logger.info(`Все асинхронные функции в задаче ${task_id} завершены`);
 
     delete tasks[task_id];
 }

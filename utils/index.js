@@ -1,6 +1,7 @@
 exports.vk   = require('./vk.js');
 exports.task = require('./task.js');
 exports.user = require('./user.js');
+exports.lang = require('./lang.js');
 exports.proxy = require('./proxy.js');
 exports.payment  = require('./payment.js');
 exports.urlparser   = require('./urlparser.js');
@@ -38,3 +39,32 @@ Object.prototype.parseSqlResult = function () {
     return JSON.parse(JSON.stringify(this))
 }
 */
+
+/**
+ * Проверяем наличие всех параметров в теле запроса
+ * @param params - массив параметров
+ */
+exports.needBodyParams = function(params) {
+	return function(req, res, next) {
+		for (let param of params) {
+			if (typeof req.body[param] == 'undefined') {
+				return res.send(`Не задан параметр ${param}`)
+			}
+		}
+    	next();
+  	}
+}
+
+/**
+ * Проверяем авторизован ли юзер
+ * @param redirect - перемещать ли на страницу /login
+ */
+exports.needAuth = function(redirect) {
+	return function(req, res, next) {
+		if (!req.isAuthenticated()) {
+			if (redirect) return res.redirect('/login');
+			else res.send('Ошибка авторизации')
+		}
+    	next();
+  	}
+}
