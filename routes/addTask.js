@@ -1,11 +1,11 @@
-var logger = require('../logger.js')
-var db = require('../db');
-var app = require('../app.js');
-var utils = require('../utils');
-var path  = require("path");
-var vkapi = require('../vkapi')
-var express = require('express')
-var router  = express.Router()
+const logger = require('../logger.js')
+const db = require('../db');
+const vkapi = require('../vkapi')
+const utils = require('../utils');
+const lang = utils.lang;
+
+const express = require('express')
+const router  = express.Router()
 
 const minLikeCount    = 50;
 const minCommentCount = 50;
@@ -23,15 +23,19 @@ router.get('/', async function(req, res) {
 	customAccountCount = Math.floor(сustomAccountCount * 0.9);
 	
 	// Проверка на то, что хватает денег
-	maxLikeCount = Math.floor(req.user.balance / req.user.like_price);
-	if (maxLikeCount > accountsCount) maxLikeCount = accountsCount;
- 
-	maxCommentCount = Math.floor(req.user.balance / req.user.comment_price);
-	if (maxCommentCount > 3500) maxCommentCount = 3500;
+	// maxLikeCount = Math.floor(req.user.balance / req.user.like_price);
+	// if (maxLikeCount > accountsCount) maxLikeCount = accountsCount;
+	// Кратно 25
+ 	maxLikeCount = accountsCount - (accountsCount % 25)
+
+	// maxCommentCount = Math.floor(req.user.balance / req.user.comment_price);
+	// if (maxCommentCount > 3500) maxCommentCount = 3500;
+	maxCommentCount = 3500;
 
 	// Максимальное количество комментариев по балансу
-	maxCustomCommentCount = Math.floor(req.user.balance / req.user.comment_price);
-	if (maxCustomCommentCount > customAccountCount * 3) maxCustomCommentCount = customAccountCount * 3;
+	// maxCustomCommentCount = Math.floor(req.user.balance / req.user.comment_price);
+	// if (maxCustomCommentCount > customAccountCount * 3) maxCustomCommentCount = customAccountCount * 3;
+	maxCustomCommentCount = customAccountCount * 3 - (customAccountCount * 3 % 25)
 
 	comments = await db.comments.getUserComments(req.user.id, true);
 	
@@ -46,105 +50,122 @@ router.get('/', async function(req, res) {
 });
 
 /**
- * Добавление задачи на накрутку лайков
+ * Добавление задачи на накрутку комментариев
  *
- * @body name - название задачи
- * @body url  - url записи
- * @body count - колличество лайков для накрутки
+ * @body url           - url записи
+ * @body like_count    - количество лайков для накрутки
+ * @body comment_count - колличество комментариев для накрутки
+ * @body comments      - массив из id наборов комментариев, например  [ '1', '2' ]
  */
-router.post('/add_likes', async function(req, res) {
+const params = ['url', 'like_count', 'comment_count', 'comments']
+
+router.post('/add', utils.needBodyParams(params), async(req, res) => {
 	if (!req.isAuthenticated()) return res.redirect('/login');
 
-	// Проверка названия [длина] + замена запрещенных символов
-	req.body.name = req.body.name.replace(/['"]/gi, '')
-	if (req.body.name.length > 75) {
-		res.send('Ошибка в названии')
+    const data = utils.urlparser.parseURL(req.body.url)
+    if (data == null) return res.send("Ошибка в URL");
+
+	// Получаем все доступные действия для объекта
+	const object = await vkapi.getAvailableActions(data.type, data.owner_id, data.item_id);
+	if (!object.found) return res.send(`Не удалось найти ${lang(data.type).toLowerCase()}`)
+
+    const accountsCount = await db.vk.getActiveAccountsCount();
+
+	// Проверка количества лайков
+    const like_need = parseInt(req.body.like_count);
+    if (like_need) {
+    	if (!object.can_like) return res.send(`${lang(data.type)} нельзя лайкать`)
+
+    	maxLikeCount = Math.floor(req.user.balance / req.user.like_price);
+		if (maxLikeCount > accountsCount) maxLikeCount = accountsCount;
+    	
+    	if (like_need < minLikeCount) return res.send(`Вы можете заказать минимум ${minLikeCount} лайков`)
+    	if (like_need > maxLikeCount) return res.send(`Вы можете заказать максимум ${maxLikeCount} лайков`)
 	}
 
-	// Проверка URL
-    const data = utils.urlparser.parseURL(req.body.url)
-    if (data == null) {
-    	res.send("Error url");
-    	return
+	// Проверка количуства комментов 
+	const comment_need = parseInt(req.body.comment_count);
+	const comments = req.body.comments;
+	let use_custom = false; // Используются ли пользовательские комментарии
+	if (comment_need) {
+		if (!object.can_comment) return res.send(`${lang(data.type)} нельзя комментировать`)
+
+		if (!Array.isArray(comments))       return res.send('Нужно добавить хотя бы один набор комментариев')
+		if (!comments.length)               return res.send('Нужно добавить хотя бы один набор комментариев')
+		if (!comments.includeOnlyNumbers()) return res.send('Один из наборов комментариев не найден')
+
+		// Получение данных о наборах
+		const comments_data = await db.comments.getCommentsData(req.body.comments);
+		if (comments_data.length != comments.length) return res.send('Один из наборов комментариев не найден')
+
+    	// Может ли пользователь использовать выбранные наборы
+    	for (comment_data of comments_data) {
+	    	if (comment_data.owner_id != 0 && comment_data.owner_id != req.user.id) {
+	    		return res.send('Нет доступа к одному из наборов комментариев')
+	    	}
+	    	if (comment_data.status != 'accept') {
+	    		return res.send('Один из наборов комментариев не активен')
+	    	}
+	    	// Проверка на то, что используются пользовательские наборы
+	    	if (comment_data.owner_id != 0) use_custom = true;
+    	}
+
+    	if (use_custom) {
+			// Получаем количество доступных аккаунтов для клиентских наборов
+			customAccountCount = await db.vk.getActiveAccountsCount(1);
+			var maxCommentCount = Math.floor(req.user.balance / req.user.comment_price);
+			if (maxCommentCount > customAccountCount * 3) maxCommentCount = customAccountCount * 3;
+    		if (maxCommentCount > 3500) maxCommentCount = 3500;
+    	}else {
+			var maxCommentCount = Math.floor(req.user.balance / req.user.comment_price);
+			if (maxCommentCount > 3500) maxCommentCount = 3500;    
+    	}
+
+    	if (comment_need < minCommentCount) return res.send(`Вы можете заказать минимум ${minCommentCount} комментариев`)
+    	if (comment_need > maxCommentCount) return res.send(`Вы можете заказать максимум ${maxCommentCount} комментариев`)
     }
 
-    // Проверка количества лайков
-	const like_need = req.body.count
+    if (!like_count && !comment_count == 0) {
+        toastr.error('Необходимо ввести количество лайков и/или комментариев')
+    }
 
-	accountsCount = await db.vk.getActiveAccountsCount();
-	accountsCount = Math.floor(accountsCount * 0.95);
+	//
+    // На этом этапе проверены все переменные
+	//
+	// Проверяем общую стоимость
+	const price = like_need * req.user.like_price + comment_need * req.user.comment_price;
+	if (price > req.user.balance) return res.send('Недостаточно средств')
 
-	maxLikeCount = Math.floor(req.user.balance / req.user.like_price);
-	if (maxLikeCount > accountsCount) maxLikeCount = accountsCount;
-
-	if (parseInt(like_need) != like_need ||	like_need < minLikeCount || like_need > maxLikeCount) {
-		return res.send('Invalid amount likes')
+	// Создаем задачи
+	if (comment_need) {
+		utils.task.addComments(
+			req.user,            // Объект пользователя, создающего задачу
+			data.type,           // Тип записи [post, photo, video, market]
+			'',                  // Название задачи
+			data.owner_id,       // Владелец записи
+			data.item_id,        // ID записи
+			comments,            // Список Id наборов комментариев
+			comment_need,        // Количество комментариев для накрутки
+			use_custom           // Используются ли клиентские наборы комментариев
+		);
 	}
-
-	// Проверка на наличие объекта (пытаемся получить список поставленных лайков)
-	let likes = await vkapi.getLikeList(data.type, data.owner_id, data.item_id, 1);
-	if (likes.error) {
-		if (likes.error.error_code == 5) {
-			return res.send('Запись не найдена или не хватает прав для комментирования')
-		} else {
-			return res.send('Ошибка при получении информации о записе')
-		}
+	if (like_need) {
+		utils.task.addLikes(
+			req.user,            // Объект пользователя, создающего задачу
+			'',                  // Название задачи
+			data.owner_id,       // Владелец записи
+			data.type,           // Тип записи [post, photo, video, market]
+			data.item_id,        // ID записи
+			like_need            // Количество лайков для накрутки
+		);
 	}
-	
-	utils.task.addLikes(req.user, req.body.name, data.owner_id, data.type, data.item_id, like_need);
 
 	res.send('Success')
 })
 
-/**
- * Добавление задачи на накрутку комментариев
- *
- * @body name - название задачи
- * @body url  - url записи
- * @body count - колличество комментариев для накрутки
- * @body comment_ids - массив из id наборов комментариев, например  [ '1', '2' ]
- */
+
 router.post('/add_comments', async function(req, res) {
-	if (!req.isAuthenticated()) return res.redirect('/login');
 
-	// Проверка названия [длина] + замена запрещенных символов
-	req.body.name = req.body.name.replace(/['"]/gi, '')
-	if (req.body.name.length > 75) {
-		res.send('Ошибка в названии')
-	}
-
-	// Проверка url
-	const data = utils.urlparser.parseURL(req.body.url)
-    if (data == null) {
-    	res.send("Error url");
-    	return
-    }
-
-    // 
-    if (!Array.isArray(req.body.comment_ids) || req.body.comment_ids.length == 0 || !req.body.comment_ids.includeOnlyNumbers()) {
-    	return res.send('Ошибка в наборах комментариев')
-    }
-    // Получение данных о наборах комментариях
-    const comments_data = await db.comments.getCommentsData(req.body.comment_ids);
-    if (comments_data.length != req.body.comment_ids.length) {
-    	return res.send('ID одного из наборов не существует')
-    }
-    let use_custom = false; // Используются ли пользовательские комментарии
-    for (comment_data of comments_data) {
-    	if (comment_data.owner_id != 0 && comment_data.owner_id != req.user.id) return res.send('Нет доступа к одному из наборов')
-    	if (comment_data.status != 'accept') return res.send('Один из наборов не активен')
-    	if (comment_data.owner_id != 0) use_custom = true;
-    }
-
-    if (use_custom) {
-		// Получаем количество доступных аккаунтов для клиентских наборов
-		customAccountCount = await db.vk.getActiveAccountsCount(1);
-		var maxCommentCount = Math.floor(req.user.balance / req.user.comment_price);
-		if (maxCommentCount > customAccountCount * 3) maxCommentCount = customAccountCount * 3;
-    }else {
-		var maxCommentCount = Math.floor(req.user.balance / req.user.comment_price);
-		if (maxCommentCount > 3500) maxCommentCount = 3500;    
-    }
 
     const comment_need = req.body.count
 

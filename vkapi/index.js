@@ -272,3 +272,115 @@ exports.getTypeByName = async function(screen_name) {
 
     return response.data.response;
 }
+
+
+
+/**
+ * Получаем информацию о возможных действиях
+ * @param type - тип объекта [post, photo, video, market]
+ * @param owner_id - владелец
+ * @param item_id  - идентефикатор объекта
+ *
+ * Возвращаемое значение
+ * {found, can_like, can_comment, can_repost}
+ * Найден ли объект, можно ли лайкать|комментировать|репостить
+ */
+exports.getAvailableActions = async function(type, owner_id, item_id) {
+    let params = { access_token: utils.vk.random_access_token, v:  '5.92' }
+
+    switch (type) {
+        case 'post':
+            var method = 'wall.getById';
+
+            params['posts'] = `${owner_id}_${item_id}`
+            break;
+        case 'photo':
+            var method = 'photos.getById';
+
+            params['photos']   = `${owner_id}_${item_id}`
+            params['extended'] = 1 // Для полей can_comment и can_repost
+            break;
+        case 'video':
+            var method = 'video.get';
+
+            params['videos'] = `${owner_id}_${item_id}`
+            params['extended'] = 1 // Для полей can_comment и can_repost
+            break;
+        case 'market':
+            method = 'market.get';
+
+            params['item_ids'] = `${owner_id}_${item_id}`
+            break;
+    }
+
+    // TODO: отслеживание ошибки
+    const res = await axios.get(`https://api.vk.com/method/${method}`, {params});
+    // Если не удалось получить информацию о объекте
+
+    if (res.data.error) {
+        switch (res.data.error.error_code) {
+            case 30:  // This profile is private
+            case 200: // Access denied
+            case 204: // Нет доступа
+            default:
+                return { found: false, can_like: false, can_comment: false, can_repost: false };
+        }
+    }
+    if (res.data.response) {
+        switch (type) {
+            case 'post':
+                // Если пост не найден
+                if (!res.data.response.length) {
+                    return { found: false, can_like: false, can_comment: false, can_repost: false };
+                }
+                const post = res.data.response[0];
+                return {
+                    found:       true,
+                    can_like:    post.likes.can_like,
+                    can_comment: post.comments.can_post,
+                    can_repost:  post.likes.can_publish
+                }
+
+            case 'photo':
+                // Если фото не найдено
+                if (!res.data.response.length) {
+                    return { found: false, can_like: false, can_comment: false, can_repost: false };
+                }
+                const photo = res.data.response[0];
+                return {
+                    found:       true,
+                    can_like:    true,
+                    can_comment: photo.can_comment,
+                    can_repost:  photo.can_repost
+                }
+            case 'video':
+                // Если видео не найдено 
+                if (!res.data.response.items.length) {
+                    return { found: false, can_like: false, can_comment: false, can_repost: false };
+                }
+                const video = res.data.response.items[0];
+                return {
+                    found:       true,
+                    can_like:    video.can_like,
+                    can_comment: video.can_comment,
+                    can_repost:  video.can_repost
+                }
+
+            case 'market':
+                // Если товар не найден
+                if (!res.data.response.items.length) {
+                    return { found: false, can_like: false, can_comment: false, can_repost: false };
+                }
+                const product = res.data.response.items[0];
+                return {
+                    found:       true,
+                    can_like:    product.can_like,
+                    can_comment: product.can_comment,
+                    can_repost:  product.can_repost
+                }
+        }
+    }
+    // По идее сюда мы не должны были дойти
+    loggger.error(res.data);
+    return { found: false, can_like: false, can_comment: false, can_repost: false };
+}
