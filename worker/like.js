@@ -174,6 +174,10 @@ queue.process('like', 3, async function(job, done){
 		// Синхронный режим (когда осталось накрутить мало лайков)
 		if (tasks[task_id].like_need - tasks[task_id].now_add < 60) {
 			if (timerID != -1) {
+				// При синхронном выполнении запросов говорим очереди
+				// что эта фукнция выполнена - чтобы не занимать в kue
+				// одну параллельную ячейку 
+				done();
 				clearInterval(timerID)
 				timerID = -1;
 			}
@@ -184,7 +188,7 @@ queue.process('like', 3, async function(job, done){
 				// Если нет аккаунта или в асинхронных функциях произошла фатальная ошибки
 				if (!account || tasks[task_id].fatal_error || tasks[task_id].error_count > 50) {
 					utils.task.onError(task_id);
-					return done();
+					return;
 				}
 
 				// Создаем синхронный запрос
@@ -195,12 +199,12 @@ queue.process('like', 3, async function(job, done){
 				// Проверка на то, что все лайки поставлены
 				if (tasks[task_id].now_add == tasks[task_id].like_need) {
 					utils.task.onSuccess(task_id);
-					return done();
+					return;
 				}
 			}
 			// Перекрутили комментов
 			utils.task.onSuccess(task_id);
-			return done();
+			return;
 		// Асинхронный режим
 		}else {
 			db.tasks.updateCount(task_id, tasks[task_id].now_add);

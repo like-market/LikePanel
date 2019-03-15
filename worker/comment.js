@@ -166,6 +166,10 @@ queue.process('comment', 3, async function(job, done){
 		// Синхронный режим (когда осталось накрутить мало комментов)
 		if (tasks[task_id].comment_need - tasks[task_id].now_add < 60) {
 			if (timerID != -1) {
+				// При синхронном выполнении запросов говорим очереди
+				// что эта фукнция выполнена - чтобы не занимать в kue
+				// одну параллельную ячейку 
+				done();
 				clearInterval(timerID)
 				timerID = -1;
 			}
@@ -182,19 +186,19 @@ queue.process('comment', 3, async function(job, done){
 				// Если в асинхронных функция произошла фатальная ошибки
 				if (tasks[task_id].fatal_error || tasks[task_id].error_count > 50) {
 					utils.task.onError(task_id);
-					return done();
+					return;
 				}
 
 				// Проверка на то, что все комменты поставлены
 				if (tasks[task_id].comment_need == tasks[task_id].now_add) {
 					utils.task.onSuccess(task_id);
-					return done();
+					return;
 				}
 			}
 			// Как мы сюда попали - это уже отдельная история...
 			// Перекрутили лайков
 			utils.task.onSuccess(task_id);
-			return done();
+			return;
 		// Асинхронный режим
 		}else {
 			db.tasks.updateCount(task_id, tasks[task_id].now_add);
