@@ -9,7 +9,7 @@ const db = mysql.createPool({
     user: config.db.user,
     database: config.db.database,
     password: config.db.password,
-    charset: 'utf8'
+    charset: 'utf8mb4'
 });
 
 db.on('connection', function (connection) {
