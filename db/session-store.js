@@ -1,12 +1,13 @@
-var session = require('express-session');
-var MySQLStore = require('express-mysql-session')(session);
- 
-var options = {
-    host: 'localhost',
-    port: 3306,
-    user: 'devlikepanel',
-    password: 'r35ImTyr52Ks666',
-    database: 'devlikepanel',
+const config = require('../config.js')
+const session = require('express-session');
+const MySQLStore = require('express-mysql-session')(session);
+
+const options = {
+    host: config.db.host,
+    port: config.db.port,
+    user: config.db.user,
+    database: config.db.database,
+    password: config.db.password,
     schema: {
         tableName: 'sessions',
         columnNames: {
