@@ -108,9 +108,13 @@
                                 <div class="form-group">
                                     <label class="control-label" for="comments">Наборы комментариев</label>
                                     <select id="comments" class="form-control" multiple="multiple" style="width: 100%">
-                                        <% comments.forEach(function(comment) { %>
-                                            <option value="<%= comment.id %>" data-custom="<%= (comment.owner_id != 0) %>"><%= comment.name %>
-                                        <% }) %>
+                                     <% comments.forEach(function(comment) {
+                                            if (comment.id == 2) { %>
+                                                <option value="<%= comment.id %>" data-custom="<%= (comment.owner_id != 0) %>" selected><%= comment.name %>
+                                         <% } else { %>
+                                                <option value="<%= comment.id %>" data-custom="<%= (comment.owner_id != 0) %>"><%= comment.name %>
+                                            }
+                                        }) %>
                                     </select>
                                 </div>
 
