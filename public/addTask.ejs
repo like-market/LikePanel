@@ -113,7 +113,7 @@
                                                 <option value="<%= comment.id %>" data-custom="<%= (comment.owner_id != 0) %>" selected><%= comment.name %>
                                          <% } else { %>
                                                 <option value="<%= comment.id %>" data-custom="<%= (comment.owner_id != 0) %>"><%= comment.name %>
-                                            }
+                                         <% }
                                         }) %>
                                     </select>
                                 </div>
