@@ -125,8 +125,8 @@ router.post('/add', utils.needBodyParams(params), async(req, res) => {
     	if (comment_need > maxCommentCount) return res.send(`Вы можете заказать максимум ${maxCommentCount} комментариев`)
     }
 
-    if (!like_count && !comment_count == 0) {
-        toastr.error('Необходимо ввести количество лайков и/или комментариев')
+    if (!like_need && !comment_need) {
+        return res.send('Необходимо ввести количество лайков и/или комментариев')
     }
 
 	//

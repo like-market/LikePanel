@@ -12,5 +12,9 @@ log/
 .npm/
 .profile
 .ssh/
+
+# Дамп бд
 dump.sql
 
+# Конфиг файл
+config.js
