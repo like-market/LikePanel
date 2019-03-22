@@ -140,3 +140,21 @@ exports.updateAccounts = async function(cb = null) {
 	logger.info('Все токены обновлены')
 	if (cb != null) cb();
 }
+
+/**
+ * Проверяем все аккаунты на валидность
+ * Если токены устарели - обновляем
+ */
+exports.checkAccounts = async function() {
+	const accounts = await db.vk.getActiveAccounts();
+
+	for (let account of accounts) {
+		const valid = await isTokenValid(account.access_token)
+		if (!valid) {
+			await exports.updateUserToken(account.user_id);
+		}
+		// Чтобы не слать много запросов в секунду
+		await utils.sleep(100)
+	}
+	logger.info('Все аккаунты проверены')
+}
