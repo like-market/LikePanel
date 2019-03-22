@@ -1,14 +1,15 @@
+const config = require('../config.js')
 const logger = require('../logger.js')
 const mysql = require('mysql');
 
 const db = mysql.createPool({
     connectionLimit: 5,
-    host: "localhost",
-    user: "devlikepanel",
-    database: "devlikepanel",
-    password: "r35ImTyr52Ks666",
-    charset: 'utf8'
-    //timezone: "+7"
+    host: config.db.host,
+    port: config.db.port,
+    user: config.db.user,
+    database: config.db.database,
+    password: config.db.password,
+    charset: 'utf8mb4'
 });
 
 db.on('connection', function (connection) {

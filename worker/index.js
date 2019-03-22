@@ -1,6 +1,8 @@
+const config = require('../config.js')
 const kue = require('kue')
+
 const queue = kue.createQueue({
-	prefix: 'd'
+	prefix: config.redis.prefix
 })
 
 
