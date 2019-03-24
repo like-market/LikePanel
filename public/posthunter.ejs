@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="vendor\animate.css\animate.css">
     <link rel="stylesheet" href="vendor\bootstrap\css\bootstrap.css">
     <link rel="stylesheet" href="vendor\select2\dist\css\select2.min.css">
+    <link rel="stylesheet" href="vendor\switchery\switchery.min.css">
     <link rel="stylesheet" href="vendor\toastr\toastr.min.css">
 
     <!-- App styles -->
@@ -28,7 +29,10 @@
     <%- include('Chatra', { user }); %>
 
     <!-- Cusom style -->
-    <style> .btn { margin: 1px !important } </style>
+    <style type="text/css">
+        .btn { margin: 1px !important }
+        td { vertical-align: middle !important  }
+    </style>
 </head>
 <body>
 
@@ -84,22 +88,34 @@
 
             <div class="row">
                 <div class="col-md-6">
-                    <div class="panel panel-filled panel-collapse" id="add-panel">
-                        <div class="panel-heading">
+                    <div class="panel panel-filled panel-collapse" id="panel">
+                        <div class="panel-heading" id="panel-name">
                             Добавить группу
                         </div>
-                        <div class="panel-body" id="add-panel-body">
+                        <div class="loader">
+                            <div class="loader-spin"></div>
+                        </div>
+                        <div class="panel-body" id="panel-body">
                             <div class="form-group">
-                                <p>Название</p>
+                                <label for="name">Название</label>
                                 <input type="text" class="form-control" id="name" placeholder="Будет отображаться в списке">
                             </div>
                             <div class="form-group">
-                                <p>Ссылка на группу</p>
+                                <label for="url">Ссылка на группу</label>
                                 <input type="text" class="form-control" id="url" placeholder="https://vk.com/public...">
                             </div>
 
                             <div class="form-group">
-                                <p>Количество лайков (выбирается случайно)</p>
+                                <p>Находить все посты&nbsp;&nbsp;<input type="checkbox" id="findAllPostButton"></p>
+                                <div id="post-options-area">
+                                    <p><i class="fa fa-ruble" style="font-size: 20px;"></i>&nbsp;&nbsp;&nbsp;Рекламные (с меткой)&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" id="adsWithMarkButton"></p>
+                                    <p><i class="fa pe-7s-refresh-2"style="font-size: 20px;"></i>&nbsp;&nbsp;Рекламные (без метки)&nbsp;&nbsp;<input type="checkbox" id="adsWithoutMarkButton"></p>
+                                    <p><i class="fa pe-7s-news-paper"style="font-size: 20px;"></i>&nbsp;&nbsp;Контент (без ссылок)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" id="onlyContentButton"></p>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="min_likes">Количество лайков (выбирается случайно)</label>
                                 <form class="form-inline">
                                     <div class="form-group">
                                         <label>От &nbsp;</label>
@@ -114,7 +130,7 @@
                             </div>
 
                             <div class="form-group">
-                                <p>Количество комментариев (выбирается случайно)</p>
+                                <label for="min_comments">Количество комментариев (выбирается случайно)</label>
                                 <form class="form-inline">
                                     <div class="form-group">
                                         <label>От &nbsp;</label>
@@ -129,80 +145,69 @@
                             </div>
 
                             <div class="form-group">
-                                <p>Наборы комментариев</p>
-                                <select id="comments_ids" class="form-control" multiple="multiple" style="width: 100%">
+                                <label for="comments">Наборы комментариев</label>
+                                <select id="comments" class="form-control" multiple="multiple" style="width: 100%">
                                     <% comments.forEach(function(comment) { %>
                                         <option value="<%= comment.id %>"><%= comment.name %>
                                     <% }) %>
                                 </select>
                             </div>
 
-                            <div class="btn-group pull-right">
-                                <a class="btn btn-w-md btn-success pull-right" onclick="add();">Добавить</a>
+                            <div class="form-group">
+                                <p>Искать вхождение текста&nbsp;&nbsp;<input type="checkbox" id="findEntryButton"></p>
+                                <div id="entry-area" style="display: none">
+                                    <textarea class="form-control" rows="2" id="entry-text" placeholder="Любая часть текста.&#10;"></textarea>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <p>Остановить после нахождения поста&nbsp;&nbsp;<input type="checkbox" id="autoStopButton"></p>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Время поиска (МСК)</label>
+                                <form class="form-inline">
+                                    <div class="form-group">
+                                        <label>Начало &nbsp;</label>
+                                        <input id="time_from" type="text" class="form-control" placeholder="HH:MM" value="00:00">
+                                    </div>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <div class="form-group">
+                                        <label>Конец &nbsp;</label>
+                                        <input id="time_to" type="text" class="form-control" placeholder="HH:MM" value="23:59">
+                                    </div>
+                                </form>
+                            </div>
+
+                            <div id="buttons" class="btn-group pull-right">
+                                <a id="add" class="btn btn-w-md btn-success pull-right">Добавить</a>
                             </div>
                         </div>
                     </div>
                 </div>
+
+
+
                 <div class="col-md-6">
-                    <div class="panel panel-filled" id="edit-panel">
+                    <div class="panel panel-filled">
                         <div class="panel-heading">
-                            Редактировать
+                            Инструкции
                         </div>
-                        <div class="loader">
-                            <div class="loader-spin"></div>
-                        </div>
-                        <div class="panel-body" id="edit-panel-body" style="display: none;">
-                            <div class="form-group">
-                                <p>Название</p>
-                                <input type="text" class="form-control" id="new_name" placeholder="Будет отображаться в списке">
-                            </div>
-                            <div class="form-group">
-                                <p>Ссылка на группу</p>
-                                <input type="text" class="form-control" id="new_url" placeholder="" disabled>
-                            </div>
-                            <div class="form-group">
-                                <p>Количество лайков (выбирается случайно)</p>
-                                <form class="form-inline">
-                                    <div class="form-group">
-                                        <label>От &nbsp;</label>
-                                        <input id="new_min_likes" type="number" class="form-control" placeholder="Минимум 10" min="10">
-                                    </div>
-                                    &nbsp;&nbsp;&nbsp;&nbsp;
-                                    <div class="form-group">
-                                        <label>До &nbsp;</label>
-                                        <input id="new_max_likes" type="number" class="form-control" placeholder="Максимум 1000" min="10">
-                                    </div>
-                                </form>
-                            </div>
-
-                            <div class="form-group">
-                                <p>Количество комментариев (выбирается случайно)</p>
-                                <form class="form-inline">
-                                    <div class="form-group">
-                                        <label>От &nbsp;</label>
-                                        <input id="new_min_comments" type="number" class="form-control" placeholder="Минимум 0" min="0">
-                                    </div>
-                                    &nbsp;&nbsp;&nbsp;&nbsp;
-                                    <div class="form-group">
-                                        <label>До &nbsp;</label>
-                                        <input id="new_max_comments" type="number" class="form-control" placeholder="Максимум 500" min="0">
-                                    </div>
-                                </form>
-                            </div>
-
-                            <div class="form-group">
-                                <p>Наборы комментариев</p>
-                                <select id="new_comments_ids" class="form-control" multiple="multiple" style="width: 100%">
-                                    <% comments.forEach(function(comment) { %>
-                                        <option value="<%= comment.id %>"><%= comment.name %>
-                                    <% }) %>
-                                </select>
-                            </div>
-
-                            <div class="btn-group pull-right">
-                                <a class="btn btn-w-md btn-accent" id="abort-edit">Отмена</a>
-                                <a class="btn btn-w-md btn-success" id="apply-edit">Изменить</a>
-                            </div>
+                        <div class="panel-body">
+                            <p>Постхантер проверяет наличие новых постов каждые 15 секунд</p>
+                            <p>
+                                Время можете указать критерии для поиска поста, такие как <code>время</code>,
+                                <code>тип&nbsp;поста</code>, <code>вхождение&nbsp;определенного&nbsp;текста</code>
+                            </p>
+                            Особенности:
+                            <p>1. Время указывается в часовом поясе МСК</p>
+                            <p>2. Вы можете выбрать один или больше типов постов для поиска</p>
+                            <p>3. Если указан текст, то идет строгий поиск вхождения - текст поста должен содержать указанный текст</p>
+                            <br/>
+                            Типы постов:<br/>
+                            1. Рекламный (с меткой) - ищет специальную метку ₽ у поста<br/>
+                            2. Рекламный (без метки) - ищет ссылки, внутренние ссылки и репосты<br/>
+                            3. Контент - все посты за исключением двух предыдущих<br/>
                         </div>
                     </div>
                 </div>
@@ -226,6 +231,7 @@
 <script src="vendor\jquery\dist\jquery.min.js"></script>
 <script src="vendor\bootstrap\js\bootstrap.min.js"></script>
 <script src="vendor\select2\dist\js\select2.js"></script>
+<script src="vendor\switchery\switchery.min.js"></script>
 <script src="vendor\toastr\toastr.min.js"></script>
 
 <!-- App scripts -->
