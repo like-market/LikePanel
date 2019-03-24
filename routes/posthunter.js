@@ -1,15 +1,14 @@
-var logger = require('../logger.js')
-var db = require('../db');
-var app = require('../app.js');
-var utils = require('../utils');
-var path  = require("path");
-var vkapi = require('../vkapi')
-var express = require('express')
-var router  = express.Router()
+const logger = require('../logger.js')
+const db = require('../db');
+const utils = require('../utils');
+const vkapi = require('../vkapi')
+const validator = require('../validator/posthunter.js')
 
-var moment = require('moment');
+const express = require('express')
+const router  = express.Router()
+
+const moment = require('moment');
 require('moment/locale/ru');
-
 
 router.get('/', async function(req, res) {
 	if (!req.isAuthenticated()) return res.redirect('/login');
@@ -18,90 +17,125 @@ router.get('/', async function(req, res) {
 	groups   = await db.posthunter.getByOwner(req.user.id); // Получаем все группы
 	for (group of groups) {
 		group.url = utils.urlparser.createPageURL(group.group_id);
-		group.create = moment(group.create).format("D MMMM YYYY")
 	}
 
 	res.render('posthunter', {user: req.user, comments, groups});
 });
 
 /**
- * Добавляем новую группу
- * @body name - название задачи
- * @body group_name - название группы
- * @body min_likes
- * @body max_likes
- * @body min_comments
- * @body max_comments
- * @body comments_ids
+ * Получаем запись постхантера по ID
+ * @body id - id записи в постхантере
  */
-router.post('/add', async function(req, res) {
+router.get('/id', utils.needBodyParams(['id']), async function(req, res) {
 	if (!req.isAuthenticated()) return res.redirect('/login');
-	data = req.body;
 
-	data.name = data.name.replace(/['"]/gi, '')
-	if (data.name.length > 60) {
-		return res.send('Ошибка в названии')
-	}
+	const group = await db.posthunter.getById(req.body.id);
+	if (!group) return res.send('Запись не найдена')
+	if (group.owner_id != req.user.id) return res.send('Не хватает прав')
 
-	// Проверка лайков
-	if (parseInt(data.min_likes) != data.min_likes || parseInt(data.max_likes) != data.max_likes ||
-		data.min_likes < 50 || data.max_likes > 5000 ||
-		data.max_likes < 50 || data.max_likes > 5000 ||
-		parseInt(data.min_likes) > parseInt(data.max_likes))
-	{
-		return res.send('Ошибка с лайками');
-	}
+	group.url = utils.urlparser.createPageURL(group.group_id);
+	res.send(group);
+})
 
-	// Проверка комментариев
-	if (!data.min_comments) data.min_comments = 0;
-	if (!data.max_comments) data.max_comments = 0;
 
-	if (parseInt(data.min_comments) != data.min_comments || parseInt(data.max_comments) != data.max_comments ||
-		data.min_comments < 0 || data.min_comments > 3500 ||
-		data.max_comments < 0 || data.max_comments > 3500  ||
-		parseInt(data.min_comments) > parseInt(data.max_comments))
-	{
-		return res.send('Ошибка с комментарими');
-	}
+/**
+ * Добавляем новую группу
+ * @body name - название постхантера
+ * @body url  - ссылка на группу
+ * @body min_likes    - минимальное  количество лайков
+ * @body max_likes    - максимальное количество лайков
+ * @body min_comments - минимальное  количество комментариев
+ * @body max_comments - максимальное количество комментариев
+ * @body comments     - набор комментариев
+ */
+const add_params = ['name', 'url', 'min_likes', 'max_likes', 'min_comments', 'max_comments', 
+                    'comments', 'entry_text', 'autostop', 'like_ads', 'like_repost', 'like_content',
+                    'time_from', 'time_to']
 
-	// Проверка url группы
-	const group_data = await vkapi.getTypeByName(data.group_name);
-	if (data.group_name == "" || (group_data.type != 'page' && group_data.type != 'user' &&
-		group_data.type != 'group'))
-	{
-		return res.send('Error group');
-	}
+router.post('/add', utils.needBodyParams(add_params), async function(req, res) {
+	if (!req.isAuthenticated()) return res.redirect('/login');
+
+	validator.validate(req, res);
+	// Если валидатор отправил сообщение об ошибке
+	if (res.headersSent) return;
+
+
+    const regex = /(https?:\/\/)?(www\.)?vk\.com\/(.[a-zA-Z0-9_]+)(\?.+)?/;
+	const group_name = regex.exec(req.body.url)[3];
+
+	const group_data = await vkapi.getTypeByName(group_name);
+	if (!group_data.type) return res.send('Группа/Страница не найдена');
+	if (group_data.type != 'group' && group_data.type != 'user') return res.send('Группа/Страница не найдена');
 
 	// Добавляем минус, если это сообщество
 	if (group_data.type == 'page' || group_data.type == 'group') {
 		group_data.object_id = '-' + group_data.object_id;
 	}
 
-	// Проверка на то, что группа еще не была добавлена
-	/*
-	const exists = await db.posthunter.getByGroupId(group_data.object_id);
-	if (exists.length) return res.send('Already added');
-	*/
-
-	// Получаем последний пост
-	let last_post_id;
-	const wall = await vkapi.getWall(group_data.object_id, 1);
-	
-	if (wall.response.items.length == 0) last_post_id = 0
-	else last_post_id = wall.response.items[0].id;
-	
-	if (parseInt(last_post_id) != last_post_id) last_post_id = 0;
+	const last_post_id = vkapi.wall.getLastPostId(group_data.object_id);
 
 	db.posthunter.add(
-		req.user.id,          // Владелец записи в постхантере
-		group_data.object_id, // Id группы/пользователя
-		data.name,            // Название записи в постхантере
-		last_post_id,    // Последний пост
-		data.min_likes, data.max_likes,       // Количество лайков
-		data.min_comments, data.max_comments, // Количество комментов
-		data.comments_ids     // Id набора комментариев
+		req.user.id,    // Владелец записи в постхантере
+		req.body.name,  // Название записи в постхантере
+		group_data.object_id, // ID группы/страницы
+		last_post_id,   // ID последнего поста
+		req.body.min_likes,    req.body.max_likes,    // Количество лайков
+		req.body.min_comments, req.body.max_comments, // Количество комментов
+		req.body.comments,           // ID наборов комментариев
+		req.body.autostop,           // Останавливать ли накрутку после нахождения поста
+		req.body.time_from, req.body.time_to, // Диапазон времени
+		req.body.like_ads,     //
+		req.body.like_repost,  // Какие посты лайкать (с меткой, с ссылкой, или контент)
+		req.body.like_content, // 
+		req.body.entry_text    // Текст, вхождение которого ищем
 	);
 	res.send('Ok');
+})
+
+const change_params = ['id', 'name', 'url', 'min_likes', 'max_likes', 'min_comments', 'max_comments', 
+                       'comments', 'entry_text', 'autostop', 'like_ads', 'like_repost', 'like_content',
+                       'time_from', 'time_to']
+
+router.post('/change', utils.needBodyParams(change_params), async function(req, res) {
+	if (!req.isAuthenticated()) return res.redirect('/login');
+
+	const group = await db.posthunter.getById(req.body.id);
+	if (!group) return res.send('Запись не найдена')
+	if (group.owner_id != req.user.id) return res.send('Не хватает прав')
+
+	validator.validate(req, res);
+	// Если валидатор отправил сообщение об ошибке
+	if (res.headersSent) return;
+
+	const regex = /(https?:\/\/)?(www\.)?vk\.com\/(.[a-zA-Z0-9_]+)(\?.+)?/;
+	const group_name = regex.exec(req.body.url)[3];
+
+	const group_data = await vkapi.getTypeByName(group_name);
+	if (!group_data.type) return res.send('Группа/Страница не найдена');
+	
+	// Добавляем минус, если это сообщество
+	if (group_data.type == 'page' || group_data.type == 'group') {
+		group_data.object_id = '-' + group_data.object_id;
+	}
+
+	const last_post_id = await vkapi.wall.getLastPostId(group_data.object_id);
+
+	db.posthunter.changeData(
+		req.body.id,          // ID записи
+		req.body.name,        // Название записи в постхантере
+		group_data.object_id, // ID группы/страницы
+		last_post_id,         // ID последнего поста
+		req.body.min_likes,    req.body.max_likes,    // Количество лайков
+		req.body.min_comments, req.body.max_comments, // Количество комментов
+		req.body.comments.join(','), // ID наборов комментариев
+		req.body.autostop,           // Останавливать ли накрутку после нахождения поста
+		req.body.time_from, req.body.time_to, // Диапазон времени
+		req.body.like_ads,     //
+		req.body.like_repost,  // Какие посты лайкать (с меткой, с ссылкой, или контент)
+		req.body.like_content, // 
+		req.body.entry_text    // Текст, вхождение которого ищем
+	)
+	res.send('Success');
 })
 
 /**
@@ -144,6 +178,22 @@ router.post('/update_status', async function(req, res) {
 	// Проверка корректности данных
 	if (req.body.status != 'enable' && req.body.status != 'disable') {
 		return res.send('Invalid data');
+	}
+	
+	// При включении ПХ нужно обновить last_post_id
+	if (req.body.status == 'enable') {
+		// Проверяем что группа существует
+		if (group.group_id.toString()[0] == '-') {
+			var group_id = 'public' + group.group_id.toString().replace('-', '');
+		}else {
+			var group_id = 'id' + group.group_id.toString().replace('-', '');
+		}
+		const group_data = await vkapi.getTypeByName(group_id);
+		if (!group_data.type) return res.send('Группа/Страница не найдена');
+
+		const last_post_id = await vkapi.wall.getLastPostId(group.group_id);
+		console.log(group.id, last_post_id);
+		await db.posthunter.setLastPostId(group.id, last_post_id);
 	}
 
 	db.posthunter.setStatus(req.body.id, req.body.status);
