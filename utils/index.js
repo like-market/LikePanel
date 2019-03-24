@@ -1,8 +1,9 @@
+exports.proxy = require('./proxy.js');
+
 exports.vk   = require('./vk.js');
 exports.task = require('./task.js');
 exports.user = require('./user.js');
 exports.lang = require('./lang.js');
-exports.proxy = require('./proxy.js');
 exports.payment  = require('./payment.js');
 exports.urlparser   = require('./urlparser.js');
 exports.posthunter  = require('./posthunter.js');
@@ -34,6 +35,18 @@ Array.prototype.includeOnlyNumbers = function() {
 	return numbers;
 }
 
+/**
+ * Получаем время с ведущими нулями, если нужно
+ */
+Date.prototype.getFullMinutes = function() {
+	if (this.getMinutes() <= 9) return `0${this.getMinutes()}`;
+	return this.getMinutes()
+}
+Date.prototype.getFullHours = function() {
+	if (this.getHours() <= 9) return `0${this.getHours()}`;
+	return this.getHours()
+}
+
 /*
 Object.prototype.parseSqlResult = function () {
     return JSON.parse(JSON.stringify(this))
@@ -47,6 +60,8 @@ Object.prototype.parseSqlResult = function () {
 exports.needBodyParams = function(params) {
 	return function(req, res, next) {
 		for (let param of params) {
+			if (req.query[param]) req.body[param] = req.query[param];
+
 			if (typeof req.body[param] == 'undefined') {
 				return res.send(`Не задан параметр ${param}`)
 			}

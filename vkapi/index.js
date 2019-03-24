@@ -5,13 +5,10 @@ const axios = require('axios-https-proxy-fix')
 
 
 exports.wall = require('./wall.js');
-// exports.likes = require('./likes.js');
+exports.account = require('./account.js');
 exports.comments = require('./comments.js');
 
-
-let proxies;
-// После загрузки модуля utils.proxy
-setTimeout(function() { proxies = utils.proxy.proxies; }, 1000);
+let proxies = utils.proxy.proxies;
 
 /**
  * Авторизация пользователя

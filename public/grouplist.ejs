@@ -2,7 +2,11 @@
     <tr>
         <th>Статус</th>
         <th>Группа</th>
-        <th>Накручено</th>
+        <th>Количество</th>
+        <th>Тип&nbsp;поста</th>
+        <th>Время</th>
+        <th>Автостоп</th>
+        <th>Вхождение</th>
         <th class="text-right">Действия</th>
     </tr>
 </thead>
@@ -12,39 +16,57 @@
     * @param groups [object] - список груп
     */ %>
 <% groups.forEach(function(group) { %>
-    <tr id="group_<%= group.id %>"
-        data-min_likes="<%= group.min_likes %>"
-        data-max_likes="<%= group.max_likes %>"
-        data-min_comments="<%= group.min_comments %>"
-        data-max_comments="<%= group.max_comments %>"
-        data-url="<%= group.url %>">
+    <tr id="group_<%= group.id %>">
         <td>
             <% if (group.status == 'enable') { %>
                 <span id="group_status_<%= group.id %>" class="label label-success">Включено</span>
-            <% }else { %>
+            <% } else if (group.status == 'pause') { %>
+                <span id="group_status_<%= group.id %>" class="label label-info">Остановлено</span>
+            <% } else { %>
                 <span id="group_status_<%= group.id %>" class="label label-danger">Отключено</span>
             <% } %>
         </td>
         <td>
-            <a href="<%= group.url %>" target="_blank" id="group_name_<%= group.id %>"><%= group.name %></a>
-            <div class="small"><i class="fa fa-clock-o"></i>
-                Добавлена <%= group.create %>
-            </div>
+            <a href="<%= group.url %>" target="_blank" id="group_name_<%= group.id %>"><%= group.name.length ? group.name : 'Ссылка' %></a>
         </td>
         <td>
-            <i class="fa pe-7s-like"></i>&nbsp;&nbsp;<%= group.total_likes %>
-            &nbsp;&nbsp;&nbsp;&nbsp;
-            <i class="fa fa-commenting-o"></i>&nbsp;&nbsp;<%= group.total_comments %>
+            <%  if (group.min_likes) { %>
+                    <i class="fa pe-7s-like"></i>&nbsp;От&nbsp;<%= group.min_likes %>&nbsp;до&nbsp;<%= group.max_likes %><br/>
+            <%  }
+                if (group.min_comments) { %>
+                    <i class="fa fa-commenting-o"></i>&nbsp;От&nbsp;<%= group.min_comments %>&nbsp;до&nbsp;<%= group.max_comments %>
+            <%  } %>
+        </td>
+        <td style="font-size: 20px;" >
+            <%  if (group.like_ads) { %>
+                    <i class="fa fa-ruble"></i>
+            <%  }
+                if (group.like_repost) { %>
+                    <i class="fa pe-7s-refresh-2"></i>
+            <%  }
+                if (group.like_content) { %>
+                    <i class="fa pe-7s-news-paper"></i>
+            <%  } %>
+        </td>
+        <td>
+            С&nbsp;&nbsp;&nbsp;<%= group.time_from %><br/>
+            До&nbsp;<%= group.time_to %><br/>
+        </td>
+        <td>
+            <%= group.autostop ? 'Да' : 'Нет'%>
+        </td>
+        <td>
+            <%= group.entry_text ? 'Да' : 'Нет'%>
         </td>
         <td>
             <div class="btn-group pull-right">
                 <% if (group.status == 'enable') { %>
-                    <button id="button_<%= group.id %>" onclick="updateStatus(<%= group.id %>, 'disable')" class="btn btn-danger btn-xs"><i class="fa fa-pencil"></i> Отключить </button>
+                    <button id="button_<%= group.id %>" onclick="updateStatus(<%= group.id %>, 'disable')" class="btn btn-danger btn-xs"><i class="fa fa-pencil"></i> Отключить </button><br/>
                 <% }else { %>
-                    <button id="button_<%= group.id %>" onclick="updateStatus(<%= group.id %>, 'enable')" class="btn btn-success btn-xs"><i class="fa fa-pencil"></i> Включить </button>
+                    <button id="button_<%= group.id %>" onclick="updateStatus(<%= group.id %>, 'enable')" class="btn btn-success btn-xs"><i class="fa fa-pencil"></i> Включить </button><br/>
                 <% } %>
                 <!-- <button onclick="stat(<%= group.id %>)" class="btn btn-default btn-xs"><i class="fa fa-folder"></i> Статистика </button> -->
-                <!-- <button onclick="edit(<%= group.id %>)" class="btn btn-default btn-xs"><i class="fa fa-folder"></i> Изменить </button> -->
+                <button onclick="edit(<%= group.id %>)" class="btn btn-default btn-xs"><i class="fa fa-folder"></i> Изменить </button><br/>
                 <button onclick="del(<%= group.id %>)" class="btn btn-danger btn-xs"><i class="fa fa-folder"></i> Удалить </button>
             </div>
         </td>
