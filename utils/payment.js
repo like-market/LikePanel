@@ -60,6 +60,14 @@ exports.checkBill = async function(pay_id, amount, sign) {
 	utils.user.changeBalance(user, 'add', amount * 1000, `Пополнение баланса. Платеж №${pay_id}`);
 	db.finance.setBillStatus(pay_id, 'paid');
 
+
+	/** Раздел акций */
+	if (amount >= 1000) {
+		let bonus = Math.cail(amount / 10) // Получаем 10% от пополненной суммы
+		utils.user.changeBalance(user, 'add', bonus * 1000, `Бонус к платежу №${pay_id}`);
+	}
+
+
 	// СМС о пополнении
 	{
 		const params = {
