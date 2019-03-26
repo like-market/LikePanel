@@ -18,8 +18,8 @@ $('#pay').click(function() {
 		$("#amount").css("border", "1.5px solid red");
 		return;
 	}
-	if (amount < 100 || amount > 10000) {
-		toastr.error('Можно пополнить от 100 до 10\'000 руб')
+	if (amount < min_payment || amount > max_payment) {
+		toastr.error(`Можно пополнить от ${min_payment}₽ до ${max_payment.toString().replace(/(\d\d\d$)/g, "'$1")}₽`)
 		$("#amount").css("border", "1.5px solid red");
 		return
 	}
