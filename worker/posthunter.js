@@ -15,7 +15,7 @@ const utils = require('../utils')
  *
  * @param 
  */
-queue.process('posthunter', 5, async function(job, done) {
+queue.process('posthunter', 3, async function(job, done) {
 	const group = job.data.group;
 	const accountsCount       = job.data.accountsCount;
 	const customAccountsCount = job.data.customAccountsCount;

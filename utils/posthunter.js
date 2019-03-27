@@ -19,7 +19,7 @@ exports.updateAll = async function () {
 	customAccountsCount = Math.floor(customAccountsCount * 0.9);
 
 	const date_now = (new Date()).getTime();
-	for (group of groups) {
+	for (let group of groups) {
 		// Проверка то, что последний найденный пост был 2 дня назад
 		const post_date = (new Date(group.last_update)).getTime();
 		if (date_now - post_date > 172800000) { // 1000 * 60 * 60 * 24 * 2 == 172800000

@@ -47,7 +47,8 @@ function addComments() {
         success: function(res) {
             switch(res) {
                 case 'Success':
-                    toastr.success('Комментарии добавлены')
+                    toastr.success('Новый набор находится на модерации.', { fadeAway: 4000 });
+                    toastr.success('Для ускорения модерации напишите менеджеру.', { fadeAway: 4000 });
                     $('#new-comments-name').val('')
                     $('#new-comments-text').val('')
                     break;
@@ -155,7 +156,7 @@ $('#apply-edit').click(function(e) {
                     $('#edit-panel-body').fadeOut(250);
                     $('#edit-comments-name').val('');
                     $('#edit-comments-text').val('');
-                    toastr.success('Набор изменен и скоро будет проверен')
+                    toastr.success('Ваш набор находится на модерации.<br/>Для ее ускорения напишите менеджеру или в чат.')
                     break;
                 default:
                     console.log(res);
