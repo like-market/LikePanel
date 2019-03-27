@@ -147,12 +147,55 @@ exports.addLike = async function(type, owner_id, item_id, account) {
 /**
  * Получить список пользователей, кто поставил лайк записи
  */
-exports.getLikeList = async function(type, owner_id, item_id, count = 1000) {
-    const params = { type, owner_id, item_id, count, filter: 'likes', v: 5.56, access_token: utils.vk.random_access_token}
+exports.getLikeList = async function(type, owner_id, item_id) {
+    const account = await db.vk.getRandomAccount();
+    const proxy = (account.proxy_id != null) ? proxies[account.proxy_id] : null;
 
-    const response = await axios.get('https://api.vk.com/method/likes.getList', {params})
+    const code = `
+        var res = API.likes.getList({ owner_id: "${owner_id}", item_id: ${item_id}, type: "${type}", count: 1000 });
+        var total_count = res.count;
 
-    return response.data;
+        var result = res.items;
+
+        var count = 1000;
+        while (count < total_count && count < 25000) {
+            res = API.likes.getList({ owner_id: "${owner_id}", item_id: ${item_id}, type: "${type}", count: 1000 });
+            result = result + res.items;
+            count = count + 1000;
+        }
+        return { count: total_count, likes: result };
+    `
+
+    let params = {
+        access_token: account.access_token,
+        code,
+        v: '5.92'
+    }
+
+    try {
+        const res = await axios.get('https://api.vk.com/method/execute', {
+            params,
+            proxy
+        });
+
+        if (res.data.error) {
+            switch (res.data.error.error_code) {
+                case 5:
+                    utils.vk.updateUserToken(account.user_id)
+                    logger.warn(`Невалидная сессия у аккаунта ${account.user_id}`)
+                    return exports.getLikeList(type, owner_id, item_id);
+
+                default:
+                    logger.warn(`Неизвестная ошибка api /vkapi/index.js:getLikeList(${type}, ${owner_id}, ${item_id})`, {json: {code, response: res.data }});
+                    return { response: {likes: []}}; // Пустой массив лайков
+            }
+        }
+
+        return res.data;
+    }catch (error) {
+        logger.error('Какая-то ошибка ошибка в axios запросе /vkapi/index.js:getLikeList(${type}, ${owner_id}, ${item_id})', { json: error.code });
+        return exports.getLikeList(type, owner_id, item_id);
+    }
 }
 
 /**
@@ -285,7 +328,13 @@ exports.getTypeByName = async function(screen_name) {
  * Найден ли объект, можно ли лайкать|комментировать|репостить
  */
 exports.getAvailableActions = async function(type, owner_id, item_id) {
-    let params = { access_token: utils.vk.random_access_token, v:  '5.92' }
+    const account = await db.vk.getRandomAccount();
+    const proxy = (account.proxy_id != null) ? proxies[account.proxy_id] : null;
+
+    let params = {
+        access_token: account.access_token,
+        v:  '5.92'
+    }
 
     switch (type) {
         case 'post':
@@ -312,74 +361,90 @@ exports.getAvailableActions = async function(type, owner_id, item_id) {
             break;
     }
 
-    // TODO: отслеживание ошибки
-    const res = await axios.get(`https://api.vk.com/method/${method}`, {params});
-    // Если не удалось получить информацию о объекте
+    try {
+        const res = await axios.get(`https://api.vk.com/method/${method}`, {
+            params,
+            proxy
+        });
+        
+        // Если не удалось получить информацию о объекте
+        if (res.data.error) {
+            switch (res.data.error.error_code) {
+                case 5:
+                    utils.vk.updateUserToken(account.user_id)
+                    logger.warn(`Невалидная сессия у аккаунта ${account.user_id}`)
+                    return exports.getAvailableActions(type, owner_id, item_id);
 
-    if (res.data.error) {
-        switch (res.data.error.error_code) {
-            case 30:  // This profile is private
-            case 200: // Access denied
-            case 204: // Нет доступа
-            default:
-                return { found: false, can_like: false, can_comment: false, can_repost: false };
+                case 30:  // This profile is private
+                case 200: // Access denied
+                case 204: // Нет доступа
+                    return { found: false, can_like: false, can_comment: false, can_repost: false };
+                default:
+                    logger.warn(`Неизвестная ошибка /vkapi/index.js:getAvailableActions(${type}, ${owner_id}, ${item_id})`, {json: res.data})
+                    return { found: false, can_like: false, can_comment: false, can_repost: false };           
+            }
         }
-    }
-    if (res.data.response) {
-        switch (type) {
-            case 'post':
-                // Если пост не найден
-                if (!res.data.response.length) {
-                    return { found: false, can_like: false, can_comment: false, can_repost: false };
-                }
-                const post = res.data.response[0];
-                return {
-                    found:       true,
-                    can_like:    post.likes.can_like,
-                    can_comment: post.comments.can_post,
-                    can_repost:  post.likes.can_publish
-                }
+        if (res.data.response) {
+            switch (type) {
+                case 'post':
+                    // Если пост не найден
+                    if (!res.data.response.length) {
+                        return { found: false, can_like: false, can_comment: false, can_repost: false };
+                    }
+                    const post = res.data.response[0];
+                    return {
+                        found:       true,
+                        can_like:    post.likes.can_like,
+                        can_comment: post.comments.can_post,
+                        can_repost:  post.likes.can_publish
+                    }
 
-            case 'photo':
-                // Если фото не найдено
-                if (!res.data.response.length) {
-                    return { found: false, can_like: false, can_comment: false, can_repost: false };
-                }
-                const photo = res.data.response[0];
-                return {
-                    found:       true,
-                    can_like:    true,
-                    can_comment: photo.can_comment,
-                    can_repost:  photo.can_repost
-                }
-            case 'video':
-                // Если видео не найдено 
-                if (!res.data.response.items.length) {
-                    return { found: false, can_like: false, can_comment: false, can_repost: false };
-                }
-                const video = res.data.response.items[0];
-                return {
-                    found:       true,
-                    can_like:    video.can_like,
-                    can_comment: video.can_comment,
-                    can_repost:  video.can_repost
-                }
+                case 'photo':
+                    // Если фото не найдено
+                    if (!res.data.response.length) {
+                        return { found: false, can_like: false, can_comment: false, can_repost: false };
+                    }
+                    const photo = res.data.response[0];
+                    return {
+                        found:       true,
+                        can_like:    true,
+                        can_comment: photo.can_comment,
+                        can_repost:  photo.can_repost
+                    }
+                case 'video':
+                    // Если видео не найдено 
+                    if (!res.data.response.items.length) {
+                        return { found: false, can_like: false, can_comment: false, can_repost: false };
+                    }
+                    const video = res.data.response.items[0];
+                    return {
+                        found:       true,
+                        can_like:    video.can_like,
+                        can_comment: video.can_comment,
+                        can_repost:  video.can_repost
+                    }
 
-            case 'market':
-                // Если товар не найден
-                if (!res.data.response.items.length) {
-                    return { found: false, can_like: false, can_comment: false, can_repost: false };
-                }
-                const product = res.data.response.items[0];
-                return {
-                    found:       true,
-                    can_like:    product.can_like,
-                    can_comment: product.can_comment,
-                    can_repost:  product.can_repost
-                }
+                case 'market':
+                    // Если товар не найден
+                    if (!res.data.response.items.length) {
+                        return { found: false, can_like: false, can_comment: false, can_repost: false };
+                    }
+                    const product = res.data.response.items[0];
+                    return {
+                        found:       true,
+                        can_like:    product.can_like,
+                        can_comment: product.can_comment,
+                        can_repost:  product.can_repost
+                    }
+            }
         }
+        // По идее сюда мы не должны были дойти
+        loggger.error(res.data);
+        return { found: false, can_like: false, can_comment: false, can_repost: false };
+
+    }catch (error) {
+        // Если ошибка в axios запросе
+        logger.error(`Ошибка в axios запросе!  /vkapi/index.js:getAvailableActions(${type}, ${owner_id}, ${item_id})`, {json: error.code})
+        return { found: false, can_like: false, can_comment: false, can_repost: false };
     }
-    // По идее сюда мы не должны были дойти
-    loggger.error(res.data);
-    return { found: false, can_like: false, can_comment: false, can_repost: false };
 }

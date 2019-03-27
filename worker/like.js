@@ -148,22 +148,15 @@ queue.process('like', 3, async function(job, done){
 	let accounts = [];
 
 	// Получаем аккаунты, которые уже поставили лайки
-	let already_set = await vkapi.getLikeList(tasks[task_id].type, tasks[task_id].owner_id, tasks[task_id].item_id);
-	if (!already_set || !already_set.response || !already_set.response.items) {
-		console.log(already_set);
-		logger.error('getLikeList вернуло null')
-		already_set = []	
-	}else {
-		already_set = already_set.response.items;
-	}
+	let likes = await vkapi.getLikeList(tasks[task_id].type, tasks[task_id].owner_id, tasks[task_id].item_id);
+	likes = likes.response.likes;
 
     for (let account of all_accounts) {
     	// Если аккаунт не поставил лайк, добавляем его в массив аккаунтов
-        if (already_set.indexOf(account.user_id) == -1) {
+        if (likes.indexOf(account.user_id) == -1) {
         	accounts.push(account);
         }
     }
-
 
 
 	let timerID; // ID таймера
