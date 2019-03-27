@@ -95,7 +95,7 @@ const createRequest = async function(task_id, comment, account) {
 				logger.warn(`Один из параметров не верный`, {json: response.error})
 				// Если запись была удалена
 				if (response.error.error_msg == "One of the parameters specified was missing or invalid: object not found") {
-					tasks[task_id].Fatall_error = true;
+					tasks[task_id].fatall_error = true;
 				}else {
 					tasks[task_id].error_count++;
 				}
@@ -114,7 +114,7 @@ const createRequest = async function(task_id, comment, account) {
 
 			// Strange Error - лимит на количиство ошибок
 			default:
-				logger.warn('Неизвестная ошибка', {json: response})
+				logger.warn('Неизвестная ошибка /worker/comments.js', {json: response})
 				tasks[task_id].error_count++;
 		}
 	}

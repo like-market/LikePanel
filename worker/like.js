@@ -107,7 +107,7 @@ const createRequest = async function(task_id, account) {
 
 			// Strange Error - лимит на количиство ошибок
 			default:
-				logger.warn('Неизвестная ошибка', {json: response})
+				logger.warn('Неизвестная ошибка /worker/like.js', {json: response})
 				tasks[task_id].error_count++;
 		}
 	}

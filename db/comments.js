@@ -1,4 +1,5 @@
-var db = require('./index.js').db;
+const db = require('./index.js').db;
+const logger = require('../logger.js')
 
 /**
  * Возвращаем наборы комментариев, которые доступны пользователю
@@ -67,7 +68,10 @@ exports.getCommentsData = function(ids) {
 		sql += "`id`=" + ids[ids.length - 1]
 
 		db.query(sql, function(err, rows) {
-        	if (err) console.log(err);
+			if (err) {
+				logger.error(err);
+				return resolve([]);
+			}
         	if (rows.length == 0) return resolve([])
 
         	resolve( JSON.parse(JSON.stringify(rows)) );

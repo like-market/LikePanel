@@ -57,6 +57,13 @@ exports.checkBill = async function(pay_id, amount, sign) {
 	}
 
 	user = await db.users.findById(bill.user_id);
+
+	const blocks = ['dnoarta', 'z74enkf3'];
+	if (blocks.indexOf(user.username) != -1) {
+		console.log(`${user.username} хотел пополнить баланс, по пошел на хуй`);
+		return;
+	}
+
 	utils.user.changeBalance(user, 'add', amount * 1000, `Пополнение баланса. Платеж №${pay_id}`);
 	db.finance.setBillStatus(pay_id, 'paid');
 

@@ -7,7 +7,7 @@ exports.lang = require('./lang.js');
 exports.payment  = require('./payment.js');
 exports.urlparser   = require('./urlparser.js');
 exports.posthunter  = require('./posthunter.js');
-exports.anticaptcha = require('./anticaptcha.js')
+exports.anticaptcha = require('./anticaptcha.js');
 
 exports.sleep = function(ms) {
 	return new Promise(resolve => setTimeout(resolve, ms));
@@ -35,6 +35,16 @@ Array.prototype.includeOnlyNumbers = function() {
 	return numbers;
 }
 
+String.prototype.replaceArray = function(find, replace) {
+	let replaceString = this;
+	let regex;
+	for (let i = 0; i < find.length; i++) {
+		regex = new RegExp(find[i], "g");
+		replaceString = replaceString.replace(regex, replace[i]);
+	}
+	return replaceString;
+}
+
 /**
  * Получаем время с ведущими нулями, если нужно
  */
@@ -45,6 +55,17 @@ Date.prototype.getFullMinutes = function() {
 Date.prototype.getFullHours = function() {
 	if (this.getHours() <= 9) return `0${this.getHours()}`;
 	return this.getHours()
+}
+
+/**
+ * Преобразуем время к формату mysql TIMESTAMP
+ */
+Date.prototype.toMySQL = function() {
+	let utc = this.getTime();
+	this.setTime(utc - this.getTimezoneOffset() * 60000) // Смещение на часовой пояс
+	let result = this.toISOString().substring(0, 19).replace('T', ' ')
+	this.setTime(utc);
+	return result;
 }
 
 /*

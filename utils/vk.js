@@ -23,7 +23,8 @@ exports.getRandomToken = async function(update = false) {
         // Если аккаунт не найден
         if (account == null) {
         	logger.error('Нет активных аккаунтов в бд')
-        	process.exit(1)
+        	//process.exit(1)
+        	return;
         }
 
         // Проверяем access_token на валидность
@@ -152,7 +153,17 @@ exports.checkAccounts = async function() {
 		const valid = await isTokenValid(account.access_token)
 		if (!valid) {
 			await exports.updateUserToken(account.user_id);
+			// Получаем новый токен
+			account = await db.vk.getAccount(account.user_id);
 		}
+
+		const data = await vkapi.account.getProfileInfo(account);
+		// Если нет телефона
+		if (data.response && !data.response.phone) {
+			logger.warn(`У аккаунта ${account.user_id} не привязан телефон`)
+			db.vk.setAccountStatus(account.user_id, 'no_phone')
+		}
+
 		// Чтобы не слать много запросов в секунду
 		await utils.sleep(100)
 	}

@@ -124,8 +124,23 @@ exports.setStatus = function(id, status) {
 	});
 }
 
+/**
+ * Установка id последнего поста
+ */
 exports.setLastPostId = function(id, post_id) {
-    var sql = "UPDATE `posthunter` SET `last_post_id`='" + post_id + "' WHERE `id`=" + id;
+    var sql = `UPDATE posthunter SET last_post_id=${post_id} WHERE id=${id}`;
+    console.log(sql);
+    db.query(sql, function(err, rows) {
+        if (err) console.log(err);
+    });
+}
+
+/**
+ * Установка времени последнего обновления
+ */
+exports.setLastUpdateTime = function(id, date) {
+    var sql = `UPDATE posthunter SET last_update='${date}' WHERE id=${id}`;
+
     db.query(sql, function(err, rows) {
         if (err) console.log(err);
     });

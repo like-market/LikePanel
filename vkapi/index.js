@@ -4,8 +4,9 @@ const db    = require('../db')
 const axios = require('axios-https-proxy-fix')
 
 
-exports.wall = require('./wall.js');
-exports.account = require('./account.js');
+exports.wall  = require('./wall.js');
+exports.group = require('./group.js');
+exports.account  = require('./account.js');
 exports.comments = require('./comments.js');
 
 let proxies = utils.proxy.proxies;
@@ -108,13 +109,14 @@ exports.getWall = async function(owner_id, count = 10) {
         access_token: utils.vk.random_access_token,
         owner_id,
         count,
-        v: 5.56
+        v: 5.92
     }
 
     try {
         const response = await axios.get('https://api.vk.com/method/wall.get', {params});
         return response.data;
     }catch (error) {
+        console.log(error.response.data);
         return error.response.data;
     }
 }

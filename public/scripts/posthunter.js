@@ -56,6 +56,31 @@ $("#name, #url, #entry-text").change(function() {
     $(this).css("border", "");
 });
 
+// При выборе нового набора комментариев
+$('#comments').on('change', function() {
+console.log('true')
+    use_custom = false; 
+
+    if ($('#comments').val() != null) {
+        for (let id of $('#comments').val()) {
+            let custom = $(this).find(`[value="${id}"]`).attr('data-custom');
+            if (custom == 'true') use_custom = true;
+        }
+    }
+
+    let max_count;
+    if (use_custom) {
+        $('#custom_comment_info').show(300);
+        max_count = maxCustomCommentCount;
+    }else{
+        $('#custom_comment_info').hide(300);
+        max_count = maxCommentCount;
+    }
+
+    $('#max_comments').prop('max', max_count)
+    $('#max_comments').attr('placeholder', `Максимум ${max_count}`)
+});
+
 /**
  * Удаляем запись в постхантере
  * @param group_id - ID записи
@@ -130,7 +155,7 @@ function checkFieldsCorrect() {
     }
 
     // Проверка ссылки
-    const regex = /(https?:\/\/)?(www\.)?vk\.com\/(.[a-zA-Z0-9_]+)(\?.+)?/gm;
+    const regex = /(https?:\/\/)?(www\.)?vk\.com\/(.[a-zA-Z0-9_.]+)(\?.+)?/gm;
     const url = $('#url').val()
     if (regex.exec(url) == null) {
         $("#url").css("border", "1.5px solid red");
@@ -195,8 +220,8 @@ function checkFieldsCorrect() {
             $("#entry-text").css("border", "1.5px solid red");
             error++;
         }
-        if (entry_text.length > 150) {
-            toastr.error('Максимальная длина текста для поиска - 150 символов');
+        if (entry_text.length > 500) {
+            toastr.error('Максимальная длина фраз для поиска - 500 символов');
             $("#entry-text").css("border", "1.5px solid red");
             error++;
         }
@@ -261,9 +286,9 @@ $('#add').click(function() {
 
                 case 'Success':
                     toastr.success('Успешно добавлено');
-                    //setTimeout(function() {
-                    //    window.location.href = "/posthunter";
-                    //}, 500);
+                    setTimeout(function() {
+                        window.location.href = "/posthunter";
+                    }, 500);
                     break;
                 default:
                     toastr.error(res);

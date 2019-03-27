@@ -41,7 +41,6 @@ exports.updateAccounts = async function() {
 			if (err) console.log(err)
 		});
 	}
-	logger.info("Прокси для аккаунтов обновлены");
 }
 
 exports.get = function(id) {
