@@ -18,10 +18,18 @@ exports.updateAll = async function () {
 	let customAccountsCount = await db.vk.getActiveAccountsCount(1);
 	customAccountsCount = Math.floor(customAccountsCount * 0.9);
 
-	for (group of groups) {
-		worker.queue.create('posthunter', { group, accountsCount, customAccountsCount }).removeOnComplete(true).save();
+	const date_now = (new Date()).getTime();
+	for (let group of groups) {
+		// Проверка то, что последний найденный пост был 2 дня назад
+		const post_date = (new Date(group.last_update)).getTime();
+		if (date_now - post_date > 172800000) { // 1000 * 60 * 60 * 24 * 2 == 172800000
+			logger.warn(`У постхантера ${group.id} закончилось время активности`);
+			db.posthunter.setStatus(group.id, 'pause');
+		}else {
+			worker.queue.create('posthunter', { group, accountsCount, customAccountsCount }).removeOnComplete(true).save();
+		}
 	}
-	logger.info('Задачи для постхантера добавлены в очередь')
+	logger.info('Постхантер обновлен')
 }
 
 /**
@@ -29,12 +37,13 @@ exports.updateAll = async function () {
  * @param post - объект поста
  */
 exports.isHideAds = function(post) {
+	console.log(post);
 	// Если это репост
 	if (post.copy_history) return true;
 	
 	// Если прикреплена ссылка
 	if (post.attachments) {
-		for (attachment of attachments) {
+		for (let attachment of post.attachments) {
 			if (attachment.type == 'link') return true;
 		}
 	}

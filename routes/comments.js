@@ -6,6 +6,9 @@ var db = require('../db');
 var moment = require('moment');
 require('moment/locale/ru');
 
+/** Замена символов в комментариях */
+const replace_from = ['А', 'Е', 'В', 'Х', 'О', 'Р', 'К', 'С', 'М', 'Т', 'Н', 'а', 'у', 'е', 'х', 'о', 'р', 'с'];
+const replace_to   = ['A', 'E', 'B', 'X', 'O', 'P', 'K', 'C', 'M', 'T', 'H', 'a', 'y', 'e', 'x', 'o', 'p', 'c'];
 
 router.get('/', async function(req, res) {
 	if (!req.isAuthenticated()) return res.redirect('/login');
@@ -46,6 +49,8 @@ router.post('/add', async function(req, res) {
 	if (count < 50) {
 		return res.send('Комментариев слишком мало')
 	}
+
+	text = text.replaceArray(replace_from, replace_to);
 
 	db.comments.add(req.user.id, name, text, count);
 	res.send('Success');
@@ -114,6 +119,8 @@ router.post('/edit', async function(req, res) {
 	// Проверяем, что комментарий принадлежит пользователю
 	let comment = await db.comments.get(comment_id);
 	if (req.user.id != comment.owner_id) return res.send('Access error')
+
+	text = text.replaceArray(replace_from, replace_to);
 
 	db.comments.edit(comment_id, name, text, count);
 	res.send('Success');

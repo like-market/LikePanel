@@ -129,6 +129,14 @@ router.post('/add', utils.needBodyParams(params), async(req, res) => {
         return res.send('Необходимо ввести количество лайков и/или комментариев')
     }
 
+    // Проверяем то, что эта группа не верицированна
+    let [error, group_info] = await vkapi.group.getGroupInfo(data.owner_id);
+    console.log(group_info)
+    // if (error) return res.send('Что-то пошло не так. Попробуйте еще раз');
+    if (group_info.verified) return res.send('Нельзя накручивать на данную запись')
+    if (group_info.members_count < 10000) return res.send('В группе должно быть минимум 10\'000 участников')
+
+
 	//
     // На этом этапе проверены все переменные
 	//

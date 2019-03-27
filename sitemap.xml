@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+   <url>
+      <loc>https://like-market.ru/</loc>
+      <lastmod>2019-03-15</lastmod>
+      <changefreq>weekly</changefreq>
+   </url>
+   <url>
+      <loc>https://like-market.ru/login</loc>
+      <lastmod>2019-03-15</lastmod>
+      <changefreq>monthly</changefreq>
+   </url>
+   <url>
+      <loc>https://like-market.ru/register</loc>
+      <lastmod>2019-03-15</lastmod>
+      <changefreq>monthly</changefreq>
+   </url>
+</urlset>

@@ -20,7 +20,7 @@ const db = require('../db');
  */
 exports.validate = async function(req, res) {
 	// Проверка названия
-	if (req.body.name > 60) return res.send('Название может содержать максимум 60 символов')
+	if (req.body.name.length > 60) return res.send('Название может содержать максимум 60 символов')
 
 	// Проверка URL
     const regex = /(https?:\/\/)?(www\.)?vk\.com\/(.[a-zA-Z0-9_]+)(\?.+)?/;
@@ -84,8 +84,8 @@ exports.validate = async function(req, res) {
 	req.body.like_content = +(req.body.like_content == '1');
 
 
-    if (req.body.entry_text.length > 150) {
-        return res.send('Максимальная длина текста для поиска - 150 символов');
+    if (req.body.entry_text.length > 500) {
+        return res.send('Максимальная длина фраз для поиска - 500 символов');
     }
 
 	if (!req.body.like_ads && !req.body.like_repost && !req.body.like_content) return res.send('Выберите хотя бы один вариант, когда будет работать накрутка')

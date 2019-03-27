@@ -64,17 +64,22 @@
 
             <div class="row">
                 <div class="col-md-6">
+                    <div class="panel panel-filled panel-c-accent">
+                        <div class="panel-body">
+                            <h4>Акция</h4>
+                            <span>При пополнении баланса сервиса от <a>1000₽</a> - Вам начислится бонус в размере <a>10%</a></span>   
+                        </div>
+                    </div>
 
                     <div class="panel panel-filled">
-                        
                         <div class="panel-body">
                             <h4>Пополнить баланс</h4>
-                            <span>Вы можете пополнить баланс от <a>100₽</a> до <a>15'000₽</a>   
+                            <span>Вы можете пополнить баланс от <a><%= min_payment %>₽</a> до <a><%= max_payment.toString().replace(/(\d\d\d$)/g, "'$1") %>₽</a>   
                             <p class="small">Если вы хотите пополнить баланс другим способом, напишите <a class="c-white" href="https://tgdo.me/olkaf" target="_blank" style="color: #f6a821;">менеджеру</a></p>
 
                             <div class="form-inline">
                                 <label>Сумма &nbsp;</label>
-                                <input id="amount" type="number" class="form-control" placeholder="Минимум 100₽" min="100">
+                                <input id="amount" type="number" class="form-control" placeholder="Минимум <%= min_payment %>₽" min="<%= min_payment %>">
                             </div>
                         </div>
                         <div class="panel-footer text-center">
@@ -192,6 +197,9 @@
 <script src="scripts\payment.js"></script>
 
 <script type="text/javascript">
+    const min_payment = <%= min_payment %>;
+    const max_payment = <%= max_payment %>;
+
     const transactions_count = <%= transactions_count %>; // Всего транзакций
     let page = 1;   // Номер текущей страницы
     let count = 10; // Количество тасков на странице

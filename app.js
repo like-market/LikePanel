@@ -30,18 +30,21 @@ if (cluster.isMaster) {
 
 }else {
     const worker = require('./worker');
+    const cli    = require('./cli.js');
 
     logger.info('Запущен backend');
 
     // Получаем рандомный валидный токен
     (async function() {
-        utils.vk.updateAccounts();       // Асинхронно обновляем все аккаунты
+        utils.vk.updateAccounts();       // Асинхронно обновляем все аккаунты со старым токеном
         await utils.vk.getRandomToken(); // Синхронно получаем рандомный валидный токен
         await utils.proxy.updateProxyList(); // Синхронно инициализируем список прокси
         await worker.createWorkers();        // Синхронно инициализируем воркеры
         await utils.posthunter.updateAll();  // Синхронно обновляем постхантер
 
-        setInterval(utils.vk.updateAccounts,    1000 * 60 * 5) // Каждые 5 минут обновляем аккаунты
-        setInterval(utils.posthunter.updateAll, 1000 * 30)     // Каждые 30 секунд обновляем постхантер 
+
+        setInterval(utils.vk.checkAccounts, 15 * 60 * 1000) // Каждые 15 минут полностью обновляем все аккаунты
+        setInterval(utils.vk.updateAccounts, 3 * 60 * 1000) // Каждые 3 минуты обновляем аккаунты со старым токеном
+        setInterval(utils.posthunter.updateAll,  30 * 1000) // Каждые 30 секунд обновляем постхантер
     })()
 }

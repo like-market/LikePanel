@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const config = require('../config.js')
 const logger = require('../logger.js')
 const utils = require('../utils');
 const db = require('../db');
@@ -7,11 +8,15 @@ const db = require('../db');
 const moment = require('moment');
 require('moment/locale/ru');
 
+const min_payment = config.payment.min; // Минимальный размер пополнения
+const max_payment = config.payment.max; // Максимальный размер пополнения
 
 router.get('/', async function(req, res) {
 	if (!req.isAuthenticated()) return res.redirect('/login');
 
 	res.render('payment', {
+		min_payment,
+		max_payment,
 		moment: moment,
 		user: req.user,
 		transactions: await db.finance.getBalanceHistory(req.user, 15),
@@ -47,8 +52,8 @@ router.post('/get_transactions', async function(req, res) {
 router.post('/pay', async function(req, res) {
 	if (!req.isAuthenticated()) return res.redirect('/login');
 
-	if (parseInt(req.body.amount) != req.body.amount || req.body.amount < 100 || req.body.amount > 15000) {
-		return res.send('Error');
+	if (parseInt(req.body.amount) != req.body.amount || req.body.amount < min_payment || req.body.amount > max_payment) {
+		return res.send(`Пополнять можно от ${min_payment}₽ до ${max_payment}₽`);
 	}
 
 	const url = await utils.payment.createBill(req.user, req.body.amount);

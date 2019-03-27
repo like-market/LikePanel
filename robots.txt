@@ -1,0 +1,7 @@
+User-agent: *
+
+Sitemap: https://like-market.ru/sitemap.xml
+
+Allow: /login
+Allow: /register
+Allow: /
