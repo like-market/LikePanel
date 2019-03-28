@@ -38,6 +38,7 @@ exports.vk = require('./vk.js');
 exports.users = require('./users.js');
 exports.tasks = require('./tasks.js');
 exports.proxy = require('./proxy.js');
+exports.fgtpwd = require('./fgtpwd.js');
 exports.finance = require('./finance.js');
 exports.comments = require('./comments.js');
 exports.activity = require('./activity.js');
