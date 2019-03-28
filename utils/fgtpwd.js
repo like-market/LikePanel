@@ -35,7 +35,7 @@ exports.requestPassword = async function(user, ip) {
 					<div style="padding: 15px 0;">
 						Уважаемый <b>${user.username}</b>. Вы сделали запрос на получение забытого пароля на сайте Like Market. Чтобы получить новый пароль, пройдите по ссылке ниже:
 					</div>
-					<a href="https://dev.like-market.ru/forgotPassword?token=${token}" style="width: 400px;margin:0 auto;display: block;background: #F6A821 repeat-x 0 0;color: #fff;font-weight:bold; line-height: 44px;text-align: center;text-transform: uppercase;text-decoration: none;border-radius: 3px;text-shadow: 0 1px 3px rgba(0,0,0,.35);border: 1px solid #388E3C;box-shadow: inset 0 1px rgba(255,255,255,.4);">
+					<a href="https://like-market.ru/forgotPassword?token=${token}" style="width: 400px;margin:0 auto;display: block;background: #F6A821 repeat-x 0 0;color: #fff;font-weight:bold; line-height: 44px;text-align: center;text-transform: uppercase;text-decoration: none;border-radius: 3px;text-shadow: 0 1px 3px rgba(0,0,0,.35);border: 1px solid #388E3C;box-shadow: inset 0 1px rgba(255,255,255,.4);">
 						Восстановить пароль
 					</a>
 					<div style="padding: 15px 0;"> 
@@ -79,7 +79,7 @@ exports.generateNewPassword = async function(token_id, user_id) {
 						${password}
 					</a>
 					<div style="padding: 15px; text-align: center;"> 
-						Сменить данный пароль можно в разделе <a href="https://dev.like-market.ru/profile" style="color: #f6a821">Профиль</a>
+						Сменить данный пароль можно в разделе <a href="https://like-market.ru/profile" style="color: #f6a821">Профиль</a>
 					</div>
 				</div>
 			</div>`
