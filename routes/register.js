@@ -27,7 +27,7 @@ router.post("/", async function(req, res) {
     }
 
     // Проверка почты [длина, совпадение с паттерном]
-    let email = req.body.email;
+    let email = req.body.email.toLowerCase();
     if (email.length > 50 || !format_email.test(email)) {
         return res.send("Ошибка с почтой");
     }

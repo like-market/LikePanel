@@ -78,7 +78,7 @@ router.use('/statistics', require('./statistics.js'));
 
 router.use('/login', require('./login.js'));
 router.use('/register', require('./register.js'));
-router.use('/forgotPassword', require('./forgotPassword.js'));
+router.use('/forgotPassword', require('./fgtpwd.js'));
 
 router.use('/news', require('./news.js'));
 router.use('/tasks', require('./tasks.js'));
