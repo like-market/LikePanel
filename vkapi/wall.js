@@ -12,24 +12,42 @@ let proxies = utils.proxy.proxies;
  */
 exports.getNewPosts = async function(group_id, last_post_id, account = null) {
 	const code = `
-		var posts = API.wall.get({ owner_id: ${group_id}, count: 1 });
-		var count = posts.items[0].id - ${last_post_id};
+		var posts = API.wall.get({
+		    owner_id: ${group_id},
+		    count: 2,
+		    extended: 0,
+		    offset: 0
+		});
+
+		var count;
+		var last_post_id;
+		if (posts.items[0].is_pinned == 1) {
+		    count = posts.items[1].id - ${last_post_id} + 1;
+		    last_post_id = posts.items[1].id;
+		} else {
+		    count = posts.items[0].id - ${last_post_id};
+		    last_post_id = posts.items[0].id;
+		}
+		if (count > 5) count = 5;
 
 		if (count <= 0) return { last_post_id: ${last_post_id}, posts: [] };
 
-		var posts = API.wall.get({ owner_id: ${group_id}, count: count });
+		var posts = API.wall.get({
+		     owner_id: ${group_id},
+		     extended: 0,
+		     count: count
+		});
 
 		var result = [];
 
-		var i = posts.length;
+		var i = posts.items.length;
 		while (i > 0) {
-			i = i - 1;
-
-			if (posts.items[i].id > ${last_post_id}) {
-				result.push(posts.items[i]);
-			}
+		    i = i - 1;
+		    if (parseInt(posts.items[i].id) > ${last_post_id}) {
+		        result.push(posts.items[i]);
+		    }
 		}
-		return { last_post_id: posts.items[0].id, posts: result };`
+		return { last_post_id: last_post_id, posts: result };`
 	
 	let params = {
         code,

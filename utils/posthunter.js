@@ -26,6 +26,7 @@ exports.updateAll = async function () {
 			logger.warn(`У постхантера ${group.id} закончилось время активности`);
 			db.posthunter.setStatus(group.id, 'pause');
 		}else {
+			logger.info(`Создали задачу для постхантера для ${group.group_id}`)
 			worker.queue.create('posthunter', { group, accountsCount, customAccountsCount }).removeOnComplete(true).save();
 		}
 	}
