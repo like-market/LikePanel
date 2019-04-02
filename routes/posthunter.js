@@ -93,11 +93,15 @@ router.post('/add', utils.needBodyParams(add_params), async function(req, res) {
 	console.log(group_data);
 	if (!group_data.type || ['group', 'page'].indexOf(group_data.type) == -1) return res.send('Группа не найдена');
 
+	// Проверка на то что группа не в блеклисте
+	const inBlackList = await db.block.isBlocked(group_data.object_id);
+	if (inBlackList) return res.send('Нельзя накручивать в данной группе.')
+
     // Проверяем то, что эта группа не верицированна
     let [error, group_info] = await vkapi.group.getGroupInfo(group_data.object_id);
     console.log(group_info)
     // if (error) return res.send('Что-то пошло не так. Попробуйте еще раз');
-    if (group_info.verified) return res.send('Нельзя накручивать в данной группе')
+    if (group_info.verified) return res.send('Нельзя накручивать в данной группе!')
     if (group_info.members_count < 10000) return res.send('В группе должно быть минимум 10\'000 участников')
 
 	// Добавляем минус, если это сообщество
@@ -146,11 +150,15 @@ router.post('/change', utils.needBodyParams(change_params), async function(req, 
 	const group_data = await vkapi.getTypeByName(group_name);
 	if (!group_data.type || ['group', 'page'].indexOf(group_data.type) == -1) return res.send('Группа не найдена');
 	
-// Проверяем то, что эта группа не верицированна
+	// Проверка на то что группа не в блеклисте
+	const inBlackList = await db.block.isBlocked(group_data.object_id);
+	if (inBlackList) return res.send('Нельзя накручивать в данной группе.')
+
+	// Проверяем то, что эта группа не верицированна
     let [error, group_info] = await vkapi.group.getGroupInfo(group_data.object_id);
     console.log(group_info)
     // if (error) return res.send('Что-то пошло не так. Попробуйте еще раз');
-    if (group_info.verified) return res.send('Нельзя накручивать в данной группе')
+    if (group_info.verified) return res.send('Нельзя накручивать в данной группе!')
     if (group_info.members_count < 10000) return res.send('В группе должно быть минимум 10\'000 участников')
 
 	// Добавляем минус, если это сообщество
