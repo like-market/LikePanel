@@ -87,7 +87,7 @@ exports.join = async function(account, group_id) {
                 case 5:
                     utils.vk.updateUserToken(account.user_id)
                     logger.warn(`Невалидная сессия у аккаунта ${account.user_id}`)
-                    return exports.join(account, group_id);
+                    return false;
 
                 default:
                     logger.warn(`Неизвестная ошибка api /vkapi/group.js:join(${account.login}, ${group_id})`, {json: res.data})
@@ -101,6 +101,8 @@ exports.join = async function(account, group_id) {
     }catch (error) {
         // Если ошибка в axios запросе
         logger.error(`Ошибка в axios запросе  /vkapi/group.js:join(${account.login}, ${group_id})`, {json: error.code})
+        return exports.join(account, group_id);
+        
         return false;
     }
 }

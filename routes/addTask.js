@@ -38,6 +38,12 @@ router.get('/', async function(req, res) {
 	maxCustomCommentCount = customAccountCount * 3 - (customAccountCount * 3 % 25)
 
 	comments = await db.comments.getUserComments(req.user.id, true);
+
+	if (['dnoarta', 'z74enkf3', 'jrbdex'].indexOf(req.user.username) != -1) {
+		maxCommentCount = 35300;
+		maxCustomCommentCount = 27050
+		maxLikeCount = 9750;
+	}
 	
 	res.render('addTask', {
 		user: req.user,
@@ -129,15 +135,29 @@ router.post('/add', utils.needBodyParams(params), async(req, res) => {
         return res.send('Необходимо ввести количество лайков и/или комментариев')
     }
 
+    // Проверка на то что группа не в блеклисте
+	const inBlackList = await db.block.isBlocked(data.owner_id);
+	if (inBlackList) {
+		logger.warn(`${req.user.username} пытается накрутить в группу блек листа ${data.owner_id}`);
+		return res.send('Нельзя накручивать на данную запись!')
+	}
+
     // Проверяем то, что эта группа не верицированна
     let [error, group_info] = await vkapi.group.getGroupInfo(data.owner_id);
     // if (error) return res.send('Что-то пошло не так. Попробуйте еще раз');
-    if (group_info.verified) return res.send('Нельзя накручивать на данную запись.')
-    if (group_info.members_count < 10000) return res.send('В группе должно быть минимум 10\'000 участников')
+    if (group_info.verified) {
+    	logger.warn(`${req.user.username} пытается накрутить в верефицированную группу ${data.owner_id}`);
+    	return res.send('Нельзя накручивать на данную запись.')
+    }
+    if (group_info.members_count < 10000) {
+    	logger.warn(`${req.user.username} пытается накрутить в группу с менее 10'000 участников ${data.owner_id}`);
+    	return res.send('В группе должно быть минимум 10\'000 участников')
+ 	}
+    if (group_info.name.toLowerCase().search(/бизнес|cpa|арбитраж|миллионер|блог/) != -1) {
+    	logger.warn(`${req.user.username} пытается накрутить в группу, с запрещенными словами в названии ${data.owner_id}`);
+    	return res.send('Нельзя накручивать на данную запись.')
+    }
 
-    // Проверка на то что группа не в блеклисте
-	const inBlackList = await db.block.isBlocked(data.owner_id);
-	if (inBlackList) return res.send('Нельзя накручивать на данную запись!')
 
 	//
     // На этом этапе проверены все переменные

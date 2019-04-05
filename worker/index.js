@@ -1,16 +1,18 @@
 const config = require('../config.js')
+const logger = require('../logger.js')
 const kue = require('kue')
 
 const queue = kue.createQueue({
 	prefix: config.redis.prefix
 })
 
+queue.on('error', function(err) {
+	logger.error('Queue error', {json: err});
+});
 
 exports.queue = queue
 
 
-// TODO: Отложить подключение очереди т.к. может случиться ситуация
-// при которой в редисе задачи есть, а бд и access_token еще не готовы
 if (!require('cluster').isMaster) {
 	// Увеличиваем кол-во слушателей до 15
 	// Т.к. параллельно могут выполнятся до 5 + 3 + 3 + 5 задач

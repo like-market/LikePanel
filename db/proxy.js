@@ -23,24 +23,27 @@ exports.getProxy = function() {
  * Устанавливаем рандомное работающее прокси
  */
 exports.updateAccounts = async function() {
+	logger.info('Начало перепривязки прокси для всех акк');
+
 	let accounts = await require('./vk.js').getAllAccounts();
-	let proxies    = await exports.getProxy();
+	let proxies  = await exports.getProxy();
 
 	// Если нет аккаутов или прокси
 	if (!accounts.length || !proxies) return;
-
-	// let proxy_id = 0;
+	
+	let proxy_id = 0;
 	for (account of accounts) {
-		// if (proxy_id >= proxy.length) proxy_id = 0;
-		let proxy = proxies.random();
+		if (proxy_id >= proxies.length) proxy_id = 0;
+		//let proxy = proxies.random();
 
-		let sql = "UPDATE `account_vk` SET `proxy_id`=" + proxy.id + " WHERE `user_id`=" + account.user_id;
-		//proxy_id++;
+		let sql = "UPDATE `account_vk` SET `proxy_id`=" + proxies[proxy_id].id + " WHERE `user_id`=" + account.user_id;
+		proxy_id++;
 
 		db.query(sql, function(err, rows) {
 			if (err) console.log(err)
 		});
 	}
+	logger.info('Прокси перепривязаны для всех аккаунтов');
 }
 
 exports.get = function(id) {

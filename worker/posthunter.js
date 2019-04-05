@@ -17,6 +17,7 @@ const utils = require('../utils')
  */
 queue.process('posthunter', 3, async function(job, done) {
 	const group = job.data.group;
+	
 	logger.info(`Обрабатываем постхантер для ${group.group_id}`);
 	const accountsCount       = job.data.accountsCount;
 	const customAccountsCount = job.data.customAccountsCount;
@@ -25,7 +26,7 @@ queue.process('posthunter', 3, async function(job, done) {
 	let account = await db.vk.getRandomAccount()
 	
 	let response = await vkapi.wall.getNewPosts(group.group_id, group.last_post_id, account);
-
+ 
 	if (response.error) {
 		switch (response.error.error_code) {
 			case 5:
@@ -44,8 +45,8 @@ queue.process('posthunter', 3, async function(job, done) {
 
 	let data = response.response;
 
-	logger.debug('', {json: data});
-	logger.debug('', {json: group});
+	logger.debug(`New posts: last_post_id: ${data.last_post_id}`, {json: data.posts});
+	logger.debug(`PH Data: id:${group.id}, owner_id:${group.owner_id}, last_post_id:${group.last_post_id}, ${group.time_from}-${group.time_to}, ${group.like_ads}${group.like_repost}${group.like_content}`);
 
 	// Проверяем появилась ли новая запись
 	// Если не появились новые посты
