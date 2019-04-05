@@ -7,7 +7,6 @@ const axios = require('axios-https-proxy-fix')
 exports.wall  = require('./wall.js');
 exports.group = require('./group.js');
 exports.account  = require('./account.js');
-exports.comments = require('./comments.js');
 
 let proxies = utils.proxy.proxies;
 

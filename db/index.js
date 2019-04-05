@@ -34,14 +34,15 @@ db.on('error', function(err) {
 
 exports.db = db;
 
-exports.vk = require('./vk.js');
-exports.users = require('./users.js');
-exports.tasks = require('./tasks.js');
-exports.proxy = require('./proxy.js');
-exports.fgtpwd = require('./fgtpwd.js');
-exports.finance = require('./finance.js');
-exports.comments = require('./comments.js');
-exports.activity = require('./activity.js');
-exports.posthunter = require('./posthunter.js');
+exports.vk = require('./vk.js');  // Аккаунты вк
+exports.users = require('./users.js'); // Пользователи на сайте
+exports.block = require('./block.js'); // Черный список групп
+exports.tasks = require('./tasks.js'); // Задачи
+exports.proxy = require('./proxy.js'); // Прокси
+exports.fgtpwd = require('./fgtpwd.js');   // Данные для восстановления пароля
+exports.finance = require('./finance.js'); // Финансовая часть
+exports.comments = require('./comments.js'); // Наборы комментариев
+exports.activity = require('./activity.js'); // Активность пользовател
+exports.posthunter = require('./posthunter.js'); // Постхантер
 
 exports.sessionStore = require('./session-store.js');

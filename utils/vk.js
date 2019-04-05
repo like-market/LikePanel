@@ -155,17 +155,37 @@ exports.checkAccounts = async function() {
 			await exports.updateUserToken(account.user_id);
 			// Получаем новый токен
 			account = await db.vk.getAccount(account.user_id);
-		}
+		}	
 
-		const data = await vkapi.account.getProfileInfo(account);
+		// const data = await vkapi.account.getProfileInfo(account);
 		// Если нет телефона
-		if (data.response && !data.response.phone) {
-			logger.warn(`У аккаунта ${account.user_id} не привязан телефон`)
-			db.vk.setAccountStatus(account.user_id, 'no_phone')
-		}
+		// if (data.response && !data.response.phone) {
+		//	logger.warn(`У аккаунта ${account.user_id} не привязан телефон`)
+		//	logger.debug('', {json: data.response})
+		//	db.vk.setAccountStatus(account.user_id, 'no_phone')
+		// }
 
 		// Чтобы не слать много запросов в секунду
 		await utils.sleep(100)
 	}
 	logger.info('Все аккаунты проверены')
+}
+
+/**
+ * Вступаем в группу всеми аккаунтами
+ * @param group_id - id группы
+ * @param pause    - время между заходами
+ */
+exports.joinToGroup = async function(group_id, pause) {
+    if (pause < 1000) return logger.warn('Пауза между вступлениями должна быть минимум 1000мс');
+
+    const accounts = await db.vk.getActiveAccounts();
+
+    for (let account of accounts) {
+        // Чтобы не слать много запросов в секунду
+        console.log(account, group_id, pause)
+        vkapi.group.join(account, group_id);
+
+        await utils.sleep(pause)
+    }
 }

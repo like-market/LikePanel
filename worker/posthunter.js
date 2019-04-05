@@ -17,6 +17,8 @@ const utils = require('../utils')
  */
 queue.process('posthunter', 3, async function(job, done) {
 	const group = job.data.group;
+	
+	logger.info(`Обрабатываем постхантер для ${group.group_id}`);
 	const accountsCount       = job.data.accountsCount;
 	const customAccountsCount = job.data.customAccountsCount;
 
@@ -24,7 +26,7 @@ queue.process('posthunter', 3, async function(job, done) {
 	let account = await db.vk.getRandomAccount()
 	
 	let response = await vkapi.wall.getNewPosts(group.group_id, group.last_post_id, account);
-
+ 
 	if (response.error) {
 		switch (response.error.error_code) {
 			case 5:
@@ -42,40 +44,54 @@ queue.process('posthunter', 3, async function(job, done) {
 	}
 
 	let data = response.response;
+
+	logger.debug(`New posts: last_post_id: ${data.last_post_id}`, {json: data.posts});
+	logger.debug(`PH Data: id:${group.id}, owner_id:${group.owner_id}, last_post_id:${group.last_post_id}, ${group.time_from}-${group.time_to}, ${group.like_ads}${group.like_repost}${group.like_content}`);
+
 	// Проверяем появилась ли новая запись
 	// Если не появились новые посты
-	if (!data.posts.length) return done();
+	if (!data.posts.length) {
+		logger.debug(`Нет новых постов у ${group.group_id}`);
+		return done();
+	}
 
-console.log(data, group, data.last_post_id, group.last_post_id);
+
 	if (data.last_post_id > group.last_post_id) {
+		logger.debug(`Установка last_post_id на ${data.last_post_id}`);
 		db.posthunter.setLastPostId(group.id, data.last_post_id)
 	}
 
 nextpost:
 	// Для всех новых постов
-	for (post of data.posts) {
-		console.log('Получили новый пост')
+	for (let post of data.posts) {
+		logger.info('Получили новый пост')
 		// Проверка на время
 		const date = new Date();
 		date.setTime(post.date * 1000);
 
 		var post_time = `${date.getFullHours()}:${date.getFullMinutes()}`;
 		// Сравниваем время вида HH:MM 
-		if (group.time_from > post_time || group.time_to < post_time) continue nextpost;
+		if (group.time_from > post_time || group.time_to < post_time) {
+			logger.debug('У поста не подошло время')
+			continue nextpost;
+		}
 
 
 		// Проверка на вхождение текста
 		let find = false;
 		post.text = post.text.toLowerCase();
 		for (let text of group.entry_text.toLowerCase().split('\n')) {
-			console.log(`Find ${text} in ${post.text}`)
+			logger.debug(`Find ${text} in ${post.text}`)
 			if (post.text.indexOf(text) != -1) {
 				find = true;
 				break;
 			}
 		}
 		// Если текст не найден
-		if (!find) continue nextpost;
+		if (!find) {
+			logger.debug('Текст вхождения не найден')
+			continue nextpost;
+		}
 
 
 		const is_ads = post.marked_as_ads;   // Рекламный ли пост с меткой
@@ -165,6 +181,8 @@ nextpost:
 				likes_count
 			);
 		}
+
+		logger.info('Добавили задачу для ПХ')
 
 		// Обновляем время последнего найденного поста
 		db.posthunter.setLastUpdateTime(group.id, (new Date).toMySQL());

@@ -92,7 +92,7 @@ router.use('/posthunter', require('./posthunter.js'));
 
 // Вывод страницы 404
 router.use(function(req, res) {
-	res.render('error')
+	res.status(404).render('error')
 })
 
 

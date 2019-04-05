@@ -48,7 +48,7 @@ $('#send').click(function() {
                 $('#data').val('');
                 setTimeout(function() {
                     window.location.href = "/login";
-                }, 1000);
+                }, 3000);
             }else {
             	toastr.error(res);
             }

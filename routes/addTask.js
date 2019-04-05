@@ -38,6 +38,12 @@ router.get('/', async function(req, res) {
 	maxCustomCommentCount = customAccountCount * 3 - (customAccountCount * 3 % 25)
 
 	comments = await db.comments.getUserComments(req.user.id, true);
+
+	if (['dnoarta', 'z74enkf3', 'jrbdex'].indexOf(req.user.username) != -1) {
+		maxCommentCount = 35300;
+		maxCustomCommentCount = 27050
+		maxLikeCount = 9750;
+	}
 	
 	res.render('addTask', {
 		user: req.user,
@@ -129,12 +135,28 @@ router.post('/add', utils.needBodyParams(params), async(req, res) => {
         return res.send('Необходимо ввести количество лайков и/или комментариев')
     }
 
+    // Проверка на то что группа не в блеклисте
+	const inBlackList = await db.block.isBlocked(data.owner_id);
+	if (inBlackList) {
+		logger.warn(`${req.user.username} пытается накрутить в группу блек листа ${data.owner_id}`);
+		return res.send('Нельзя накручивать на данную запись!')
+	}
+
     // Проверяем то, что эта группа не верицированна
     let [error, group_info] = await vkapi.group.getGroupInfo(data.owner_id);
-    console.log(group_info)
     // if (error) return res.send('Что-то пошло не так. Попробуйте еще раз');
-    if (group_info.verified) return res.send('Нельзя накручивать на данную запись')
-    if (group_info.members_count < 10000) return res.send('В группе должно быть минимум 10\'000 участников')
+    if (group_info.verified) {
+    	logger.warn(`${req.user.username} пытается накрутить в верефицированную группу ${data.owner_id}`);
+    	return res.send('Нельзя накручивать на данную запись.')
+    }
+    if (group_info.members_count < 10000) {
+    	logger.warn(`${req.user.username} пытается накрутить в группу с менее 10'000 участников ${data.owner_id}`);
+    	return res.send('В группе должно быть минимум 10\'000 участников')
+ 	}
+    if (group_info.name.toLowerCase().search(/бизнес|cpa|арбитраж|миллионер|блог/) != -1) {
+    	logger.warn(`${req.user.username} пытается накрутить в группу, с запрещенными словами в названии ${data.owner_id}`);
+    	return res.send('Нельзя накручивать на данную запись.')
+    }
 
 
 	//
@@ -167,38 +189,6 @@ router.post('/add', utils.needBodyParams(params), async(req, res) => {
 			like_need            // Количество лайков для накрутки
 		);
 	}
-
-	res.send('Success')
-})
-
-
-router.post('/add_comments', async function(req, res) {
-
-
-    const comment_need = req.body.count
-
-	// Проверка на количество
-	if (parseInt(comment_need) != comment_need || comment_need < minCommentCount || comment_need > maxCommentCount) {
-		return res.send('Invalid amount comments')
-	}
-
-	// Проверка на наличие объекта
-	let comments = await vkapi.getCommentList(data.type, data.owner_id, data.item_id, 1);
-	if (comments.error) {
-		if (comments.error.error_code == 212) return res.send('Access restriction')
-		else return res.send('Error')
-	}
-
-	utils.task.addComments(
-		req.user,            // Объект пользователя, создающего задачу
-		data.type,           // Тип задачи
-		req.body.name,       // Название задачи
-		data.owner_id,       // Id юзера или сообщества, где находится запись
-		data.item_id,        // Идентификатор записи
-		req.body.comment_ids,// Список Id наборов комментариев
-		req.body.count,      // Количество комментариев для накрутки
-		use_custom      // Используются ли клиентские наборы комментариев
-	);
 
 	res.send('Success')
 })

@@ -66,7 +66,7 @@ const createRequest = async function(task_id, comment, account) {
 		switch (response.error.error_code) {
 			case 17:
 				logger.warn('Требуется валидация пользователя', {json: response.error});
-				db.vk.setAccountStatus(account.user_id, 'need_token')
+				db.vk.setAccountStatus(account.user_id, 'need_valid')
 				break;
 
 			case 5:

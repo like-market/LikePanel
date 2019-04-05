@@ -29,19 +29,30 @@ const recursiveAsyncReadLine = function () {
 				break;
 			// Удаляем комментарии с поста
 			case /removecomments/.test(answer):
-				const regex = /removecomments (.*) (.*)/
-				const match = answer.match(regex);
+				var regex = /removecomments (.*) (.*)/
+				var match = answer.match(regex);
 				if (!match) {
 					logger.warn('Используйте: removecomments owner_id object_id');
 				}else {
-					logger.info(`Удаляем комментарии с записи http://vk.com/wall${match[1]}_${match[2]}`);
+					logger.info(`Начинаем удалять комментарии с записи http://vk.com/wall${match[1]}_${match[2]}`);
 					await critical.removeCommentsFromWall(match[1], match[2]);
-					logger.info(`Удаление комментариев завершено`);
+					logger.info(`Завершено удаление комментариев к записи http://vk.com/wall${match[1]}_${match[2]}`);
 				}
 				break;
+            // Вступление аккаунтами в группу
+            case /jointogroup/.test(answer):
+                var regex = /jointogroup (.*) (.*)/
+                var match = answer.match(regex);
+                if (!match) {
+                    logger.warn('Используйте: jointogroup group_id pause');
+                }else {
+                    logger.info(`Начало вступление аккаунтов в группу ${match[1]}`);
+                    await utils.vk.joinToGroup(match[1], match[2]);
+                    logger.info(`Завершено вступление аккаунтов в группу ${match[1]}`);
+                }
 			default:
 				logger.warn(`Не существует команды '${answer}'`)
-  				logger.info('Доступные команды: updateproxy, updateaccounts, removecomments')
+  				logger.info('Доступные команды: updateproxy, updateaccounts, removecomments, jointogroup')
   		}
 
   	});
