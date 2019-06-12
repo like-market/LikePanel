@@ -19,6 +19,9 @@ router.get('/', async function(req, res) {
 		max_payment,
 		moment: moment,
 		user: req.user,
+		// Последние 10 транзакций
+		last_transactions: await db.finance.getUserTransactions(req.user.id, 10),
+		// Транзакции за последние 15 дней
 		transactions: await db.finance.getBalanceHistory(req.user, 15),
 		transactions_count: await db.finance.getTransactionsCount(req.user),
 	});

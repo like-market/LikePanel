@@ -64,12 +64,12 @@
 
             <div class="row">
                 <div class="col-md-6">
-                    <div class="panel panel-filled panel-c-accent">
+<!--                    <div class="panel panel-filled panel-c-accent">
                         <div class="panel-body">
                             <h4>Акция</h4>
                             <span>При пополнении баланса сервиса от <a>1000₽</a> - Вам начислится бонус в размере <a>10%</a></span>   
                         </div>
-                    </div>
+                    </div>-->
 
                     <div class="panel panel-filled">
                         <div class="panel-body">
@@ -119,7 +119,7 @@
                                 </thead>
                                 <tbody id="transactions-data">
                                     <%  let count = 0;
-                                        transactions.reverse().forEach(function(trx) {
+                                        last_transactions.reverse().forEach(function(trx) {
                                         if (trx.id == 'start' || trx.id == 'end') return;
                                         if (++count > 10) return;  %>
                                         <tr>
@@ -142,7 +142,7 @@
                                 </tbody>
                             </table>
 
-                            <% if (transactions.length == 2) { %>
+                            <% if (last_transactions.length == 0) { %>
                                 <p> У вас еще не было транзакций </p>
                             <% } %>
 
@@ -208,10 +208,10 @@
     // График с состоянием счета
     $(document).ready(function () {
         var data = [{
-            data: [ 
+            data: [
             <% transactions.forEach(function(transaction) { %>
                 <%= '[' + moment(transaction.date).valueOf() + ', ' + (transaction.balance / 1000).toFixed(2) + '],' %>
-            <% }) %> 
+            <% }) %>
             ]
         }];
         var chartUsersOptions = {
