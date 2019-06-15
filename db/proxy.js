@@ -1,5 +1,9 @@
-const logger = require('../logger.js')
-const db = require('./index.js').db;
+const logger = require('../logger.js');
+const db = require('./index.js');
+
+const PROXY_ID = {
+    UNUSED: 0
+}
 
 /**
  * Получаем все прокси
@@ -73,3 +77,34 @@ exports.getRandom = function() {
         })
 	})
 }
+
+
+
+/**
+ * Получаем количество нераспользуемых прокси
+ */
+exports.getUnusedProxiesCount = async function() {
+    const sql = `SELECT COUNT(*) FROM proxy WHERE proxy.group = ${PROXY_ID.UNUSED}`;
+    const result = await db.async_query(sql);
+    return JSON.parse(JSON.stringify(result[0]))['COUNT(*)'];
+};
+
+/**
+ * Получаем неиспользуемые прокси
+ * @param count - количество прокси
+ */
+exports.getUnusedProxies = async function(count) {
+    const sql = `SELECT * FROM proxy WHERE proxy.group = ${PROXY_ID.UNUSED} LIMIT ${count}`;
+    const result = await db.async_query(sql);
+    return JSON.parse(JSON.stringify(result));
+};
+
+/**
+ * Устанавливаем группу у прокси
+ * @param proxy_id - id прокси
+ * @param group_id   - id набора аккаунтов
+ */
+exports.setProxyGroup = function(proxy_id, group_id) {
+    const sql = `UPDATE proxy SET proxy.group = ${group_id} WHERE id = ${proxy_id}`;
+    db.async_query(sql);
+};

@@ -1,4 +1,4 @@
-var db = require('./index.js').db;
+var db = require('./index.js');
 
 /**
  * Функция нужна для получения данных аккаунта
@@ -184,6 +184,16 @@ exports.setAccountStatus = function(user_id, status) {
         })
 	})
 }
+
+/**
+ * Устанавливаем id прокси для аккаунта вк
+ * @param user_id  - id пользователя вк
+ * @param proxy_id - id прокси
+ */
+exports.setAccountProxyId = function(user_id, proxy_id) {
+    const sql = `UPDATE account_vk SET account_vk.proxy_id = ${proxy_id} WHERE user_id = ${user_id}`;
+    db.async_query(sql);
+};
 
 exports.setAccountToken = function(user_id, access_token) {
 	return new Promise(function(resolve, reject){
