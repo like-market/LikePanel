@@ -148,13 +148,13 @@ queue.process('comment', 3, async function(job, done){
 	tasks[task_id]['error_count'] = 0;     // Количество ошибок
 	tasks[task_id]['fatal_error'] = false; // Флаг фатальной ошибки (прекращения накрутки)
 
-    if (tasks[task_id].use_custom) {
-		// Если используются клиентские наборы комментариев, то получаем набор аккаунтов под номером 1
-    	var accounts = await db.vk.getActiveAccounts(1);
-    }else {
-		// Иначе получаем все активные аккаунты 
-		var accounts = await db.vk.getActiveAccounts();
-    }
+    if (tasks[task_id].comment_need < 250) var account_count = 25;
+    else var account_count = 50;
+    // Получаем набор аккаунтов
+    const accounts = await db.accounts_group.getAccountsForComment(account_count);
+    // Обновляем время последнего использования
+    db.accounts_group.updateLastUsedForGroup(accounts[0].group);
+
 	// Получаем все комментарии
 	const comments = await db.comments.getComments(tasks[task_id].comments_ids);
 
@@ -204,7 +204,7 @@ queue.process('comment', 3, async function(job, done){
 			db.tasks.updateCount(task_id, tasks[task_id].now_add);
 
 			// Создаем асинхронные запросы
-			while (tasks[task_id].async_count < 50) {
+			while (tasks[task_id].async_count < 2) {
 				// Выбираем случайные значения из массивов
 				const comment = comments.random()
 				const account = accounts.random()

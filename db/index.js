@@ -63,6 +63,6 @@ exports.finance = require('./finance.js'); // Финансовая часть
 exports.comments = require('./comments.js'); // Наборы комментариев
 exports.activity = require('./activity.js'); // Активность пользовател
 exports.posthunter = require('./posthunter.js'); // Постхантер
-exports.account_groups = require('./account_group.js'); // Наборы аккаунтов
+exports.accounts_group = require('./accounts_group.js'); // Наборы аккаунтов
 
 exports.sessionStore = require('./session-store.js');

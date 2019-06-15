@@ -14,6 +14,20 @@ const GROUP_ID = {
     COMMENT_50_MAX: 299
 };
 
+/**
+ * Получаем диапазон id для наборов, предназначенных для комментирования
+ * @param count - количество аккаунтов в наборе 
+ * @return object {from, to}
+ */
+const getCommentGroupIdRange = function(count) {
+    if (count != 25 && count != 50) return logger.warn(`Невозможно получить id для ноыой группы из ${count} аккаунтов`);
+    if (count == 25) {
+        return { from: GROUP_ID.COMMENT_25_MIN, to: GROUP_ID.COMMENT_25_MAX };
+    }
+    if (count == 50) {
+        return { from: GROUP_ID.COMMENT_50_MIN, to: GROUP_ID.COMMENT_50_MAX };
+    }
+};
 
 /**
  * Получаем количество активных нераспределенных аккаунтов
@@ -35,6 +49,35 @@ exports.getUnusedAccounts = async function(count) {
 };
 
 /**
+ * Получаем активные аккаунты, предназначеные для лайков
+ */
+exports.getAccountsForLike = async function() {
+    const sql = `SELECT * FROM account_vk WHERE account_vk.group = ${GROUP_ID.LIKE} AND status = 'active'`;
+    const result = await db.async_query(sql);
+    
+    return JSON.parse(JSON.stringify(result));
+};
+
+/**
+ * Получаем набор акк, предназначенный для комментирования
+ * @param count - количество аккаунтов в наборе (25 или 50)
+ */
+exports.getAccountsForComment = async function(count) {
+    const id = getCommentGroupIdRange(count);
+
+    const sql = `SELECT * FROM likepanel.account_vk WHERE account_vk.group = (
+        SELECT id FROM likepanel.account_group
+        WHERE id >= ${id.from} AND id < ${id.to}
+        AND status = 'active'
+        ORDER BY last_used ASC
+        LIMIT 1
+    );`;
+
+    const result = await db.async_query(sql);
+    return JSON.parse(JSON.stringify(result));  
+};
+
+/**
  * Устанавливаем группу аккаунту вк
  * @param user_id - id аккаунта вк
  * @param group_id   - id набора аккаунтов
@@ -49,20 +92,11 @@ exports.setAccountGroup = function(user_id, group_id) {
  * @param count - число аккаунтов в наборе (25 или 50)
  */
 exports.getFreeCommentId = async function(count) {
-    if (count != 25 && count != 50) return logger.warn(`Невозможно получить id для ноыой группы из ${count} аккаунтов`);
-    if (count == 25) {
-        var from = GROUP_ID.COMMENT_25_MIN;
-        var to   = GROUP_ID.COMMENT_25_MAX;
-    }
-    if (count == 50) {
-        var from = GROUP_ID.COMMENT_50_MIN;
-        var to   = GROUP_ID.COMMENT_50_MAX;
-    }
+    const id = getCommentGroupIdRange(count);
     const sql = `SELECT id + 1 AS available_id
         FROM account_group AS t
-        WHERE 
-        id >= ${from}
-        AND id < ${to}
+        WHERE id >= ${id.from}
+        AND id < ${id.to}
         AND NOT EXISTS (
             SELECT * 
             FROM account_group
@@ -72,7 +106,7 @@ exports.getFreeCommentId = async function(count) {
         LIMIT 1`;
     const result = await db.async_query(sql);
     // Если в бд еще нет записи
-    if (result.length == 0) return from;
+    if (result.length == 0) return id.from;
     return JSON.parse(JSON.stringify(result[0]))['available_id'];
 };
 
@@ -145,7 +179,17 @@ exports.selectGroupsAndAccountCount = async function() {
     const sql = 'SELECT account_group.*, COUNT(account_vk.id) as account_count \
         FROM likepanel.account_group \
         LEFT OUTER JOIN likepanel.account_vk ON account_vk.group = account_group.id \
+        WHERE account_vk.status="active" \
         GROUP BY account_group.id';
     const result = await db.async_query(sql);
     return JSON.parse(JSON.stringify(result));
+};
+
+/**
+ * Обновляем время последнего использования набора аккаунтов
+ * @param group_id
+ */
+exports.updateLastUsedForGroup = async function(group_id) {
+    const sql = `UPDATE account_group SET last_used = CURRENT_TIMESTAMP WHERE id = ${group_id}`;
+    db.async_query(sql);
 };

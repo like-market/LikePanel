@@ -11,7 +11,7 @@ router.get('/', async function(req, res){
     if (!req.isAuthenticated()) return res.redirect('/login');
     if (!req.user.admin) return res.redirect('/panel');
 
-    let groups = await db.account_groups.selectGroupsAndAccountCount();
+    let groups = await db.accounts_group.selectGroupsAndAccountCount();
     groups.forEach(group => {
         group.last_used = moment(group.last_used).format('DD MMMM HH:mm:ss');
         if (group.id == 0) group.comment = 'Неиспользуемые аккаунты';

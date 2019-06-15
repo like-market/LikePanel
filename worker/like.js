@@ -141,8 +141,8 @@ queue.process('like', 3, async function(job, done){
 	tasks[task_id]['error_count'] = 0;     // Количество ошибок
 	tasks[task_id]['fatal_error'] = false; // Флаг фатальной ошибки (прекращения накрутки)
 
-	// Получаем все аккаунты
-	const all_accounts = await db.vk.getActiveAccounts();
+	// Получаем аккаунты, предназначенные для лайков
+    const all_accounts = await db.accounts_group.getAccountsForLike();
 
 	// Аккаунты, которые еще не поставили лайки
 	let accounts = [];
@@ -203,7 +203,7 @@ queue.process('like', 3, async function(job, done){
 			db.tasks.updateCount(task_id, tasks[task_id].now_add);
 
 			// Создаем асинхронные запросы
-			while (tasks[task_id].async_count < 50) {
+			while (tasks[task_id].async_count < 2) {
 				// Выбираем случайный аккаунт и удаляем из массива аккаунтов
 				const account = accounts.popRandom()
 
