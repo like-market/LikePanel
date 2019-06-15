@@ -73,8 +73,10 @@ router.get('/', function(req, res) {
     res.render('index')
 })
 
+router.use('/api', require('./api.js'));
 router.use('/admin', require('./admin.js'));
-router.use('/statistics', require('./statistics.js'));
+router.use('/statistics', require('./statistics/main.js'));
+router.use('/account_group', require('./statistics/account_group.js'));
 
 router.use('/login', require('./login.js'));
 router.use('/register', require('./register.js'));

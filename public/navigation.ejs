@@ -37,16 +37,35 @@
                 <li <% if (page == 'admin') { %> class="active" <% } %>>
                     <a href="admin">Админка</a>
                 </li>
-                <li <% if (page == 'statistics') { %> class="active" <% } %>>
-                    <a href="statistics">Статистика</a>
+                
+                <% 
+                    // Развернут ли список
+                    if (page == 'statistics' || page == 'account_group') open = true;
+                    else open = false;
+                %>
+                <li <%= open ? "class=active" : "" %>>
+                    <a href="#statistics" data-toggle="collapse" aria-expanded="<%= open ? "true" : "false" %>">
+                        Статистика <span class="sub-nav-icon"> <i class="stroke-arrow"></i> </span>
+                    </a>
+                    <ul id="statistics" class="nav nav-second collapse <%= open ? "in" : "" %>" aria-expanded="<%= open ? "true" : "false" %>">
+                        <li <%= page == 'statistics' ? "class=active" : '' %>>
+                            <a href="statistics">Общая</a>
+                        </li>
+                        <li <%= page == 'account_group' ? "class=active" : '' %>>
+                            <a href="account_group">Наборы аккаунтов</a>
+                        </li>
+                    </ul>
                 </li>
             <% } %>
 
             <li class="nav-info">
                 <div class="m-t-xs">
                     Баланс: <a><%= (user.balance / 1000).toFixed(2) %>₽</a><br/>
-                    1к&nbsp;&nbsp<i style="font-size: 12px" class="fa pe-7s-like"></i>&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;<a><%= user.like_price %>₽</a><br/>
-                    1к&nbsp;&nbsp<i style="font-size: 12px" class="fa fa-commenting-o"></i>&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;<a><%= user.comment_price %>₽</a><br/>
+                    1к&nbsp;&nbsp<i style="font-size: 12px" class="fa pe-7s-like"></i>&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;<a><%= user.like_price %>₽</a>
+                    <br/>
+                    1к&nbsp;&nbsp<i style="font-size: 12px" class="fa fa-commenting-o"></i>&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;<a><%= user.comment_price %>₽</a>
+                    <br/>
+                    1к&nbsp;&nbsp<i style="font-size: 12px" class="fa pe-7s-back"></i>&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;<a><%= user.repost_price %>₽</a>
                 </div>
                 <div class="m-t-md">
                     <span class="c-white">LikeMarket</span> сервис для накрутки лайков

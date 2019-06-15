@@ -1,8 +1,8 @@
-const utils   = require("../utils");
+const utils   = require('../../utils');
 const express = require('express');
 const router = express.Router();
 
-const db = require('../db');
+const db = require('../../db');
 
 const moment = require('moment');
 require('moment/locale/ru');

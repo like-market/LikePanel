@@ -137,3 +137,15 @@ exports.tryCreateCommentGroup = async function(count) {
     logger.debug(`Добавляем информацию о новой группе ${newGroupId}`);
     exports.addNewGroup(newGroupId);
 };
+
+/**
+ * Получаем данные о всех группах и кол-во аккаунтов в каждой группе
+ */
+exports.selectGroupsAndAccountCount = async function() {
+    const sql = 'SELECT account_group.*, COUNT(account_vk.id) as account_count \
+        FROM likepanel.account_group \
+        LEFT OUTER JOIN likepanel.account_vk ON account_vk.group = account_group.id \
+        GROUP BY account_group.id';
+    const result = await db.async_query(sql);
+    return JSON.parse(JSON.stringify(result));
+};
