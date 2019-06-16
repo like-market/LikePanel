@@ -100,11 +100,46 @@ exports.getUnusedProxies = async function(count) {
 };
 
 /**
+ * Получаем прокси, которые принадлежат набору аккаунтов
+ * @param group_id - id набора аккаунтов
+ */
+exports.getProxiesInGroup = async function(group_id) {
+    const sql = `SELECT * from proxy WHERE proxy.group = ${group_id}`;
+    const result = await db.async_query(sql);
+    return JSON.parse(JSON.stringify(result));
+};
+
+/**
+ * Получаем прокси, назначенные набору аккаунтов с количеством аккаунтов на каждом прокси
+ * @param  {Number} group_id - id набора аккаунтов
+ * @return {Array} Массив из данных о прокси: id, group, ip, port, login, password, account_count
+ */
+exports.getProxiesInGroupWithAccountCount = async function(group_id) {
+    const sql = `SELECT proxy.*, COUNT(account_vk.id) as account_count
+		FROM likepanel.proxy
+		LEFT OUTER JOIN likepanel.account_vk ON account_vk.proxy_id = proxy.id
+		WHERE proxy.group = ${group_id}
+		GROUP BY proxy.id`;
+    const result = await db.async_query(sql);
+    return JSON.parse(JSON.stringify(result));
+};
+
+/**
  * Устанавливаем группу у прокси
  * @param proxy_id - id прокси
  * @param group_id   - id набора аккаунтов
  */
 exports.setProxyGroup = function(proxy_id, group_id) {
     const sql = `UPDATE proxy SET proxy.group = ${group_id} WHERE id = ${proxy_id}`;
+    db.async_query(sql);
+};
+
+/**
+ * Удаляем группу прокси
+ * Устанавливаем group = PROXY_ID.UNUSED
+ */
+exports.removeProxiesGroup = function(group_id) {
+    logger.info(`Удаляем набор прокси для набора ${group_id}`);
+    const sql = `UPDATE proxy SET proxy.group = ${PROXY_ID.UNUSED} WHERE proxy.group = ${group_id}`;
     db.async_query(sql);
 };

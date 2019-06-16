@@ -27,13 +27,13 @@ exports.addComments = async function(user, type, name, owner_id, item_id, commen
 
     // Добавляем задачу в бд, получаем её id
     task_id = await db.tasks.createTask(user.id, 'comment', name, type, owner_id, item_id, comment_need, comments_ids);
-
-    logger.debug('User: ' + user.username + ' Comment_need: ' + comment_need + ' TaskId: ' + task_id)
-
+    logger.debug(`Пользователь ${user.username} заказал ${comment_need} комментариев. Задача ${task_id}`);
+    
     // Уменьшаем баланс
     db.finance.changeBalance(user, 'spend', comment_need * user.comment_price, 'Задача ' + task_id + ' накрутка ' + comment_need + ' комментариев')
 
     task_data = {
+        task_type: 'comment',
         user_id: user.id,
         type,
         owner_id,
@@ -61,12 +61,13 @@ exports.addLikes = async function(user, name, owner_id, type, item_id, like_need
 
     // Добавляем задачу в бд, получаем её id
     task_id = await db.tasks.createTask(user.id, 'like', name, type, owner_id, item_id, like_need);
-    logger.debug('User: ' + user.username + ' Like_need: ' + like_need + ' TaskId: ' + task_id)
+    logger.debug(`Пользователь ${user.username} заказал ${like_need} лайков. Задача ${task_id}`);
 
     // Уменьшаем баланс
     db.finance.changeBalance(user, 'spend', like_need * user.like_price,  'Задача ' + task_id + ' накрутка ' + like_need + ' лайков')
     
     task_data = {
+        task_type: 'like',
         user_id: user.id,
         type,
         owner_id,
@@ -76,6 +77,39 @@ exports.addLikes = async function(user, name, owner_id, type, item_id, like_need
 
     // Создаем задачу в воркере
     worker.queue.create('like', { task_id, task_data }).removeOnComplete(true).save();
+}
+
+/**
+ * Обрабатываем запрос на репосты
+ * @param user_id  - id пользователя, создавшего задачу
+ * @param name     - название задачи
+ * @param owner_id - идентификатор владельца объекта
+ * @param type     - тип объекта
+ * @param item_id  - идентификатор объекта
+ * @param repost_need - количество лайков для накрутки
+ */
+exports.addReposts = async function(user, name, owner_id, type, item_id, repost_need) {
+    logger.debug('Пришел запрос на репосты')
+
+    // TODO: Так как на лайкесте задачи объединяются в одну для одного поста
+    // То мы либо обновляем существующую задачу, либо создаем новую
+    task_id = await db.tasks.createTask(user.id, 'repost', name, type, owner_id, item_id, repost_need);
+    logger.debug(`Пользователь ${user.username} заказал ${repost_need} репостов. Задача ${task_id}`);
+
+    // Уменьшаем баланс
+    db.finance.changeBalance(user, 'spend', repost_need * user.repost_price,  'Задача ' + task_id +  ' накрутка ' + repost_need + ' репостов')
+    
+    task_data = {
+        task_type: 'repost',
+        user_id: user.id,
+        type,
+        owner_id,
+        item_id,
+        repost_need,
+    }
+
+    // Создаем задачу в воркере
+    worker.queue.create('repost', { task_id, task_data }).removeOnComplete(true).save();
 }
 
 /**
@@ -111,13 +145,18 @@ exports.onError = async function(task_id) {
     const user = await db.users.findById(task.owner_id)
 
     let price;
-    if (task.type == 'like')    price = user.like_price
-    if (task.type == 'comment') price = user.comment_price
+    if (task.task_type == 'like')    price = user.like_price
+    if (task.task_type == 'comment') price = user.comment_price
 
     // Количество денег для возврата
     const amount = (task.need_add - task.now_add) * price; 
     utils.user.changeBalance(user, 'add', amount, `Возврат по задаче ${task_id}`);
     logger.warn(`Возвращаем пользователю ${user.username} ${(amount / 1000).toFixed(2)}₽`)
+
+    if (task.task_type == 'comment') {
+        // Обновляем набор аккаунтов, предназначенныз для комментирования
+        db.accounts_group.updateCommentGroup(task.accounts_group);
+    }
 
     delete tasks[task_id];
 }
@@ -134,6 +173,11 @@ exports.onSuccess = async function(task_id) {
         await utils.sleep(500);
     }
     logger.info(`Все асинхронные функции в задаче ${task_id} завершены`);
+
+    if (tasks[task_id].task_type == 'comment') {
+        // Обновляем набор аккаунтов, предназначенныз для комментирования
+        db.accounts_group.updateCommentGroup(tasks[task_id].accounts_group);
+    }
 
     delete tasks[task_id];
 }

@@ -155,6 +155,8 @@ queue.process('comment', 3, async function(job, done){
     // Обновляем время последнего использования
     db.accounts_group.updateLastUsedForGroup(accounts[0].group);
 
+    tasks[task_id]['accounts_group'] = accounts[0].group;
+
 	// Получаем все комментарии
 	const comments = await db.comments.getComments(tasks[task_id].comments_ids);
 

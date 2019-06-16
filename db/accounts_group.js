@@ -78,6 +78,17 @@ exports.getAccountsForComment = async function(count) {
 };
 
 /**
+ * Получаем количество аккаунтов в наборе
+ * @param group_id - id набора
+ */
+exports.getAccountsInGroupCount = async function(group_id) {
+    const sql = `SELECT COUNT(*) FROM account_vk WHERE account_vk.group = ${group_id} AND status = 'active'`;
+
+    const result = await db.async_query(sql);
+    return JSON.parse(JSON.stringify(result[0]))['COUNT(*)'];  
+};
+
+/**
  * Устанавливаем группу аккаунту вк
  * @param user_id - id аккаунта вк
  * @param group_id   - id набора аккаунтов
@@ -170,6 +181,86 @@ exports.tryCreateCommentGroup = async function(count) {
 
     logger.debug(`Добавляем информацию о новой группе ${newGroupId}`);
     exports.addNewGroup(newGroupId);
+};
+
+/**
+ * Удаляем набор аккаунтов, предназначенный для комментирования
+ * 1. Устанавливаем group_id у аккаунтов в GROUP_ID.UNUSED
+ * 2. Устанавливаем group_id у прокси в PROXY_ID.UNUSED
+ */
+exports.removeGroupForComment = async function(group_id) {
+    logger.info(`Удаляем набор аккаунтов ${group_id}`);
+    let sql = `UPDATE account_vk SET account_vk.group = ${GROUP_ID.UNUSED} WHERE account_vk.group = ${group_id}`;
+    db.async_query(sql);
+
+    sql = `DELETE FROM account_group WHERE id = ${group_id}`;
+    db.async_query(sql);
+
+    db.proxy.removeProxiesGroup(group_id);
+};
+
+/**
+ * Обновляем все наборы аккаунтов
+ * 
+ * Для всех наборов для комментирования запускаем функцию обновления набора
+ */
+exports.updateAllCommentGroups = async function() {
+    const groups = await exports.selectGroupsAndAccountCount();
+    for (let group of groups) {
+        // Пропускаем неиспользуеммые аккаунты и набор для лайков
+        if (group.id == GROUP_ID.UNUSED || group.id == GROUP_ID.LIKE) continue;
+    
+        await exports.updateCommentGroup(group.id);
+    }
+};
+
+/**
+ * Обновляем набор аккаунтов, предназначенный для комментирования
+ * 1. Если не хватает аккаунтов в наборе, то пробуем добавить из неиспользуемых аккаунтов
+ * 2. Если после этого аккаунтов в наборе меньше 80%, то расформировываем группу
+ */
+exports.updateCommentGroup = async function(group_id) {
+    logger.debug(`Начало обновления набора ${group_id}`);
+    if (group_id >= GROUP_ID.COMMENT_25_MIN && group_id < GROUP_ID.COMMENT_25_MAX) var need = 25;
+    if (group_id >= GROUP_ID.COMMENT_50_MIN && group_id < GROUP_ID.COMMENT_50_MAX) var need = 20;
+
+    const accountsInGroupCount = await exports.getAccountsInGroupCount(group_id);
+
+    // Если не хватает аккаунтов
+    if (accountsInGroupCount < need) {
+        logger.debug(`В наборе не хватает ${need - accountsInGroupCount} акк (сейчас ${accountsInGroupCount})`);
+        const unusedAccountsCount = await exports.getUnusedAccountsCount();
+        
+        // Если после добавления аккаунтов в наборе все-равно будет слишком мало аккаунтов - удаляем группу
+        if (accountsInGroupCount + unusedAccountsCount < need * 0.8) {
+            logger.info(`Не хватает акк для добавления в набор ${group_id}. Свободно только ${unusedAccountsCount} акк`);
+            await exports.removeGroupForComment(group_id);
+            return;
+        }
+
+        const accounts = await exports.getUnusedAccounts(need - accountsInGroupCount);
+        const proxies  = await db.proxy.getProxiesInGroupWithAccountCount(group_id);
+
+
+        for (let account of accounts) {
+            logger.info(`Добавили ${account.user_id} акк в набор ${group_id}`);
+            await exports.setAccountGroup(account.user_id, group_id);
+
+            let proxy_index = 0; // Индекс прокси в массиве с наименьшим кол-вом аккаунтов
+            let min_count = proxies[0].account_count;
+            proxies.forEach((proxy, index) => {
+                if (proxy.account_count < min_count) {
+                    min_count = proxy.account_count;
+                    proxy_index = index;
+                }
+            });
+            proxies[proxy_index].account_count++;
+
+            logger.info(`Установили прокси ${proxies[proxy_index].id} для ${account.user_id} акк`);
+            db.vk.setAccountProxyId(account.user_id, proxies[proxy_index].id);
+        }
+    }
+
 };
 
 /**
