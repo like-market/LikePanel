@@ -1,194 +1,141 @@
+<!DOCTYPE html>
 <html lang="ru">
+
 <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Page title -->
-    <title>LikeMarket | Накрутка лайков</title>
+	<meta charset="utf-8">
 
-    <link rel="shortcut icon" type="image/png" href="https://like-market.ru/images/favicon.png"/>
-    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900"/>
+	<title>LikeMarket | Накрутка лайков</title>
+	<meta name="description" content="LIKE-MARKET.RU - сервис накрутки VK">
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="https://like-market.ru/vendor\bootstrap\css\bootstrap.css"/>
-    <link rel="stylesheet" type="text/css" media="screen,projection" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"/>
-    <link rel="stylesheet" type="text/css" media="screen,projection" href="./styles/index.css"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-    <%- include('YandexMetrika'); %>
+	<meta property="og:image" content="path/to/image.jpg">
+	<link rel="shortcut icon" href="images/favicon.png" type="image/x-icon">
+	<link rel="apple-touch-icon" href="images/favicon/apple-touch-icon.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="images/favicon/apple-touch-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="images/favicon/apple-touch-icon-114x114.png">
+
+	<!-- Chrome, Firefox OS and Opera -->
+	<meta name="theme-color" content="#000">
+	<!-- Windows Phone -->
+	<meta name="msapplication-navbutton-color" content="#000">
+	<!-- iOS Safari -->
+	<meta name="apple-mobile-web-app-status-bar-style" content="#000">
+
+	<link rel="stylesheet" href="styles/main.min.css">
+
+        <%- include('YandexMetrika'); %>
 </head>
-
 <body>
-    <div class="section no-pad-bot" style="background: #2f323b">
-        <div class="container">
-            <center>
-                <img width="155px" src="./images/like1.png"/>
-            </center>
-            <h1 style="color: #FFFFFF !important" class="header center teal-text text-lighten-2">
-                Сервис для накрутки лайков
-            </h1>
-            <div class="row center">
-                <h5 class="header col s12" style="color: #949ba2;">
-                    Накручивай комментарии, репосты, лайки в один клик!
-                </h5>
-            </div>
-            <div class="row center">
-                <a href="login"
-                   style="background: transparent!important; box-shadow: none; border: 1px solid #f6a821; color: #f6a821;"
-                   class="btn-large waves-effect waves-light main-btn auth">
-                    Авторизация
-                </a>
-                <a href="register"
-                   style="background-color: #f6a821 !important;"
-                   class="btn-register btn-large waves-effect waves-light main-btn">
-                    Регистрация
-                </a>
-            </div>
-            <br/>
-            <br/>
-            <br/>
-        </div>
-    </div>
 
-    <div class="sec-2" style="background: #24262d;">
-        <div class="container">
-            <div class="section">
-                <h3 style="color: #FFFFFF;">Что мы умеем накручивать?</h3>
-                <div class="row">
-                    <div class="col s12 m4">
-                        <div class="icon-block ">
-                            <h2 class="center brown-text">
-                                <img width="70px" src="./images/like3.png" />
-                            </h2>
-                            <h5 class="center" style="color: #949ba2;">Репосты</h5>
+	<div class="container">
+		<header class="header">
+			<h1>
+				LIKE-MARKET.RU
+			</h1>
+			<div class="header__title">
+				<img src="./images/like.png" alt="">
+				<h1>
+					Сервис для накрутки VK
+				</h1>
+				<p>Накручивай лайки, комментарии, репосты в 1 клик!</p>
+				<p>Увеличь охват постов прямо сейчас!</p>
+			</div>
 
-                            <!-- <p class="light">Какой то текст про репосты.</p> -->
-                        </div>
-                    </div>
+			<div class="divider"></div>
 
-                    <div class="col s12 m4">
-                        <div class="icon-block sec-info" style="background-color: #2f323b;">
-                            <h2 class="center brown-text">
-                                <img width="70px" src="./images/like2.png" />
-                            </h2>
-                            <h5 class="center" style="color: #949ba2;">Лайки</h5>
+			<div class="flex flex__space-between flex__align-center">
+				<div class="flex__item">
+					<a href="https://like-market.ru/login" class="button">Вход</a>
+				</div>
+				<div class="flex__item">
+					<a href="https://like-market.ru/register" class="button">Регистрация</a>
+				</div>
+			</div>
 
-                            <!-- <p class="light">Какой то текст про лайки.</p> -->
-                        </div>
-                    </div>
+			<div class="whatwedo">
+				<h1>Что мы умеем накручивать?</h1>
+				<div class="flex flex__center flex__align-center">
+					<div>
 
-                    <div class="col s12 m4">
-                        <div class="icon-block">
-                            <h2 class="center brown-text">
-                                <img width="70px" src="./images/like4.png" />
-                            </h2>
-                            <h5 class="center" style="color: #949ba2;">Комментарии</h5>
+					</div>
+					<div>
+						
+					</div>
+				</div>
+				<div class="whatwedo__sections">
+					<div>
+						<h2>Лайки</h2>
+						<p>Мгновенный старт накрутки, без задержек и проблем, 
+								только живые страницы, никаких ботов!
+								Возможность выбора скорости накрутки: от быстрой 
+								до интервальной</p>
+					</div>
+					<div>
+						<h2>Комментарии</h2>
+						<p>Без комментариев никуда, крутим до 3.5к на 1 запись!
+								Возможность выбора скорости накрутки, 
+							 типов комментариев (от стикеров до своих баз коментов)</p>
+					</div>
+					<div>
+						<h2>Репосты</h2>
+						<p>Здесь все просто и понятно,
+								повышаем виральный охват своих записей!
+								Мгновенный старт, без задержек, все как надо ;)</p>
+					</div>
+				</div>
+				
+				<div class="divider"></div>
 
-                            <!-- <p class="light">Какой то текст про комментарии.</p> -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+				<a href="https://like-market.ru/register" class="button button-nakrutka">Накрутить</a>
+			</div>
+		</header>
 
-    <div class="counters" style="background: #2f323b">
-        <div class="container">
-            <div class="row counters" style="padding: 50px 0; color: #f6a821;">
-                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-                    <div class="crumina-module crumina-counter-item">
-                        <div class="counter-numbers counter c-yellow" style="font-size: 46px;">
-            
-                            <span
-                              data-speed="2000"
-                              data-refresh-interval="3"
-                              data-to="30"
-                              data-from="2">
-                                30
-                            </span>
-                            <div class="units" style="display: inline-block;">M+</div>
-                        </div>
+		<section class="advances">
+			<h2>Преимущества LIKE-MARKET</h2>
 
-                        <span style="font-size: 25px; color: #949ba2;" class="counter-title">Лайков</span>
-                    </div>
-                </div>
-      
-                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-                    <div class="crumina-module crumina-counter-item">
-                        <div class="counter-numbers counter c-yellow" style="font-size: 46px;">
-                            <span
-                              data-speed="2000"
-                              data-refresh-interval="3"
-                              data-to="8"
-                              data-from="2">
-                                8
-                            </span>
-                            <div class="units" style="display: inline-block;">M+</div>
-                        </div>
-                        <span style="font-size: 25px; color: #949ba2;" class="counter-title">Комментариев</span>
-                    </div>
-                </div>
+			<div class="row">
+				<div class="col-sm-6 col-xs-12">
+					<img src="./images/find.png" alt="">
+					<h3>Постхантер</h3>
+					<p>Найдём все твои рекламные посты или просто контент в сообществе и все сами накрутим. Даешь отдых админам :) Возможность настройки постхантера: от кол-ва накрутки на пост заканчивая поиском постов по ключевым словам и ссылкам.</p>
+				</div>
 
-                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-                    <div class="crumina-module crumina-counter-item">
-                        <div class="counter-numbers counter c-yellow" style="font-size: 46px;">
-                            <span
-                              data-speed="2000"
-                              data-refresh-interval="3"
-                              data-to="4"
-                              data-from="2">
-                                4
-                            </span>
-                            <div class="units" style="display: inline-block;">M+</div>
-                        </div>
-                        <span style="font-size: 25px; color: #949ba2;" class="counter-title">Репостов</span>
-                    </div>
-                </div>
-      
-                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-                    <div class="crumina-module crumina-counter-item">
-                        <div class="counter-numbers counter c-yellow" style="font-size: 46px;">
-                            <span
-                              data-speed="2000"
-                              data-refresh-interval="3"
-                              data-to="50000"
-                              data-from="2">
-                                50000
-                            </span>
-                        </div>
-                        <span style="font-size: 25px; color: #949ba2;" class="counter-title">Заданий</span>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-9 col-md-6 col-sm-6 col-xs-12">
-                    <span style="font-size: 25px; color: #f6a821;" class="c-white">
-                        Стабильная работа сервиса
-                    </span>
-                    <p class="c-semitransparent-white" style="color: #949ba2;">
-                        Благодаря мощности и защищенности серверов, а также
-                        профессионализму команды наш сервис выполняет большие объемы
-                        заказов без сбоев и задержек
-                    </p>
-                </div>
-                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-                    <span style="font-size: 25px; color: #f6a821;" class="c-white">
-                        Контакты
-                    </span>
-                    <p class="c-semitransparent-white" style="color: #949ba2;">
-                        Телеграмм&nbsp;<a class="c-white" href="https://tgdo.me/like_market" target="_blank" style="color: #f6a821;">@like_market</a>
-                        </br>
-                        Менеджер&nbsp;<a class="c-white" href="https://tgdo.me/olkaf" target="_blank" style="color: #f6a821;">@olkaf</a>
-                        </br>
-                        Почта&nbsp;<a class="c-white" href="mailto:support@like-market.ru" target="_blank" style="color: #f6a821;">support@like-market.ru</a>
-                        
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Vendor scripts -->
-    <script src="https://like-market.ru\vendor\jquery\dist\jquery.min.js"></script>
+				<div class="col-sm-6 col-xs-12">
+					<img src="./images/chat.png" alt="">
+					<h3>Свои комментарии</h3>
+					<p>Хочешь крутить определенные комментарии под контент своего сообщества или под рекламу определенных товаров и услуг? теперь это возможно! добавляй свои базы коментов в панели и накручивай их :)</p>
+				</div>
+			</div>
+
+			<div>
+				<img src="./images/money-bag.png" alt="">
+				<h3>Пополнение в автоматическом режиме</h3>
+				<h4>само собой без комиссии, бро!</h4>
+				<h4>Поддерживаем все популярные платежные системы</h4>
+			</div>
+
+			<div>
+				<img src="./images/headphones.png" alt="">
+				<h3>Поддержка</h3>
+				<h4>Почти 24/7 готовы прийти на помощь и ответить на Ваши вопросы.</h4>
+				<h4>Поддержка у нас представлена в виде чата в правом нижнем углу сайта</h4>
+				<h4>(Доступно после регистрации) или через раздел контакты.</h4>
+			</div>
+			
+			<div>
+				<img src="./images/cursor.png" alt="">
+				<h3>Крутим в 1 клик!</h3>
+				<h4>Больше не нужно переходить в разные разделы накрутки, все в 1 месте :)</h4>
+			</div>
+
+			<div>
+				<img src="./images/api.png" alt="">
+				<h4>Программист? мы тебя поняли и сделали API</h4>
+			</div>
+		</section>
+	</div>
 </body>
 </html>
