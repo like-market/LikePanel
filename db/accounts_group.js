@@ -3,20 +3,20 @@ const db = require('./index.js');
 
 const GROUP_ID = {
     UNUSED: 0, // Неиспользуемые аккаунты
-    
+
     LIKE: 10,  // Аккаунты для лайков
 
     // Диапазоны ID групп для комментирования
     COMMENT_25_MIN: 100, // В которых 25 аккаунтов
     COMMENT_25_MAX: 199,
 
-    COMMENT_50_MIN: 200, // В которых 50 аккаунтов 
+    COMMENT_50_MIN: 200, // В которых 50 аккаунтов
     COMMENT_50_MAX: 299
 };
 
 /**
  * Получаем диапазон id для наборов, предназначенных для комментирования
- * @param count - количество аккаунтов в наборе 
+ * @param count - количество аккаунтов в наборе
  * @return object {from, to}
  */
 const getCommentGroupIdRange = function(count) {
@@ -139,7 +139,7 @@ exports.addNewGroup = function(group_id) {
  * 4. Получаем свободные аккаунты
  * 5. У каждого аккаунта устанавливаем группу и прокси
  * 6. Добавляем запись о новой группе аккаунтов
- * 
+ *
  * @param count - число аккаунтов в наборе (25 или 50)
  */
 exports.tryCreateCommentGroup = async function(count) {
@@ -148,14 +148,14 @@ exports.tryCreateCommentGroup = async function(count) {
     const unusedAccountsCount = await exports.getUnusedAccountsCount();
     if (unusedAccountsCount < count) {
         logger.debug(`Пытаемся  создать группу с ${count} аккаунтов, но свободно только ${unusedAccountsCount}`);
-        return;
+        return {status: 'error', msg: 'Не хватает свободных аккаунтов'};
     }
 
     const unusedProxiesCount = await db.proxy.getUnusedProxiesCount();
     const needProxiesCount = Math.ceil(count / 10); // На 1 прокси приходится максимум 10 аккаунтов
     if (unusedProxiesCount < needProxiesCount) {
         logger.error(`Не хватает прокси (${unusedProxiesCount}) для создания набора из ${count} акк`);
-        return;
+        return {status: 'error', msg: 'Не хватает свободных прокси'};
     }
 
     const newGroupId = await exports.getFreeCommentId(count); // Получаем ID новой группы
@@ -181,6 +181,7 @@ exports.tryCreateCommentGroup = async function(count) {
 
     logger.debug(`Добавляем информацию о новой группе ${newGroupId}`);
     exports.addNewGroup(newGroupId);
+    return {status: 'success'};
 };
 
 /**
@@ -200,8 +201,74 @@ exports.removeGroupForComment = async function(group_id) {
 };
 
 /**
+ * Убираем аккаунты из набора, предназначенного для лайков
+ * 1. Получаем количество аккаунтов на каждом прокси
+ * 2. ${account_count} раз ищем прокси с максимальным кол-вом акк
+ *    Удаляем акк с найденым прокси
+ *
+ * @param {Number} account_count - количество аккаунтов
+ */
+exports.removeAccountsFromLikeGroup = async function(account_count) {
+    const proxies = await db.proxy.getProxiesInGroupWithAccountCount(GROUP_ID.LIKE);
+
+    for (let i = 0; i < account_count; i++) {
+        let max_proxy_id = 0; // Id прокси с максимальным кол-вом акк на прокси
+        let max_account_count = 0;
+
+        Object.entries(proxies).forEach(([proxy_id, account_count]) => {
+            if (account_count > max_account_count) {
+                max_account_count = account_count;
+                max_proxy_id = proxy_id;
+            }
+        });
+
+        logger.debug(`Убираем один аккаунт из набора лайков. У которого proxy_id = ${max_proxy_id} (На прокси висит ${proxies[max_proxy_id]} акк)`);
+        proxies[max_proxy_id]--;
+
+        const sql = `UPDATE account_vk
+            SET account_vk.group = ${GROUP_ID.UNUSED}, proxy_id = 0
+            WHERE status = 'active' AND account_vk.group = ${GROUP_ID.LIKE} AND proxy_id = ${max_proxy_id}
+            LIMIT 1`;
+        await db.async_query(sql);
+    }
+};
+
+exports.addAccountsToLikesGroup = async function(account_count) {
+    const unusedAccountsCount = await exports.getUnusedAccountsCount();
+
+    if (unusedAccountsCount < account_count) {
+        logger.debug(`Не хватает аккаунтов для добавления в набор, предназначенный для лайков (Есть ${unusedAccountsCount}, а нужно ${account_count})`);
+        return {status: 'error', msg: 'Не хватает свободных аккаунтов'};
+    }
+
+    const accounts = await exports.getUnusedAccounts(account_count);
+    const proxies  = await db.proxy.getProxiesInGroupWithAccountCount(GROUP_ID.LIKE);
+
+    logger.debug(`Начинаем добавлять ${account_count} в набор для лайков`);
+    for (let account of accounts) {
+        logger.info(`Добавили ${account.user_id} акк в набор ${GROUP_ID.LIKE}`);
+        await exports.setAccountGroup(account.user_id, GROUP_ID.LIKE);
+
+        let min_proxy_id = 0; // Id прокси с минимальным кол-вом акк на прокси
+        let min_account_count = Number.MAX_SAFE_INTEGER;
+
+        Object.entries(proxies).forEach(([proxy_id, account_count]) => {
+            if (account_count < min_account_count) {
+                min_account_count = account_count;
+                min_proxy_id = proxy_id;
+            }
+        });
+        proxies[min_proxy_id]++;
+
+        logger.info(`Установили прокси ${min_proxy_id} для ${account.user_id} акк`);
+        db.vk.setAccountProxyId(account.user_id, min_proxy_id);
+    }
+    return {status: 'success'};
+};
+
+/**
  * Обновляем все наборы аккаунтов
- * 
+ *
  * Для всех наборов для комментирования запускаем функцию обновления набора
  */
 exports.updateAllCommentGroups = async function() {
@@ -209,7 +276,7 @@ exports.updateAllCommentGroups = async function() {
     for (let group of groups) {
         // Пропускаем неиспользуеммые аккаунты и набор для лайков
         if (group.id == GROUP_ID.UNUSED || group.id == GROUP_ID.LIKE) continue;
-    
+
         await exports.updateCommentGroup(group.id);
     }
 };
@@ -230,7 +297,7 @@ exports.updateCommentGroup = async function(group_id) {
     if (accountsInGroupCount < need) {
         logger.debug(`В наборе не хватает ${need - accountsInGroupCount} акк (сейчас ${accountsInGroupCount})`);
         const unusedAccountsCount = await exports.getUnusedAccountsCount();
-        
+
         // Если после добавления аккаунтов в наборе все-равно будет слишком мало аккаунтов - удаляем группу
         if (accountsInGroupCount + unusedAccountsCount < need * 0.8) {
             logger.info(`Не хватает акк для добавления в набор ${group_id}. Свободно только ${unusedAccountsCount} акк`);
@@ -241,26 +308,26 @@ exports.updateCommentGroup = async function(group_id) {
         const accounts = await exports.getUnusedAccounts(need - accountsInGroupCount);
         const proxies  = await db.proxy.getProxiesInGroupWithAccountCount(group_id);
 
-
         for (let account of accounts) {
             logger.info(`Добавили ${account.user_id} акк в набор ${group_id}`);
             await exports.setAccountGroup(account.user_id, group_id);
 
-            let proxy_index = 0; // Индекс прокси в массиве с наименьшим кол-вом аккаунтов
-            let min_count = proxies[0].account_count;
-            proxies.forEach((proxy, index) => {
-                if (proxy.account_count < min_count) {
-                    min_count = proxy.account_count;
-                    proxy_index = index;
+            let min_proxy_id = 0; // Id прокси с минимальным кол-вом акк на прокси
+            let min_account_count = Number.MAX_SAFE_INTEGER;
+
+            Object.entries(proxies).forEach(([proxy_id, account_count]) => {
+                if (account_count < min_account_count) {
+                    min_account_count = account_count;
+                    min_proxy_id = proxy_id;
                 }
             });
-            proxies[proxy_index].account_count++;
+            proxies[min_proxy_id]++;
 
-            logger.info(`Установили прокси ${proxies[proxy_index].id} для ${account.user_id} акк`);
-            db.vk.setAccountProxyId(account.user_id, proxies[proxy_index].id);
+            logger.info(`Установили прокси ${min_proxy_id} для ${account.user_id} акк`);
+            db.vk.setAccountProxyId(account.user_id, min_proxy_id);
         }
     }
-
+    logger.debug(`Обновления набора ${group_id} завершено`);
 };
 
 /**

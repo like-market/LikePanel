@@ -68,11 +68,9 @@ Date.prototype.toMySQL = function() {
 	return result;
 }
 
-/*
 Object.prototype.parseSqlResult = function () {
-    return JSON.parse(JSON.stringify(this))
-}
-*/
+    return JSON.parse(JSON.stringify(this));
+};
 
 /**
  * Проверяем наличие всех параметров в теле запроса

@@ -3,7 +3,7 @@ const db = require('./index.js');
 
 const PROXY_ID = {
     UNUSED: 0
-}
+};
 
 /**
  * Получаем все прокси
@@ -78,8 +78,6 @@ exports.getRandom = function() {
 	})
 }
 
-
-
 /**
  * Получаем количество нераспользуемых прокси
  */
@@ -112,16 +110,26 @@ exports.getProxiesInGroup = async function(group_id) {
 /**
  * Получаем прокси, назначенные набору аккаунтов с количеством аккаунтов на каждом прокси
  * @param  {Number} group_id - id набора аккаунтов
- * @return {Array} Массив из данных о прокси: id, group, ip, port, login, password, account_count
+ * @return {Object} Массив из данных о прокси: { proxy_id: account_count }
  */
 exports.getProxiesInGroupWithAccountCount = async function(group_id) {
-    const sql = `SELECT proxy.*, COUNT(account_vk.id) as account_count
-		FROM likepanel.proxy
-		LEFT OUTER JOIN likepanel.account_vk ON account_vk.proxy_id = proxy.id
-		WHERE proxy.group = ${group_id}
-		GROUP BY proxy.id`;
-    const result = await db.async_query(sql);
-    return JSON.parse(JSON.stringify(result));
+    const proxies = await exports.getProxiesInGroup(group_id);
+
+    const sql = `SELECT COUNT(account_vk.id) as account_count, proxy_id
+	  	         FROM likepanel.account_vk
+		         WHERE account_vk.status = 'active' AND account_vk.group = ${group_id}
+		         GROUP BY proxy_id`;
+    const counts = await db.async_query(sql);
+
+    let result = {};
+    for (let proxy of proxies) {
+        result[proxy.id] = 0;
+    }
+    for (let count of counts) {
+        result[count.proxy_id] = count.account_count;
+    }
+
+    return result;
 };
 
 /**

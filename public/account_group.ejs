@@ -59,9 +59,9 @@
                     <hr>
                 </div>
             </div>
-            
+
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-8 col col-sm-12">
                     <div class="panel panel-filled">
                         <div class="panel-body">
                             <table class="table table-vertical-align-middle table-striped table-hover">
@@ -71,6 +71,7 @@
                                         <th>Тип</th>
                                         <th>Акк в наборе</th>
                                         <th>Последнее использование</th>
+                                        <th>Действия</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -80,14 +81,32 @@
                                         <td><%= group.comment %></td>
                                         <td><%= group.account_count %></td>
                                         <td><%= group.last_used %></td>
+                                        <td>
+                                            <button onclick="removeGroup(<%= group.id %>)" class="btn btn-danger btn-xs"><i class="fa fa-folder"></i>Удалить</button>
+                                        </td>
                                     </tr>
                                 <% }) %>
                                 </tbody>
                             </table>
-
                         </div>
                     </div>
-                </div>   
+                </div>
+                <div class="col-md-4 col col-sm-6">
+                    <div class="panel panel-filled">
+                        <div class="panel-body buttons-margin">
+                            <button onclick="createGroup(25)" type="button" class="btn btn-info">Создать набор из 25 акк</button>
+                            <button onclick="createGroup(50)" type="button" class="btn btn-accent">Создать набор из 50 акк</button>
+
+
+                            <div style="margin-top: 10px;">
+                                <label for="account_count">Набор для лайков</label>
+                                <input id="account_count" type="number" class="form-control" placeholder="" min="0">
+                                <button onclick="addAccountsToLikeGroup()" type="button" class="btn btn-accent">Добавить</button>
+                                <button onclick="removeAccountsFromLikeGroup()" type="button" class="btn btn-accent">Убрать</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -105,6 +124,7 @@
 
 <!-- App scripts -->
 <script src="scripts\luna.js"></script>
+<script src="scripts\account_group.js"></script>
 
 </body>
 

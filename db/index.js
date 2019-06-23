@@ -39,7 +39,8 @@ exports.async_query = function(query) {
                 reject(err);
             }
 
-            resolve(rows);
+            if (rows === undefined) resolve(undefined);
+            else resolve(rows.parseSqlResult());
         });
     });
 };

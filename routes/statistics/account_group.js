@@ -25,4 +25,52 @@ router.get('/', async function(req, res){
     });
 });
 
+/**
+ * Запрос на создание нового набора аккаунтов
+ * @body {Number} count - количество аккаунтов в наборе
+ */
+router.post('/create_group', async function(req, res) {
+    if (!req.isAuthenticated()) return res.redirect('/login');
+    if (!req.user.admin) return res.redirect('/panel');
+
+    const result = await db.accounts_group.tryCreateCommentGroup(req.body.count);
+    res.send(result);
+});
+
+/**
+ * Запрос на удаление набора аккаунтов
+ * @body {Number} group_id - id набора аккаунтов
+ */
+router.post('/remove_group', async function(req, res) {
+    if (!req.isAuthenticated()) return res.redirect('/login');
+    if (!req.user.admin) return res.redirect('/panel');
+
+    db.accounts_group.removeGroupForComment(req.body.group_id);
+    res.send('ok');
+});
+
+/**
+ * Запрос на добавление аккаунтов в набор для лайков
+ * @body {Number} account_count - количество аккаунтов
+ */
+router.post('/add_account_to_like_group', async function(req, res) {
+    if (!req.isAuthenticated()) return res.redirect('/login');
+    if (!req.user.admin) return res.redirect('/panel');
+
+    const result = await db.accounts_group.addAccountsToLikesGroup(req.body.account_count);
+    res.send(result);
+});
+
+/**
+ * Запрос на удаление аккаунтов из набора для лайков
+ * @body {Number} account_count - количество аккаунтов
+ */
+router.post('/remove_account_from_like_group', async function(req, res) {
+    if (!req.isAuthenticated()) return res.redirect('/login');
+    if (!req.user.admin) return res.redirect('/panel');
+
+    db.accounts_group.removeAccountsFromLikeGroup(req.body.account_count);
+    res.send('ok');
+});
+
 module.exports = router;
